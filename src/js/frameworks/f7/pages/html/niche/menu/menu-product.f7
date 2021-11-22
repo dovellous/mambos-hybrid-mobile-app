@@ -1,0 +1,219 @@
+<template>
+    <div class="page">
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner sliding">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title">${productData.product_name}</div>
+            </div>
+        </div>
+        <div class="page-content">
+
+            <div class="card card-expandable" style="height: 66vw;">
+                <div class="card-content">
+                    <div class="bg-color-yellow" style="height: 66vw; ">
+                        <img src="https://mamboschicken.com/uploads/products/food-1024/MBS-CKN-020.jpg" width="100%" />
+                    </div>
+                    <div class="card-content-padding">
+
+                        <div class="appstore-block-title block-title no-hairline app-details-block app-details-block-title">
+                            <span>${productData.product_name}</span>
+                            <a class="link" href="#"><strong>Price: USD ${productData.gaap_forex_price}</strong></a>
+                        </div>
+                        <div>
+                            <small>${productData.gaap_department_name} : ${productData.product_code}</small>
+                        </div>
+                        <div class="block app-description app-details-block">
+                            <div class="app-description-content">
+                                <div class="app-description-text">
+                                    ${productData.product_description}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="app-props app-details-block">
+                            <div class="app-props-wrap">
+                                <div class="app-props-item">
+                                    <div class="app-props-item-title">930 Ratings</div>
+                                    <div class="app-props-item-value">4.9</div>
+                                    <div class="app-props-item-label">
+                                        <div class="rating-stars">
+                                            <i class="icon f7-icons">star_fill</i>
+                                            <i class="icon f7-icons">star_fill</i>
+                                            <i class="icon f7-icons">star_fill</i>
+                                            <i class="icon f7-icons">star_fill</i>
+                                            <i class="icon f7-icons">star_lefthalf_fill</i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="app-props-item">
+                                    <div class="app-props-item-title">Prep</div>
+                                    <div class="app-props-item-value"><i class="f7-icons">clock</i></div>
+                                    <div class="app-props-item-label">13min</div>
+                                </div>
+                                <div class="app-props-item">
+                                    <div class="app-props-item-title">Carbs</div>
+                                    <div class="app-props-item-value"><i class="f7-icons">flame_fill</i></div>
+                                    <div class="app-props-item-label">56g</div>
+                                </div>
+                                <div class="app-props-item">
+                                    <div class="app-props-item-title">Fats</div>
+                                    <div class="app-props-item-value"><i class="f7-icons">drop</i></div>
+                                    <div class="app-props-item-label">32g</div>
+                                </div>
+                                <div class="app-props-item">
+                                    <div class="app-props-item-title">Proteins</div>
+                                    <div class="app-props-item-value"><i class="f7-icons">person_alt</i></div>
+                                    <div class="app-props-item-label">64g</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="appstore-block-title block-title no-hairline app-details-block app-details-block-title">
+                            <span>Ratings & Reviews</span>
+                            <a class="link" href="#">See All</a>
+                        </div>
+                        <div class="block app-reviews app-details-block">
+                            <div class="app-review">
+                                <div class="app-review-header">
+                                    <span><b>John</b></span><span>2d ago</span>
+                                </div>
+                                <div class="app-review-header">
+                                    <div class="rating-stars">
+                                        <i class="icon f7-icons">star_fill</i>
+                                        <i class="icon f7-icons">star_fill</i>
+                                        <i class="icon f7-icons">star_fill</i>
+                                        <i class="icon f7-icons">star_fill</i>
+                                        <i class="icon f7-icons">star_fill</i>
+                                    </div>
+                                </div>
+                                <div class="app-review-text">
+                                    ${productData.product_description}
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="block block-strong inset ">
+                <div class="appstore-block-title block-title no-hairline app-details-block app-details-block-title" style="padding: 0">
+                    <span>${productData.product_name}</span>
+                    <a class="link" href="#"><strong>USD ${productData.gaap_forex_price}</strong></a>
+                </div>
+                <p>${productData.product_description}</p>
+            </div>
+
+            <div class="block block-strong inset row margin-top">
+                <div class="col">
+                    <button class="button button-large button-raised">
+                        Add Addons
+                    </button>
+                </div>
+                <div class="col">
+                    <button class="button button-large button-raised">
+                        Add Sides
+                    </button>
+                </div>
+            </div>
+
+            <div class="block block-strong inset row margin-top">
+                <div class="col">
+                    <div class="stepper stepper-raised stepper-large stepper-init order-now">
+                        <div class="stepper-button-minus"></div>
+                        <div class="stepper-input-wrap">
+                            <input type="text" min="0" max="100" step="1" value="0" readonly="" class="" @input="${updateProductDataQuantity}" />
+                        </div>
+                        <div class="stepper-button-plus"></div>
+                    </div>
+                    <p>
+                        <code>Subtotal: USD ${(parseFloat(productData.gaap_forex_price) * productDataQuantity).toFixed(2)} (incl. VAT)</code>
+                    </p>
+                </div>
+            </div>
+
+            <div class="block block-strong inset row margin-top">
+                <div class="col">
+                    <button class="button button-large button-fill button-raised">
+                        Add To Cart
+                    </button>
+                </div>
+            </div>
+
+            <div class="block block-strong inset row margin-top" style="margin-bottom: auto;">
+                <div class="col"></div>
+            </div>
+
+        </div>
+    </div>
+</template>
+<script>
+
+import konstants from '../../../../libs/constants.js';
+
+import helper from '../../../../libs/helper.js';
+
+import images from "../../../../libs/images";
+
+export default (props, {$f7ready, $f7, $f7route, $on, $update, $store}) => {
+
+    let productData = {};
+
+    let productDataQuantity;
+
+    const updateProductDataQuantity = function(e){
+        productDataQuantity = e.target.value;
+        $update();
+    };
+
+    $on('pageMounted', (e, page) => {
+
+        console.log('page mounted');
+
+        const productsDataObject = $store.getters.productsMenu.value;
+
+        console.log(':: productsDataObject ::', productsDataObject, $f7route.params);
+
+        productData = productsDataObject[$f7route.params.categorySlug]["products"][$f7route.params.productGAAPCODE]
+
+        console.log(':: productData ::', productData);
+
+        productDataQuantity = 1;
+
+        $f7.preloader.show();
+
+        $update();
+
+    });
+
+    $on('pageInit', (e, page) => {
+        console.log('page init');
+        $f7.preloader.hide();
+    });
+    $on('pageBeforeIn', (e, page) => {
+        console.log('page before in');
+    });
+    $on('pageAfterIn', (e, page) => {
+        console.log('page after in');
+    });
+    $on('pageBeforeOut', (e, page) => {
+        console.log('page before out');
+    });
+    $on('pageAfterOut', (e, page) => {
+        console.log('page after out');
+    });
+    $on('pageBeforeUnmount', (e, page) => {
+        console.log('page before unmount');
+    });
+    $on('pageBeforeRemove', (e, page) => {
+        console.log('page before remove');
+    });
+
+    return $render;
+
+};
+</script>

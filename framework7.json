@@ -1,0 +1,28 @@
+{
+  "cwd": "/Volumes/FreecomAD 1/Applications/git/com.mamboschicken.app.android",
+  "type": [
+    "web",
+    "pwa",
+    "capacitor"
+  ],
+  "name": "Mambo's Chicken",
+  "framework": "core",
+  "template": "tabs",
+  "bundler": "vite",
+  "cssPreProcessor": "scss",
+  "theming": {
+    "customColor": true,
+    "color": "#dd0000",
+    "darkTheme": false,
+    "iconFonts": true,
+    "fillBars": false
+  },
+  "customBuild": false,
+  "pkg": "com.mamboschicken.app",
+  "capacitor": {
+    "platforms": [
+      "ios",
+      "android"
+    ]
+  }
+}

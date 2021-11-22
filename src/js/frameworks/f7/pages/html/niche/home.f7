@@ -1,0 +1,398 @@
+<template>
+    <div class="page" data-name="home">
+        <!-- Top Navbar -->
+        <div class="navbar navbar-large">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link icon-only panel-open" data-panel="left">
+                        <i class="icon f7-icons if-not-md">menu</i>
+                        <i class="icon material-icons if-md">menu</i>
+                    </a>
+                </div>
+                <div class="title sliding">Mambo's Chicken</div>
+                <div class="right">
+                    <a href="#" class="link icon-only panel-open" data-panel="right">
+                        <i class="icon f7-icons if-not-md">menu</i>
+                        <i class="icon material-icons if-md">menu</i>
+                    </a>
+                </div>
+                <div class="title-large">
+                    <div class="title-large-text text-align-center" >
+                        <img src="${images.logo}" style="height: 36px;"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scrollable page content-->
+        <div class="page-content">
+
+            <div class="searchbar-backdrop"></div>
+            <form class="searchbar">
+                <div class="searchbar-inner">
+                    <div class="searchbar-input-wrap">
+                        <input type="search" placeholder="Search" />
+                        <i class="searchbar-icon"></i>
+                        <span class="input-clear-button"></span>
+                    </div>
+                    <span class="searchbar-disable-button">Cancel</span>
+                </div>
+            </form>
+
+            ${searchState === 2 && $h`
+
+            <div class="list media-list recipes-list no-chevron">
+                <ul>
+                    ${Array.from({
+                    length: 10 + Math.round(Math.random() * 20)
+                    }).map((item, index) => $h`
+                    <li>
+                        <div class="item-content item-link">
+                            <div class="item-media">
+                                <div class=""></div>
+                            </div>
+                            <div class="item-inner">
+                                <div class="item-title-row"><div class="item-title">aaaaaaaaaaaaaaaaaaaaaaaa</div></div>
+                                <div class="item-text item-badges">
+                                    <div class="item-badge"></div>
+                                    <div class="item-badge"></div>
+                                    <div class="item-badge"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    `)}
+                </ul>
+            </div>
+
+            `}
+
+            ${searchState === 1 && $h`
+
+            <div class="list media-list recipes-list no-chevron skeleton-effect-wave">
+                <ul>
+                    ${Array.from({
+                    length: 10 + Math.round(Math.random() * 20)
+                    }).map((item, index) => $h`
+                    <li>
+                        <div class="item-content item-link">
+                            <div class="item-media"><div class="skeleton-block"></div></div>
+                            <div class="item-inner">
+                                <div class="item-title-row"><div class="item-title skeleton-text">aaaaaaaaaaaaaaaaaaaaaaaa</div></div>
+                                <div class="item-text item-badges">
+                                    <div class="item-badge skeleton-block"></div>
+                                    <div class="item-badge skeleton-block"></div>
+                                    <div class="item-badge skeleton-block"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    `)}
+                </ul>
+            </div>
+
+            `}
+
+            ${searchState === 0 && $h`
+
+            <div class="block-title block-title-medium">Today's Fresh Recipes</div>
+            <div class="block fresh-recipes scroll-block">
+                <a href="#" class="fresh-recipes-item scroll-block-item">
+                    <img src="https://www.edamam.com/web-img/859/85985d3317060f565f3fe1652ac4fac5.jpg"
+                         alt="Asian-Style Flank Steak"/>
+                    <div class="fresh-recipes-item-content">
+                        <div class="fresh-recipes-item-badges">
+                            <div><i class="icon f7-icons ios-only">flame_fill</i><span>1510</span></div>
+                            <div><i class="icon f7-icons ios-only">person_2_fill</i><span>4</span></div>
+                        </div>
+                        <div class="fresh-recipes-item-title">Asian-Style Flank Steak</div>
+                    </div>
+                </a>
+                <a href="#" class="fresh-recipes-item scroll-block-item">
+                    <img src="https://www.edamam.com/web-img/16b/16b9bc85d1496ac27737ebcf43b12cdd.jpg"
+                         alt="Shrimp Soup Dumplings"/>
+                    <div class="fresh-recipes-item-content">
+                        <div class="fresh-recipes-item-badges">
+                            <div><i class="icon f7-icons ios-only">flame_fill</i><span>5667</span></div>
+                            <div><i class="icon f7-icons ios-only">person_2_fill</i><span>20</span></div>
+                        </div>
+                        <div class="fresh-recipes-item-title">Shrimp Soup Dumplings</div>
+                    </div>
+                </a>
+                <a href="#" class="fresh-recipes-item scroll-block-item">
+                    <img src="https://www.edamam.com/web-img/456/456276877634874082240ae71a25038e.jpg"
+                         alt="Slow-Roasted Balsamic-Glazed Duck"/>
+                    <div class="fresh-recipes-item-content">
+                        <div class="fresh-recipes-item-badges">
+                            <div><i class="icon f7-icons ios-only">flame_fill</i><span>14160</span></div>
+                            <div><i class="icon f7-icons ios-only">person_2_fill</i><span>8</span></div>
+                            <div><i class="icon f7-icons ios-only">timer</i><span>518</span></div>
+                        </div>
+                        <div class="fresh-recipes-item-title">Slow-Roasted Balsamic-Glazed Duck</div>
+                    </div>
+                </a>
+                <a href="#" class="fresh-recipes-item scroll-block-item">
+                    <img src="https://www.edamam.com/web-img/6a5/6a51fa785a95a820ca8c089042555387.jpg"
+                         alt="Texas-Style Smoked Brisket"/>
+                    <div class="fresh-recipes-item-content">
+                        <div class="fresh-recipes-item-badges">
+                            <div><i class="icon f7-icons ios-only">flame_fill</i><span>13863</span></div>
+                            <div><i class="icon f7-icons ios-only">person_2_fill</i><span>12</span></div>
+                        </div>
+                        <div class="fresh-recipes-item-title">Texas-Style Smoked Brisket</div>
+                    </div>
+                </a>
+                <a href="#" class="fresh-recipes-item scroll-block-item">
+                    <img src="https://www.edamam.com/web-img/d4c/d4c3a4f1db4e8c413301ae1f324cf32a.jpg"
+                         alt="Strawberry Cheesecake Parfaits"/>
+                    <div class="fresh-recipes-item-content">
+                        <div class="fresh-recipes-item-badges">
+                            <div><i class="icon f7-icons ios-only">flame_fill</i><span>3883</span></div>
+                            <div><i class="icon f7-icons ios-only">person_2_fill</i><span>14</span></div>
+                            <div><i class="icon f7-icons ios-only">timer</i><span>246</span></div>
+                        </div>
+                        <div class="fresh-recipes-item-title">Strawberry Cheesecake Parfaits</div>
+                    </div>
+                </a>
+                <a href="#" class="fresh-recipes-item scroll-block-item">
+                    <img src="https://www.edamam.com/web-img/b81/b81cc137d04448242202c171a2a4ca86.jpg"
+                         alt="Smoked Salmon Salad Sandwich"/>
+                    <div class="fresh-recipes-item-content">
+                        <div class="fresh-recipes-item-badges">
+                            <div><i class="icon f7-icons ios-only">flame_fill</i><span>1358</span></div>
+                            <div><i class="icon f7-icons ios-only">person_2_fill</i><span>4</span></div>
+                            <div><i class="icon f7-icons ios-only">timer</i><span>20</span></div>
+                        </div>
+                        <div class="fresh-recipes-item-title">Smoked Salmon Salad Sandwich</div>
+                    </div>
+                </a>
+            </div>
+            <div class="block-title block-title-medium">Popular Recipes</div>
+            <div class="block popular-recipes scroll-block">
+                <a href="#" class="popular-recipes-item scroll-block-item">
+                    <img src="https://www.edamam.com/web-img/089/089a7ab54f52d79eb2da05c0c20e0333.jpg"
+                         alt="Chocolate Cake For Cupcake Pops"/>
+                    <div class="popular-recipes-item-badges">
+                        <div><i class="icon f7-icons ios-only">flame_fill</i><span>6062</span></div>
+                        <div><i class="icon f7-icons ios-only">person_2_fill</i><span>18</span></div>
+                    </div>
+                    <div class="popular-recipes-item-title">Chocolate Cake For Cupcake Pops</div>
+                </a>
+                <a href="#" class="popular-recipes-item scroll-block-item">
+                    <img src="https://www.edamam.com/web-img/d9d/d9dd4def0e806fd0432e7ccc7623b594.jpg"
+                         alt="Nigiri Sushi"/>
+                    <div class="popular-recipes-item-badges">
+                        <div><i class="icon f7-icons ios-only">flame_fill</i><span>2511</span></div>
+                        <div><i class="icon f7-icons ios-only">person_2_fill</i><span>6</span></div>
+                    </div>
+                    <div class="popular-recipes-item-title">Nigiri Sushi</div>
+                </a>
+                <a href="#" class="popular-recipes-item scroll-block-item">
+                    <img src="https://www.edamam.com/web-img/2d1/2d1770d49a37ccc618c0780c2abcf2b9.jpg"
+                         alt="Kimchi Pasta"/>
+                    <div class="popular-recipes-item-badges">
+                        <div><i class="icon f7-icons ios-only">flame_fill</i><span>1166</span></div>
+                        <div><i class="icon f7-icons ios-only">person_2_fill</i><span>6</span></div>
+                    </div>
+                    <div class="popular-recipes-item-title">Kimchi Pasta</div>
+                </a>
+                <a href="#" class="popular-recipes-item scroll-block-item">
+                    <img src="https://www.edamam.com/web-img/1aa/1aa45736abb04ebd2f92ed5eba261137"
+                         alt="Rainbow Veggie Pizza"/>
+                    <div class="popular-recipes-item-badges">
+                        <div><i class="icon f7-icons ios-only">flame_fill</i><span>2292</span></div>
+                        <div><i class="icon f7-icons ios-only">person_2_fill</i><span>6</span></div>
+                        <div><i class="icon f7-icons ios-only">timer</i><span>55</span></div>
+                    </div>
+                    <div class="popular-recipes-item-title">Rainbow Veggie Pizza</div>
+                </a>
+                <a href="#" class="popular-recipes-item scroll-block-item">
+                    <img src="https://www.edamam.com/web-img/a00/a005b69bf0a3e80f439ef1bfc3138299.jpg" alt="Plov"/>
+                    <div class="popular-recipes-item-badges">
+                        <div><i class="icon f7-icons ios-only">flame_fill</i><span>4519</span></div>
+                        <div><i class="icon f7-icons ios-only">person_2_fill</i><span>6</span></div>
+                    </div>
+                    <div class="popular-recipes-item-title">Plov</div>
+                </a>
+                <a href="#" class="popular-recipes-item scroll-block-item">
+                    <img src="https://www.edamam.com/web-img/3af/3afbb8738b090741ac5640b62ece9cd9.jpg"
+                         alt="Russian Borsh/Borsch"/>
+                    <div class="popular-recipes-item-badges">
+                        <div><i class="icon f7-icons ios-only">flame_fill</i><span>2082</span></div>
+                        <div><i class="icon f7-icons ios-only">person_2_fill</i><span>8</span></div>
+                        <div><i class="icon f7-icons ios-only">timer</i><span>210</span></div>
+                    </div>
+                    <div class="popular-recipes-item-title">Russian Borsh/Borsch</div>
+                </a>
+            </div>
+            <div class="block-title block-title-medium">Recent Recipes</div>
+            <div class="block recent-recipes scroll-block">
+                <a href="#" class="recent-recipes-item scroll-block-item">
+                    <img src="https://www.edamam.com/web-img/16b/16b9bc85d1496ac27737ebcf43b12cdd.jpg"
+                         alt="Shrimp Soup Dumplings"/>
+                    <div class="recent-recipes-item-title">Shrimp Soup Dumplings</div>
+                </a>
+                <a href="#" class="recent-recipes-item scroll-block-item">
+                    <img src="https://www.edamam.com/web-img/a00/a005b69bf0a3e80f439ef1bfc3138299.jpg" alt="Plov"/>
+                    <div class="recent-recipes-item-title">Plov</div>
+                </a>
+            </div>
+
+            <div class="block-title">Panels</div>
+            <div class="block block-strong">
+                <div class="row">
+                    <div class="col-50">
+                        <a href="#" class="button button-raised button-fill panel-open" data-panel="left">Left
+                            Panel</a>
+                    </div>
+                    <div class="col-50">
+                        <a href="#" class="button button-raised button-fill panel-open" data-panel="right">Right
+                            Panel</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="list links-list">
+                <ul>
+                    <li>
+                        <a href="/dynamic-route/blog/45/post/125/?foo=bar#about">Dynamic (Component) Route</a>
+                    </li>
+                    <li>
+                        <a href="/load-something-that-doesnt-exist/">Default Route (404)</a>
+                    </li>
+                    <li>
+                        <a href="/request-and-load/user/123456/">Request Data & Load</a>
+                    </li>
+                </ul>
+            </div>
+
+            `}
+
+        </div>
+    </div>
+</template>
+<script>
+
+    import konstants from '../../../libs/constants.js';
+
+    import helper from '../../../libs/helper.js';
+
+    import images from "../../../libs/images";
+
+    export default (props, {$f7ready, $f7, $f7route, $on, $update, $store}) => {
+
+        let searchState =  0;
+
+        let searchbar;
+
+        const createSearchbar = () => {
+
+            searchbar = $f7.searchbar.create({
+                el: '.searchbar',
+                searchContainer: '.list',
+                searchIn: '.item-title',
+
+                on: {
+                    enable(sb) {
+
+                        searchState = 2;
+
+                        $update();
+
+                        console.log(sb);
+                    },
+                    disable(sb) {
+
+                        searchState = 0;
+
+                        $update();
+
+                        console.log(sb);
+                    },
+                    search(sb, query, previousQuery) {
+
+                        searchState = 1;
+
+                        $update();
+
+                        console.log(query, previousQuery);
+                    },
+                    clear(sb) {
+
+                        searchState = 0;
+
+                        $update();
+
+                        console.log(sb);
+                    },
+                }
+            });
+        };
+
+        const destroySearchbar = () => {
+            searchbar.destroy();
+        };
+
+        let isStyled = false;
+
+        $on('pageMounted', (e, page) => {
+
+            console.log('page init');
+
+            if (!isStyled) {
+
+                jQuery("style").each(function (a, b) {
+                    if (a > 4) {
+                        jQuery(b).remove();
+                    }
+                });
+
+                setTimeout(function () {
+                    jQuery("body").append(
+                        `
+                    <style id="theme-color" ></style>
+                    <style id="theme-color-fill" ></style>
+                    `
+                    );
+                }, 1000);
+
+                isStyled = true;
+
+            }
+
+            console.log('page mounted ***');
+
+            createSearchbar();
+
+            $f7.preloader.show();
+
+        });
+
+        $on('pageInit', (e, page) => {
+            console.log('page init');
+        });
+        $on('pageBeforeIn', (e, page) => {
+            console.log('page before in');
+        });
+        $on('pageAfterIn', (e, page) => {
+            console.log('page after in');
+        });
+        $on('pageBeforeOut', (e, page) => {
+            console.log('page before out');
+        });
+        $on('pageAfterOut', (e, page) => {
+            console.log('page after out');
+        });
+        $on('pageBeforeUnmount', (e, page) => {
+            console.log('page before unmount');
+            destroySearchbar();
+        });
+        $on('pageBeforeRemove', (e, page) => {
+            console.log('page before remove');
+        });
+
+        return $render;
+
+    };
+</script>

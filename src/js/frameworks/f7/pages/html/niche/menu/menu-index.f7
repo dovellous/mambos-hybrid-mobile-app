@@ -1,0 +1,277 @@
+<template>
+  <div class="appstore-page page page-current page-with-navbar-large" data-name="home">
+    <!-- Top Navbar -->
+    <div class="navbar navbar-large">
+      <div class="navbar-bg"></div>
+      <div class="navbar-inner">
+        <div class="left">
+          <a href="#" class="link icon-only panel-open" data-panel="left">
+            <i class="icon f7-icons if-not-md">menu</i>
+            <i class="icon material-icons if-md">menu</i>
+          </a>
+        </div>
+        <div class="title sliding">Mambo's Menu</div>
+        <div class="right">
+          <a href="#" class="link icon-only panel-open" data-panel="right">
+            <i class="icon f7-icons if-not-md">menu</i>
+            <i class="icon material-icons if-md">menu</i>
+          </a>
+        </div>
+        <div class="title-large">
+          <div class="title-large-text text-align-center" >
+            <img src="${images.logo}" style="height: 36px;"/>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scrollable page content-->
+    <div class="page-content">
+
+      <div class="searchbar-backdrop"></div>
+      <form class="searchbar">
+        <div class="searchbar-inner">
+          <div class="searchbar-input-wrap">
+            <input type="search" placeholder="Search" />
+            <i class="searchbar-icon"></i>
+            <span class="input-clear-button"></span>
+          </div>
+          <span class="searchbar-disable-button">Cancel</span>
+        </div>
+      </form>
+
+      ${searchState === 2 && $h`
+
+      <div class="list media-list recipes-list no-chevron">
+        <ul>
+          ${Array.from({
+          length: 10 + Math.round(Math.random() * 20)
+          }).map((item, index) => $h`
+          <li>
+            <div class="item-content item-link">
+              <div class="item-media">
+                <div class=""></div>
+              </div>
+              <div class="item-inner">
+                <div class="item-title-row"><div class="item-title">aaaaaaaaaaaaaaaaaaaaaaaa</div></div>
+                <div class="item-text item-badges">
+                  <div class="item-badge"></div>
+                  <div class="item-badge"></div>
+                  <div class="item-badge"></div>
+                </div>
+              </div>
+            </div>
+          </li>
+          `)}
+        </ul>
+      </div>
+
+      `}
+
+      ${searchState === 1 && $h`
+
+      <div class="list media-list recipes-list no-chevron skeleton-effect-wave">
+        <ul>
+          ${Array.from({
+          length: 10 + Math.round(Math.random() * 20)
+          }).map((item, index) => $h`
+          <li>
+            <div class="item-content item-link">
+              <div class="item-media"><div class="skeleton-block"></div></div>
+              <div class="item-inner">
+                <div class="item-title-row"><div class="item-title skeleton-text">aaaaaaaaaaaaaaaaaaaaaaaa</div></div>
+                <div class="item-text item-badges">
+                  <div class="item-badge skeleton-block"></div>
+                  <div class="item-badge skeleton-block"></div>
+                  <div class="item-badge skeleton-block"></div>
+                </div>
+              </div>
+            </div>
+          </li>
+          `)}
+        </ul>
+      </div>
+
+      `}
+
+      ${searchState === 0 && $h`
+
+      ${helper.snippets.getArray($store.getters.productsMenu.value).map((item, index) => $h`
+
+      ${helper.snippets.getArray(item[1].products).length !== 0 ? $h`
+
+      <div class="block-title appstore-block-title">
+        <span>${item[1].category_name}</span>
+        <a class="link" href="#">See All</a>
+      </div>
+
+      <div class="apps-table-list apps-table-list-scrollable list no-hairlines no-chevron">
+        <ul>
+
+          ${ helper.snippets.getArray(item[1].products).map((product, productIndex) => $h`
+
+          <li class="">
+            <a class="item-link" href="/menu/${item[0]}/${productIndex}/${product[1].product_id}/${product[1].gaap_code}/">
+              <div class="item-content">
+                <div class="item-media">
+                  <img loading="lazy" class="apps-table-list-image" slot="media" src="https://mamboschicken.com/uploads/products/food-1024/MBS-CKN-020.jpg" alt="Slap Kings" />
+                </div>
+                <div class="item-inner">
+                  <div class="item-title">
+                    <div class="apps-table-list-title" slot="title">
+                      ${product[1].product_name}
+                    </div>
+                    <div class="apps-table-list-subtitle item-text" slot="title">
+                      ${product[1].product_description}
+                    </div>
+                  </div>
+                  <div class="apps-table-list-button" slot="inner">
+                    <button class="prevent-active-state-propagation button button-round" type="button">USD ${product[1].gaap_forex_price}</button>
+                    <span>${product[1].gaap_department_name}</span>
+                  </div>
+                </div>
+              </div>
+            </a>
+          </li>
+
+          `)}
+
+        </ul>
+      </div>
+
+      ` : $h`<!-- data-not-available="No Product for Category : ${item[0]}" -->`}
+
+      `)}
+
+      `}
+
+    </div>
+  </div>
+</template>
+<script>
+
+  import konstants from '../../../../libs/constants.js';
+
+  import helper from '../../../../libs/helper.js';
+
+  import images from "../../../../libs/images";
+
+  export default (props, {$f7ready, $f7, $f7route, $on, $update, $store}) => {
+
+    let searchState =  0;
+
+    let searchbar;
+
+    const createSearchbar = () => {
+
+      searchbar = $f7.searchbar.create({
+        el: '.searchbar',
+        searchContainer: '.list',
+        searchIn: '.item-title',
+
+        on: {
+          enable(sb) {
+
+            searchState = 2;
+
+            $update();
+
+            console.log(sb);
+          },
+          disable(sb) {
+
+            searchState = 0;
+
+            $update();
+
+            console.log(sb);
+          },
+          search(sb, query, previousQuery) {
+
+            searchState = 1;
+
+            $update();
+
+            console.log(query, previousQuery);
+          },
+          clear(sb) {
+
+            searchState = 0;
+
+            $update();
+
+            console.log(sb);
+          },
+        }
+      });
+    };
+
+    const destroySearchbar = () => {
+      searchbar.destroy();
+    };
+
+    let isStyled = false;
+
+    let productsMenuObject = [];
+
+    $on('pageMounted', (e, page) => {
+
+      console.log('page init');
+
+      if (!isStyled) {
+
+        jQuery("style").each(function (a, b) {
+          if (a > 4) {
+            jQuery(b).remove();
+          }
+        });
+
+        setTimeout(function () {
+          jQuery("body").append(
+                  `
+                    <style id="theme-color" ></style>
+                    <style id="theme-color-fill" ></style>
+                    `
+          );
+        }, 1000);
+
+        isStyled = true;
+
+      }
+
+      console.log('page mounted ***');
+
+      createSearchbar();
+
+      $f7.preloader.show();
+
+    });
+
+    $on('pageInit', (e, page) => {
+      console.log('page init');
+
+    });
+    $on('pageBeforeIn', (e, page) => {
+      console.log('page before in');
+    });
+    $on('pageAfterIn', (e, page) => {
+      console.log('page after in');
+    });
+    $on('pageBeforeOut', (e, page) => {
+      console.log('page before out');
+    });
+    $on('pageAfterOut', (e, page) => {
+      console.log('page after out');
+    });
+    $on('pageBeforeUnmount', (e, page) => {
+      console.log('page before unmount');
+      destroySearchbar();
+    });
+    $on('pageBeforeRemove', (e, page) => {
+      console.log('page before remove');
+    });
+
+    return $render;
+
+  };
+</script>
