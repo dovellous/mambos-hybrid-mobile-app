@@ -1,5 +1,6 @@
 <template>
     <div class="page">
+        <img src="https://mamboschicken.com/images/products/${productData.product_code}.jpg" width="100%" style="top: -200px; filter: blur(5rem);display: block;position: absolute;height: 75vh;mix-blend-mode: hard-light;opacity: 0.5;" />
         <div class="navbar">
             <div class="navbar-bg"></div>
             <div class="navbar-inner sliding">
@@ -10,14 +11,24 @@
                     </a>
                 </div>
                 <div class="title">${productData.product_name}</div>
+
+                <div class="right">
+                    <a class="link sheet-open" href="#" data-sheet=".my-sheet-swipe-to-close">
+                        <i class="icon f7-icons">map_pin_ellipse</i>
+                    </a>
+                    <a class="link popover-open" href="#" data-popover=".popover-links-set-currency">
+                        <i class="icon f7-icons">money_dollar_circle</i>
+                    </a>
+                </div>
+
             </div>
         </div>
         <div class="page-content">
 
-            <div class="card card-expandable" style="height: 66vw;">
+            <div class="card card-expandable" style="height: 75vw;">
                 <div class="card-content">
-                    <div class="bg-color-yellow" style="height: 66vw; ">
-                        <img src="https://mamboschicken.com/uploads/products/food-1024/MBS-CKN-020.jpg" width="100%" />
+                    <div class="bg-color-yellow" style="height: 100vw; ">
+                        <img class="lazy lazy-loaded lazy-fade-in" src="https://mamboschicken.com/images/products/${productData.product_code}.jpg" width="100%" />
                     </div>
                     <div class="card-content-padding">
 
@@ -149,6 +160,7 @@
             </div>
 
         </div>
+
     </div>
 </template>
 <script>

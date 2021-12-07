@@ -43,10 +43,11 @@ const store = createStore({
             auto_lock: [],
             currency: "USD",
             enable_2fa: [],
+            enable_fingerprint_auth: [],
             enable_dark_theme: [],
             enable_solid_theme: [],
             enable_color_theme: "THEME_LIGHT",
-            show_balances: ['on'],
+            auto_detect_device_theme: ['on'],
         },
         oauth: {
             accessToken: false,

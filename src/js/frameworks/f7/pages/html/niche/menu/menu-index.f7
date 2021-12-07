@@ -11,12 +11,16 @@
           </a>
         </div>
         <div class="title sliding">Mambo's Menu</div>
+
         <div class="right">
-          <a href="#" class="link icon-only panel-open" data-panel="right">
-            <i class="icon f7-icons if-not-md">menu</i>
-            <i class="icon material-icons if-md">menu</i>
+          <a class="link sheet-open" href="#" data-sheet=".my-sheet-swipe-to-close">
+            <i class="icon f7-icons">map_pin_ellipse</i>
+          </a>
+          <a class="link popover-open" href="#" data-popover=".popover-links-set-currency">
+            <i class="icon f7-icons">money_dollar_circle</i>
           </a>
         </div>
+
         <div class="title-large">
           <div class="title-large-text text-align-center" >
             <img src="${images.logo}" style="height: 36px;"/>
@@ -98,12 +102,20 @@
 
       ${helper.snippets.getArray($store.getters.productsMenu.value).map((item, index) => $h`
 
-      ${helper.snippets.getArray(item[1].products).length !== 0 ? $h`
+      ${helper.snippets.getArray(item[1].products).length !== 0 && $h`
+
+      <div class="block-title appstore-block-title" style=" margin-top: 0; ">
+        <img src=${products[item[1].category_slug]} style=" width: 100%; border-radius: 10px; " />
+      </div>
+
+      <!--
 
       <div class="block-title appstore-block-title">
         <span>${item[1].category_name}</span>
         <a class="link" href="#">See All</a>
       </div>
+
+      -->
 
       <div class="apps-table-list apps-table-list-scrollable list no-hairlines no-chevron">
         <ul>
@@ -114,11 +126,11 @@
             <a class="item-link" href="/menu/${item[0]}/${productIndex}/${product[1].product_id}/${product[1].gaap_code}/">
               <div class="item-content">
                 <div class="item-media">
-                  <img loading="lazy" class="apps-table-list-image" slot="media" src="https://mamboschicken.com/uploads/products/food-1024/MBS-CKN-020.jpg" alt="Slap Kings" />
+                  <img loading="lazy" class="apps-table-list-image " slot="media" src="https://mamboschicken.com/images/products/${product[1].product_code}.jpg" alt="Slap Kings" />
                 </div>
                 <div class="item-inner">
                   <div class="item-title">
-                    <div class="apps-table-list-title" slot="title">
+                    <div class="apps-table-list-title" slot="title" style="font-size: 15px; font-weight: 600;">
                       ${product[1].product_name}
                     </div>
                     <div class="apps-table-list-subtitle item-text" slot="title">
@@ -139,7 +151,7 @@
         </ul>
       </div>
 
-      ` : $h`<!-- data-not-available="No Product for Category : ${item[0]}" -->`}
+      `}
 
       `)}
 
@@ -161,6 +173,26 @@
     let searchState =  0;
 
     let searchbar;
+
+    let products = {
+      addons: images.addons,
+      beverages: images.beverages,
+      breakfast: images.breakfast,
+      burgers: images.burgers,
+      dessert: images.dessert,
+      "family-sharing": images.family_sharing,
+      grilled: images.grilled,
+      njano_rice: images.njano_rice,
+      others: images.others,
+      platters: images.platters,
+      promotions: images.promotions,
+      sadza: images.sadza,
+      salads: images.salads,
+      "staff-meal": images.staff_meal,
+      "value-meal": images.value_meal,
+      wings: images.wings,
+      wraps: images.wraps,
+    };
 
     const createSearchbar = () => {
 

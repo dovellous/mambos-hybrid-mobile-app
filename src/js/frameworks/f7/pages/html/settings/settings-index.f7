@@ -38,10 +38,10 @@
 						<li>
 							<div class="item-content">
 								<div class="item-inner">
-									<div class="item-title">Show my balances</div>
+									<div class="item-title">Auto-detect device theme</div>
 									<div class="item-after">
 										<label class="toggle toggle-init">
-											<input name="show_balances" type="checkbox" @input="${updateSettingsShowBalances}" />
+											<input name="auto_detect_device_theme" type="checkbox" @input="${updateSettingsAutoDetectDeviceTheme}" />
 											<span class="toggle-icon"></span>
 										</label>
 									</div>
@@ -156,6 +156,19 @@
 								</div>
 							</div>
 						</li>
+						<li>
+							<div class="item-content">
+								<div class="item-inner">
+									<div class="item-title">Enable fingerprint authentication</div>
+									<div class="item-after">
+										<label class="toggle toggle-init">
+											<input name="enable_fingerprint_auth" type="checkbox" @input="${updateSettingsEnableFingerprintAuth}" />
+											<span class="toggle-icon"></span>
+										</label>
+									</div>
+								</div>
+							</div>
+						</li>
 					</ul>
 				</div>
 				<div class="block-title">Currency</div>
@@ -193,12 +206,13 @@ export default (props, {$f7ready, $f7, $f7route, $on, $update, $store}) => {
     let isWeb = true;
 
     let settingsAllowPushNotifications = ['on'];
-    let settingsShowBalances = ['on'];
+    let settingsAutoDetectDeviceTheme = ['on'];
 	let settingsEnableDarkTheme = [];
 	let settingsEnableSolidTheme = [];
 	let settingsColorTheme = "THEME_LIGHT";
     let settingsAutoLock = [];
-    let settingsEnable2FA = [];
+	let settingsEnable2FA = [];
+	let settingsEnableFingerprintAuth = [];
     let settingsCurrency = 'USD';
 
     const updateSettingsAllowPushNotifications = function(e){
@@ -206,8 +220,8 @@ export default (props, {$f7ready, $f7, $f7route, $on, $update, $store}) => {
         $update();
     };
 
-    const updateSettingsShowBalances = function(e){
-        settingsShowBalances = e.target.value;
+    const updateSettingsAutoDetectDeviceTheme = function(e){
+        settingsAutoDetectDeviceTheme = e.target.value;
         $update();
     };
 
@@ -231,10 +245,15 @@ export default (props, {$f7ready, $f7, $f7route, $on, $update, $store}) => {
         $update();
     };
 
-    const updateSettingsEnable2FA = function(e){
-        settingsEnable2FA = e.target.value;
-        $update();
-    };
+	const updateSettingsEnable2FA = function(e){
+		settingsEnable2FA = e.target.value;
+		$update();
+	};
+
+	const updateSettingsEnableFingerprintAuth = function(e){
+		settingsEnableFingerprintAuth = e.target.value;
+		$update();
+	};
 
     const updateSettingsCurrency = function(e){
         settingsCurrency = e.target.value;

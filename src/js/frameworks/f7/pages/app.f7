@@ -303,7 +303,56 @@
                 </div>
             </div>
 
+
+            <div class="popover popover-links-set-currency" style="width: calc(var(--f7-popover-width) * 1.25) !important;">
+                <div class="popover-inner">
+                    <div class="list">
+                        <ul class="no-chevron">
+                            <li>
+                                <a class="item-link item-content">
+                                    <div class="item-media">
+                                        <img src="https://cdn.countryflags.com/thumbs/united-states-of-america/flag-square-500.png" width="24" style="border-radius:100%;" />
+                                    </div>
+                                    <div class="item-inner">
+                                        <div class="item-title">United States Dollars</div>
+                                        <div class="item-after">USD</div>
+                                    </div>
+                                </a>
+                            </li>
+                            <li>
+                                <a class="item-link item-content">
+                                    <div class="item-media">
+                                        <img src="https://cdn.countryflags.com/thumbs/zimbabwe/flag-square-500.png" width="24" style="border-radius:100%;" />
+                                    </div>
+                                    <div class="item-inner">
+                                        <div class="item-title">Zimbabwean Dollars</div>
+                                        <div class="item-after">ZWL
+                                            <i class="f7-icons" style="color: green;position: relative;top: -5px;font-size: 14px;right: 0px;">checkmark_alt_circle_fill</i>
+                                        </div>
+                                    </div>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
             </div>
+
+            <div class="sheet-modal my-sheet-swipe-to-close" style="height:auto; --f7-sheet-bg-color: #fff;">
+                <div class="sheet-modal-inner">
+                    <div class="page-content">
+                        <div class="block-title block-title-medium">Select Delivery Address</div>
+                        <div class="block">
+                            <p><b>Swipe me down to close</b></p>
+                            <p>Eaque maiores ducimus, impedit unde culpa qui, explicabo accusamus, non vero corporis voluptatibus
+                                similique odit ab. Quaerat quasi consectetur quidem libero? Repudiandae adipisci vel voluptatum, autem
+                                libero minus dignissimos repellat.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
 
         </template>
 
@@ -511,10 +560,11 @@ export default (props, {$f7ready, $f7, $f7route, $on, $update, $store}) => {
                     auto_lock: [],
                     currency: "USD",
                     enable_2fa: [],
+                    enable_fingerprint_auth: [],
                     enable_dark_theme: [],
                     enable_solid_theme: [],
                     enable_color_theme: "THEME_LIGHT",
-                    show_balances: ['on'],
+                    auto_detect_device_theme: ['on'],
                 },
                 false
             );
