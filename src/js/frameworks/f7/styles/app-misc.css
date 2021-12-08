@@ -391,3 +391,13 @@ body{
 .md .page-content .searchbar:not(.searchbar-inline) {
     margin: calc(var(--f7-searchbar-in-page-content-margin) * 2);
 }
+
+.page{
+    background: rgb(243,243,243);
+    background: linear-gradient(180deg, rgba(243,243,243,1) 63%, rgba(255,255,255,1) 81%, rgba(255,255,255,1) 100%);
+}
+
+.ios form.searchbar {
+    margin-top: 12px !important;
+    margin-bottom: 12px !important;
+}
