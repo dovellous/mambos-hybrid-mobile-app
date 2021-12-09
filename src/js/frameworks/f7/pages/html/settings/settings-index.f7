@@ -221,20 +221,20 @@
 						</li>
 					</ul>
 				</div>
-				<div class="block block-strong">
-					<button class="button button-large button-fill button-preloader ${isLoading ? 'button-loading' : ''}"
-							@click=${load}>
-						<span class="preloader"></span>
-						<span>Check Updates</span>
-					</button>
-				</div>
-				<div class="block block-strong">
-					<button class="button button-large button-fill"
-							@click=${load}>
-						<span>Rate Application</span>
-					</button>
-				</div>
 			</form>
+			<div class="block block-strong">
+				<button class="button button-large button-fill color-theme-white button-preloader ${isLoading ? 'button-loading' : ''}"
+						@click=${load}>
+					<span class="preloader"></span>
+					<span>Check Updates</span>
+				</button>
+			</div>
+			<div class="block block-strong">
+				<button class="button button-large button-fill"
+						@click=${load}>
+					<span>Rate Application</span>
+				</button>
+			</div>
 		</div>
 	</div>
 </template>
