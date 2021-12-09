@@ -44,6 +44,7 @@ const store = createStore({
             currency: "USD",
             enable_2fa: [],
             enable_fingerprint_auth: [],
+            enable_kiosk_mode: [],
             enable_dark_theme: [],
             enable_solid_theme: [],
             enable_color_theme: "THEME_LIGHT",

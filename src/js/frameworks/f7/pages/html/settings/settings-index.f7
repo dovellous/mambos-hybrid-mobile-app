@@ -38,6 +38,19 @@
 						<li>
 							<div class="item-content">
 								<div class="item-inner">
+									<div class="item-title">Enable kiosk mode</div>
+									<div class="item-after">
+										<label class="toggle toggle-init">
+											<input name="enable_kiosk_mode" type="checkbox" @input="${updateSettingsEnableKioskMode}" />
+											<span class="toggle-icon"></span>
+										</label>
+									</div>
+								</div>
+							</div>
+						</li>
+						<li>
+							<div class="item-content">
+								<div class="item-inner">
 									<div class="item-title">Auto-detect device theme</div>
 									<div class="item-after">
 										<label class="toggle toggle-init">
@@ -194,6 +207,33 @@
 						</li>
 					</ul>
 				</div>
+				<div class="block-title">System</div>
+				<div class="list">
+					<ul>
+						<li>
+							<label class="item-link item-radio item-content">
+								<input type="radio" disabled="disabled" />
+								<i class="icon icon-radio"></i>
+								<div class="item-inner">
+									<div class="item-title">Systems Settings</div>
+								</div>
+							</label>
+						</li>
+					</ul>
+				</div>
+				<div class="block block-strong">
+					<button class="button button-large button-fill button-preloader ${isLoading ? 'button-loading' : ''}"
+							@click=${load}>
+						<span class="preloader"></span>
+						<span>Check Updates</span>
+					</button>
+				</div>
+				<div class="block block-strong">
+					<button class="button button-large button-fill"
+							@click=${load}>
+						<span>Rate Application</span>
+					</button>
+				</div>
 			</form>
 		</div>
 	</div>
@@ -213,6 +253,7 @@ export default (props, {$f7ready, $f7, $f7route, $on, $update, $store}) => {
     let settingsAutoLock = [];
 	let settingsEnable2FA = [];
 	let settingsEnableFingerprintAuth = [];
+	let settingsEnableKioskMode = [];
     let settingsCurrency = 'USD';
 
     const updateSettingsAllowPushNotifications = function(e){
@@ -255,6 +296,11 @@ export default (props, {$f7ready, $f7, $f7route, $on, $update, $store}) => {
 		$update();
 	};
 
+	const updateSettingsEnableKioskMode = function(e){
+		settingsEnableKioskMode = e.target.value;
+		$update();
+	};
+
     const updateSettingsCurrency = function(e){
         settingsCurrency = e.target.value;
         $update();
@@ -265,6 +311,17 @@ export default (props, {$f7ready, $f7, $f7route, $on, $update, $store}) => {
         $f7.form.fillFromData('#app-settings-form', settingsData);
 
     };
+
+	let isLoading = false;
+
+	const load = () => {
+		isLoading = true;
+		$update();
+		setTimeout(() => {
+			isLoading = false;
+			$update();
+		}, 3000);
+	}
 
     $on('pageInit', () => {
 
