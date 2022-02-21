@@ -1,0 +1,132 @@
+<template>
+    <div class="page">
+        <div class="page-content page-bg-startup">
+
+            <div class="login-screen-title" style="margin-top: 72px; margin-bottom: 72px;">
+                <img src="static/images/logo.png" style="width: 64%; vertical-align: text-top;"/>
+            </div>
+
+        </div>
+    </div>
+</template>
+<script>
+    export default (props, {$f7ready, $f7, $on, $update}) => {
+
+        let page_title = ":: STARTUP ::";
+
+        let toolbarEl;
+
+        let loginFBTimeout = null;
+
+        let statusbarHeight = 24;
+
+        const initStatusBar = () => {
+
+            $$('html')[0].style.setProperty('--f7-statusbar-height', `${statusbarHeight}px`);
+
+            $f7.statusbar.overlaysWebView(true);
+
+            $f7.statusbar.setTextColor("black");
+
+        };
+
+        const hideToolbar = () => {
+
+            toolbarEl.hide();
+
+        };
+
+        const checkLogin = () => {
+
+            // check login
+            // check do not show again
+
+            console.log("STARTING UP PAGE CHECK LOGIN", page_title);
+
+            if(typeof firebase !== "undefined") {
+
+                const firebase_user = firebase.auth().currentUser;
+
+                clearInterval(loginFBTimeout);
+
+                if (firebase_user !== null) {
+
+
+                    //Todo: depend on usertype
+                    //Todo:make sure menu items correspoind to user type
+                    window.app.appModules.plugin.NavigatorModel.gotoUrl("/app-landing-screen/");
+
+                } else {
+
+                    window.app.appModules.plugin.NavigatorModel.gotoUrl("/app-auth-login/");
+
+                }
+
+            }
+
+        };
+
+        $f7ready(() => {
+
+            console.log("STARTING UP && F7 READY EVENT", page_title);
+
+        });
+
+        $on('pageInit', (e, page) => {
+
+            page_title = "Starting up ...";
+
+            console.log("STARTING UP PAGE INIT EVENT", page_title);
+
+            toolbarEl = $$('#app-toolbar');
+
+            initStatusBar();
+
+            hideToolbar();
+
+            checkLogin();
+
+            window.app.on("FIREBASE_USER_AUTH_LOGIN_EVENT", function (user) {
+
+                console.log(":: STARTUP SCREEN USER LOG IN EVENT >>>> :3:", user);
+
+                window.app.appModules.plugin.NavigatorModel.gotoUrl("/app-landing-screen/");
+
+                window.app.appRenderer.appViewsObject.popups.welcomePopupView.close();
+
+            });
+
+            loginFBTimeout = setInterval(checkLogin, 3000);
+
+            $update();
+
+        });
+
+        $on('pageMounted', (e, page) => {
+            console.log('page_title:', page_title, 'page mounted');
+        });
+        $on('pageBeforeIn', (e, page) => {
+            console.log('page_title:', page_title, 'page before in');
+        });
+        $on('pageAfterIn', (e, page) => {
+            console.log('page_title:', page_title, 'page after in');
+            CapSplashScreen.hide();
+        });
+        $on('pageBeforeOut', (e, page) => {
+            console.log('page_title:', page_title, 'page before out');
+        });
+        $on('pageAfterOut', (e, page) => {
+            console.log('page_title:', page_title, 'page after out');
+        });
+        $on('pageBeforeUnmount', (e, page) => {
+            console.log('page_title:', page_title, 'page before unmount');
+        });
+        $on('pageBeforeRemove', (e, page) => {
+            console.log('page_title:', page_title, 'page before remove');
+        });
+
+        return $render;
+
+    }
+
+</script>

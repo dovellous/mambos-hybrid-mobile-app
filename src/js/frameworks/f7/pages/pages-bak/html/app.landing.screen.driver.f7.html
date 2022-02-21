@@ -1,0 +1,561 @@
+<template>
+    <div class="page">
+        <div class="navbar navbar-current">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title" style="text-align: center; width: 100%">
+                    ${page_title}
+                </div>
+                <div class="right">
+                    <a href="#" class="link" @click=${scan}>
+                        <i class="f7-icons">qrcode</i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="toolbar tabbar-labels toolbar-top">
+            <div class="toolbar-inner">
+                <a class="tab-link tab-link-active" href="#tabIDOrders1" id="app-order-index-tab-link-tabIDOrders1">
+                    <i class="f7-icons">car_fill</i>
+                    <span class="tabbar-label">PENDING</span>
+                </a>
+                <a class="tab-link " href="#tabIDOrders2" id="app-order-index-tab-link-tabIDOrders2">
+                    <i class="f7-icons">bag_fill</i>
+                    <span class="tabbar-label">DELIVERED/COLLECTED</span>
+                </a>
+                <a class="tab-link " href="#tabIDOrders3" id="app-order-index-tab-link-tabIDOrders3">
+                    <i class="f7-icons">checkmark_alt_circle_fill</i>
+                    <span class="tabbar-label">COMPLETED</span>
+                </a>
+                <span class="tab-link-highlight" style="width: 25%; transform: translate3d(0%, 0px, 0px);"></span>
+            </div>
+        </div>
+
+        <div class="tabs-animated-wrap">
+
+            <div class="tabs">
+
+                <div class="page-content page-content-bg tab tabClass tab-active"
+                     id="tabIDOrders1">
+
+                    <div class="block padding-left-0 padding-right-0">
+
+                        <div class="list media-list">
+                            <ul>
+
+                                ${ordersObject.pending.map((item, index) => $h`
+
+                                <li class="swipeout" data-order-id="${item[1].order_id}" @swipeout:deleted=${onDeleted}>
+                                    <div class="swipeout-content">
+                                        <a href="/app-ecommerce-orders-details/${item[1].order_id}/?order_tab=pending" class="item-link item-content">
+                                            <div class="item-inner">
+                                                <div class="item-title-row">
+                                                    <div class="item-title"><strong>${item[1].meta.firstname} ${item[1].meta.lastname}</strong></div>
+                                                    <div class="item-after"><strong>#${item[1].order_id}</strong></div>
+                                                </div>
+                                                <div class="item-subtitle">${item[1].meta.cart_title}</div>
+                                                <div class="item-text">
+                                                    <Lorem>
+                                                        ${item[1].meta.delivery_address.address_full}
+                                                    </Lorem>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </div>
+                                    <div class="swipeout-actions-left">
+                                        <a href="#" class="color-orange" data-order-id="${item[1].order_id}" @click=${info}>View Info</a>
+                                        <a href="#" class="color-green swipeout-overswipe" data-order-id="${item[1].order_id}" @click=${deliver}>Deliver Order</a>
+                                    </div>
+                                    <div class="swipeout-actions-right">
+                                        <a href="#" data-confirm="Are you sure you want to cancel this Order#${item[1].order_id} ?"
+                                           class="swipeout-delete swipeout-overswipe">Cancel</a>
+                                    </div>
+                                </li>
+
+                                `)}
+
+                            </ul>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="page-content page-content-bg tab tabClass "
+                     id="tabIDOrders2">
+
+                    <div class="block padding-left-0 padding-right-0">
+
+                        ${ordersObject.delivered.map((item, index) => $h`
+
+                        <li class="swipeout" data-order-id="${item[1].order_id}" @swipeout:deleted=${onDeleted}>
+                            <div class="swipeout-content">
+                                <a href="/app-ecommerce-orders-details/${item[1].order_id}/?order_tab=delivered" class="item-link item-content">
+                                    <div class="item-inner">
+                                        <div class="item-title-row">
+                                            <div class="item-title">${item[1].firstname} ${item[1].lastname}</div>
+                                            <div class="item-after"><strong>#${item[1].order_id}</strong></div>
+                                        </div>
+                                        <div class="item-subtitle">${item[1].cart_title}</div>
+                                        <div class="item-text">
+                                            <Lorem>
+                                                ${item[1].delivery_address.address_full}
+                                            </Lorem>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="swipeout-actions-left">
+                                <a href="#" class="color-orange" data-order-id="${item[1].order_id}" @click=${info}>View Info</a>
+                                <a href="#" class="color-green swipeout-overswipe" @click=${complete}>Complete Order</a>
+                                <a href="#" class="color-blue" data-order-id="${item[1].order_id}" @click=${payment}>Add Payment</a>
+                            </div>
+                            <div class="swipeout-actions-right">
+                                <a href="#" data-confirm="Are you sure you want to cancel this Order#${item[1].order_id} ?"
+                                   class="swipeout-delete swipeout-overswipe">Cancel</a>
+                            </div>
+                        </li>
+
+                        `)}
+
+                    </div>
+
+
+                </div>
+
+                <div class="page-content page-content-bg tab tabClass "
+                     id="tabIDOrders3">
+
+                    <div class="block padding-0 margin-0">
+
+                        ${ordersObject.completed.map((item, index) => $h`
+
+                        <li class="swipeout" data-order-id="${item[1].order_id}" @swipeout:deleted=${onDeleted}>
+                            <div class="swipeout-content">
+                                <a href="/app-ecommerce-orders-details/${item[1].order_id}/?order_tab=completed" class="item-link item-content">
+                                    <div class="item-inner">
+                                        <div class="item-title-row">
+                                            <div class="item-title">${item[1].firstname} ${item[1].lastname}</div>
+                                            <div class="item-after"><strong>#${item[1].order_id}</strong></div>
+                                        </div>
+                                        <div class="item-subtitle">${item[1].cart_title}</div>
+                                        <div class="item-text">
+                                            <Lorem>
+                                                ${item[1].delivery_address.address_full}
+                                            </Lorem>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="swipeout-actions-left">
+                                <a href="#" class="color-orange" data-order-id="${item[1].order_id}" @click=${info}>View Info</a>
+                            </div>
+                            <div class="swipeout-actions-right">
+                                <a href="#" data-confirm="Are you sure you want to cancel this Order#${item[1].order_id} ?"
+                                   class="swipeout-delete swipeout-overswipe">Cancel</a>
+                            </div>
+                        </li>
+
+                        `)}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</template>
+<script>
+    export default (props, {$f7ready, $f7, $f7route, $on, $update}) => {
+
+        let page_title, logoPath;
+
+        let ordersObject = {
+            pending: [],
+            delivered: [],
+            completed: []
+            };
+
+        $f7ready(() => {
+
+            //
+
+        });
+
+        const scan = () => {
+
+            OrderBarcodeScanner.init("SCAN_MY_ORDERS");
+
+            OrderBarcodeScanner.startScan();
+
+        };
+
+        const info = () => {
+
+            let order_id = $$(this).attr("data-order-id");
+
+            $f7.dialog.alert(`Order #${order_id} details`);
+
+        };
+
+        const deliver = () => {
+
+            let order_id = $$(this).attr("data-order-id");
+
+            let from_tab = "pending";
+
+            let to_tab = "delivered";
+
+            app.appFirebase.module.auth.changeDriverTab(from_tab, to_tab, order_id,
+                function (result) {
+                    console.log("::: DELIVER RESULT", result);
+                },
+                function (error) {
+                    console.log("::: DELIVER ERROR", error);
+                }
+            );
+
+            $f7.dialog.alert(`Order has been marked as delivered!`);
+
+        };
+
+        const complete = () => {
+
+            let order_id = $$(this).attr("data-order-id");
+
+            $f7.dialog.alert(`Order #${order_id} has been completed!`);
+
+        };
+
+        const onDeleted = () => {
+
+            let order_id = $$(this).attr("data-order-id");
+
+            $f7.dialog.alert(`Order #${order_id} has been cancelled!`);
+
+        };
+
+
+        const getData = function ( callbackFunctionSuccess, callbackFunctionError ) {
+
+            // Must return an object
+
+            let _pending_obj = {};
+
+            let _delivered_obj = {};
+
+            let _completed_obj = {};
+            
+            const user = firebase.auth().currentUser;
+
+            // DRIVER ORDERS
+
+            let firebaseRefDriversOrdersPath = 'accounts/drivers/locations/' + user.uid + '/orders';
+            
+            //accounts/drivers/locations/Fh8c5atsclY7OVX4uPWugVp5uw52/orders
+            //accounts/drivers/locations/Fh8c5atsclY7OVX4uPWugVp5uw52/orders
+            
+            console.warn("firebaseRefDriversOrdersPath:::::::", firebaseRefDriversOrdersPath);
+
+            let firebaseRefDriversOrders = firebase.database().ref(firebaseRefDriversOrdersPath);
+
+            firebaseRefDriversOrders.on('value', function (snapshot) {
+
+                let driver_orders = snapshot.val();
+
+                console.warn("firebaseRefDriversOrdersPath:::::::driver_orders", driver_orders, (driver_orders === false || driver_orders === null || typeof driver_orders !== "object"));
+
+                if (driver_orders === false || driver_orders === null || typeof driver_orders !== "object") {
+
+                    console.log(":: DRIVER ORDERS SNAPSHOT [NULL]::", driver_orders);
+
+                    if(typeof callbackFunctionError === "function"){
+
+                        callbackFunctionError(driver_orders);
+
+                    }
+
+                } else {
+
+                    _pending_obj =  driver_orders.pending;
+
+                    _delivered_obj =  driver_orders.delivered;
+
+                    _completed_obj =  driver_orders.completed;
+
+                    const _pending   = (_pending_obj === null || typeof _pending_obj === "undefined") ? [] : Object.keys(_pending_obj).map((key) => [key, _pending_obj[key]]);
+
+                    const _delivered = (_delivered_obj === null || typeof _delivered_obj === "undefined") ? [] : Object.keys(_delivered_obj).map((key) => [key, _delivered_obj[key]]);
+
+                    const _completed = (_completed_obj === null || typeof _completed_obj === "undefined") ? [] : Object.keys(_completed_obj).map((key) => [key, _completed_obj[key]]);
+
+                    const _orders_object = {
+                        pending: _pending,
+                        delivered: _delivered,
+                        completed: _completed
+                    };
+
+                    ordersObject = _orders_object;
+
+                    // trigger re-render
+                    $update();
+
+                    if(typeof callbackFunctionSuccess === "function"){
+
+                        callbackFunctionSuccess(ordersObject);
+
+                    }
+
+                    return _orders_object;
+
+                }
+
+            });
+
+        };
+
+
+        const OrderBarcodeScanner = {
+
+            resultEventName: "SCANNED",
+
+                init: async (resultEventName) => {
+
+                    OrderBarcodeScanner.resultEventName = resultEventName;
+
+                    OrderBarcodeScanner.prepare();
+
+            },
+
+                prepare: () => {
+
+                CapBarcodeScanner.prepare();
+
+            },
+
+                startScan: async () => {
+
+                    let deviceInfo = await app.appModules.plugin.CapDevice.getInfo();
+
+                    if(deviceInfo.platform !== "web") {
+
+
+                        if (OrderBarcodeScanner.didUserGrantPermission()) {
+
+                            CapBarcodeScanner.hideBackground();
+
+                            $$("body").css("background", "transparent");
+
+                            $$("body").css("background-color", "transparent");
+
+                            $$("#app").css("opacity", 0);
+
+                            $$(".framework7-root").css("opacity", 0);
+
+                            const result = await  CapBarcodeScanner.startScan();
+
+                            if (result.hasContent) {
+
+                                $$("body").css("background", "#ffffff");
+
+                                $$("body").css("background-color", "#ffffff");
+
+                                $$("#app").css("opacity", 1);
+
+                                $$(".framework7-root").css("opacity", 1);
+
+                                app.emit(parent.resultEventName, result.content);
+
+                                console.log("SCAN RESULT", result.content);
+
+                            } else {
+
+                                console.log("SCAN RESULT (e)", result);
+
+                            }
+
+                        } else {
+
+                            console.log("PERMISSIOS ERROR(e)", result);
+
+                        }
+
+                    }
+
+            },
+
+                stopScan: () => {
+
+                $$("body").css("background", "#ffffff");
+
+                $$("body").css("background-color", "#ffffff");
+
+                $$("#app").css("opacity", 1);
+
+                $$(".framework7-root").css("opacity", 1);
+
+                CapBarcodeScanner.showBackground();
+                CapBarcodeScanner.stopScan();
+            },
+
+                askUser: () => {
+
+                    OrderBarcodeScanner.prepare();
+
+                const c = confirm('Do you want to scan a barcode?');
+
+                if (c) {
+                    OrderBarcodeScanner.startScan();
+                } else {
+                    OrderBarcodeScanner.stopScan();
+                }
+            },
+
+                checkPermission: async () => {
+                // check or request permission
+                const status = await  CapBarcodeScanner.checkPermission({force: true});
+
+                return status.granted;
+
+            },
+
+                didUserGrantPermission: async () => {
+                // check if user already granted permission
+                const status = await  CapBarcodeScanner.checkPermission({force: false});
+
+                if (status.granted) {
+                    // user granted permission
+                    return true;
+                }
+
+                if (status.denied) {
+                    // the user denied permission for good
+                    // redirect user to app settings if they want to grant it anyway
+                    const c = confirm(
+                        'If you want to grant permission for using your camera, enable it in the app settings.',
+                    );
+                    if (c) {
+                        CapBarcodeScanner.openAppSettings();
+                    }
+                }
+
+                if (status.asked) {
+                    // system requested the user for permission during this call
+                    // only possible when force set to true
+                }
+
+                if (status.neverAsked) {
+                    // user has not been requested this permission before
+                    // it is advised to show the user some sort of prompt
+                    // this way you will not waste your only chance to ask for the permission
+                    const c = confirm(
+                        'We need your permission to use your camera to be able to scan barcodes',
+                    );
+                    if (!c) {
+                        return false;
+                    }
+                }
+
+                if (status.restricted || status.unknown) {
+                    // ios only
+                    // probably means the permission has been denied
+                    return false;
+                }
+
+                // user has not denied permission
+                // but the user also has not yet granted the permission
+                // so request it
+                const statusRequest = await  CapBarcodeScanner.checkPermission({force: true});
+
+                if (statusRequest.asked) {
+                    // system requested the user for permission during this call
+                    // only possible when force set to true
+                }
+
+                if (statusRequest.granted) {
+                    // the user did grant the permission now
+                    return true;
+                }
+
+                // user did not grant the permission, so he must have declined the request
+                return false;
+            },
+
+        };
+
+
+        $on('pageInit', () => {
+
+            page_title = "My Orders";
+
+            // trigger re-render
+            $update();
+
+            logoPath = window.app.appRenderer.module.styling.getNavBarLogo();
+
+            $f7.on("SCAN_MY_ORDERS", function (barcode) {
+               
+                $f7.dialog.alert(`Order# ${barcode} has been added to your portal`);
+
+                //TODO: Check if we still have items to scan
+                OrderBarcodeScanner.startScan();
+
+            });
+
+            getData(
+                function (_order_obj) {
+
+                    ordersObject = _order_obj;
+
+                },
+                function (_order_obj) {
+
+                    console.log("COULD NOT LOAD DRIVER ORDERS::", _order_obj);
+
+                }
+            );
+
+            //console.error(":: ORDER OBJECT >>>> :2:", $f7route.params, ordersObject);
+
+            // trigger re-render
+            $update();
+
+        });
+
+        $on('pageMounted', (e, page) => {
+            console.log('page_title:', page_title, 'page mounted');
+        });
+        $on('pageBeforeIn', (e, page) => {
+            console.log('page_title:', page_title, 'page before in');
+        });
+        $on('pageAfterIn', (e, page) => {
+            console.log('page_title:', page_title, 'page after in');
+        });
+        $on('pageBeforeOut', (e, page) => {
+            console.log('page_title:', page_title, 'page before out');
+        });
+        $on('pageAfterOut', (e, page) => {
+            console.log('page_title:', page_title, 'page after out');
+        });
+        $on('pageBeforeUnmount', (e, page) => {
+            console.log('page_title:', page_title, 'page before unmount');
+        });
+        $on('pageBeforeRemove', (e, page) => {
+            console.log('page_title:', page_title, 'page before remove');
+        });
+
+        return $render;
+
+    }
+</script>

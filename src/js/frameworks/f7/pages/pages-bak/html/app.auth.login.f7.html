@@ -1,0 +1,688 @@
+<template>
+
+    <div class="page">
+
+        <!--  no-navbar hide-toolbar-on-scroll no-toolbar no-swipeback no-swipe-panel -->
+
+        <div class="page-content login-screen-content">
+
+            <div class="login-screen-title" style="margin-top: 72px; margin-bottom: 72px;">
+                <img src="static/images/logo.png" style="width: 64%; vertical-align: text-top;"/>
+            </div>
+
+            <!--<div class="login-screen-title">Sign In to WVZ</div>-->
+
+            <div class="block">
+
+                <div class="list">
+                    <ul>
+
+                        <li class="item-content item-input">
+                            <div class="item-inner">
+                                <div class="item-title item-floating-label">Email</div>
+                                <div class="item-input-wrap">
+                                    <input id="login-email" class="login-input" type="text" name="login-email"
+                                           placeholder="Your email address"/>
+                                    <span class="input-clear-button"></span>
+                                </div>
+                            </div>
+                        </li>
+
+                        <li class="item-content item-input">
+                            <div class="item-inner">
+                                <div class="item-title item-floating-label">Password</div>
+                                <div class="item-input-wrap">
+                                    <input id="login-password" class="login-input" type="password" name="login-password"
+                                           placeholder="Your password"/>
+                                    <span class="input-clear-button"></span>
+                                </div>
+                            </div>
+                        </li>
+
+                    </ul>
+                </div>
+                <div class="block list">
+                    <ul>
+                        <li class="login-btn-container">
+                            <button class="colx button button-large button-raised button-fill login-by-password"
+                                    @click=${(e) => loginAccountByPassword()}>
+                                LOGIN
+                            </button>
+                        </li>
+                        <li class="register-btn-container margin-top-x2">
+                            <button class="colx button button-large button-raised create-account"
+                                    @click=${(e) => openRegistrationScreen()}>
+                                CREATE A MAMBO'S ACCOUNT
+                            </button>
+                        </li>
+                    </ul>
+
+                    ${showBiometricArea ? $h`
+
+                    <div class="block-footer">
+                        <p style="margin-top: 48px;">
+                            <a class="link login-by-fingerprint" href="#"
+                               @click=${(e) => loginAccountByBiometric()}>
+                                <i class="icon material-icons md-only" style="font-size: 48px">fingerprint</i>
+                            </a>
+                        </p>
+                    </div>
+
+                    ` : $h `<!-- dont show biometric --->`}
+
+                </div>
+
+                <div class="list">
+                    <div class="block-footer">
+                        <p class="password-reset" style="margin-top: 48px;">
+                            Forgot your password?
+                            <a href="#"  @click=${(e) => sendResetCode()}> <strong>Click here to reset.</strong></a></p>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <div class="sheet-modal sheet-modal-send-code h-85vh">
+            <div class="toolbar toolbar-bottom">
+                <div class="toolbar-inner">
+                    <div class="left margin-left"><strong>Send Password Reset Code</strong></div>
+                    <div class="right">
+                        <a class="link sheet-close">
+                            <i class="f7-icons">xmark</i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="sheet-modal-inner">
+                <div class="page-content">
+
+                    <div class="block" id="sheet-modal-send-code-1">
+                        <div class="block-title block-title-large">Reset Code</div>
+                        <div class="eligible-font">Enter your email address below</div>
+
+
+                        <div class="list no-hairline-bottom no-hairline-top">
+                            <ul>
+
+                                <li class="item-content item-input">
+                                    <div class="item-inner">
+                                        <div class="item-title item-floating-label">Email</div>
+                                        <div class="item-input-wrap">
+                                            <input id="password-reset-email" class="login-input" type="text" name="reset-password-email"
+                                                   placeholder="Your email address"/>
+                                            <span class="input-clear-button"></span>
+                                        </div>
+                                    </div>
+                                </li>
+
+                                <li class="item-content item-input margin-top-x3">
+                                    <div class="item-inner">
+
+                                        <button class="button button-large button-fill  button-preloader ${isSendingPasswordResetCode ? 'button-loading' : ''}" @click=${sendPasswordResetCode}>
+                                            <span class="preloader"></span>
+                                            <span>Send Password Reset Code</span>
+                                        </button>
+
+                                    </div>
+                                </li>
+
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="sheet-modal sheet-modal-reset-password h-85vh">
+            <div class="toolbar toolbar-bottom">
+                <div class="toolbar-inner">
+                    <div class="left margin-left"><strong>Reset Password</strong></div>
+                    <div class="right">
+                        <a class="link sheet-close">
+                            <i class="f7-icons">xmark</i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="sheet-modal-inner">
+                <div class="page-content">
+                    <div class="block">
+                        <div class="block-title block-title-medium">New Password</div>
+                        <div class="eligible-font">Please enter the new password below and confirm it in the second text input box.</div>
+
+                        <div class="list no-hairline-bottom no-hairline-top">
+                            <ul>
+
+                                <li class="item-content item-input">
+                                    <div class="item-inner">
+                                        <div class="item-title item-floating-label">New Password</div>
+                                        <div class="item-input-wrap">
+                                            <input id="new-password" class="login-input" type="text" name="new-password"
+                                                   placeholder="Your new password"/>
+                                            <span class="input-clear-button"></span>
+                                        </div>
+                                    </div>
+                                </li>
+
+                                <li class="item-content item-input">
+                                    <div class="item-inner">
+                                        <div class="item-title item-floating-label">Verify Password</div>
+                                        <div class="item-input-wrap">
+                                            <input id="verify-password" class="login-input" type="password" name="verify-password"
+                                                   placeholder="Your password again"/>
+                                            <span class="input-clear-button"></span>
+                                        </div>
+                                    </div>
+                                </li>
+
+
+                                <li class="item-content item-input margin-top-x3">
+                                    <div class="item-inner">
+
+                                        <button class="button button-large button-fill button-preloader ${isResettingPassword ? 'button-loading' : ''}" @click=${resetPassword}>
+                                            <span class="preloader"></span>
+                                            <span>Change Password</span>
+                                        </button>
+
+                                    </div>
+                                </li>
+
+
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
+</template>
+<script>
+    export default (props, {$f7ready, $f7, $on, $update}) => {
+
+        let toolbarEl;
+
+        let showBiometricArea = false;
+
+        let passwordResetCode = 0;
+
+        let passwordResetCodeAttempts = 0;
+
+        let passwordResetEmail = "";
+
+        const sendPasswordResetCode = () => {
+
+            passwordResetEmail = $$("#password-reset-email");
+
+            passwordResetCode = getRandomNumber(100000,999999);
+
+            doSendPasswordResetCode("PASSWORD_RESET", {email: passwordResetEmail, code: passwordResetCode});
+
+        };
+
+        const resetPassword = () => {
+
+            const password_1 = $$("#new-password").val();
+
+            const password_2 = $$("#verify-password").val();
+
+            console.log("CHECK NEW PASSWORD:::",password_1 !== password_2,password_1,password_2);
+
+            if(password_1 !== password_2){
+
+                app.appModules.plugin.CapLocalNotifications.toast('Your passwords do not match please try again');
+
+                $$("#new-password").val("");
+
+                $$("#new-password").focus();
+
+                $$("#verify-password").val("");
+
+            }else{
+
+                doResetPassword("PASSWORD_RESET_DO", {email: passwordResetEmail, password: password_1});
+
+            }
+
+        };
+
+        const resetAccountPassword = () => {
+
+            console.log("VERIFYING PASSWORD..");
+
+            window.app.appFirebase.module.auth.passwordResetCode(
+                function () {
+
+                    //
+
+                },
+                function (error) {
+
+                    console.log("EMAIl RESET CODE ERROR:::", error);
+
+                }
+            );
+
+        };
+
+        const checkLogin = () => {
+
+            console.log("CHECK LOGIN...");
+
+            window.app.appFirebase.module.auth.checkLogin(
+                function () {
+
+                    openHomeScreen();
+
+                },
+                function (error) {
+
+                    console.log("CHECK LOGOUT ::: NO USER DATA FOUND:::", error);
+
+                }
+            );
+
+        };
+
+        const doLogin = (type, payload) => {
+
+            window.app.appFirebase.module.auth.doLogin(
+                type,
+                payload,
+                $f7,
+                function (user_data) {
+
+                    console.log("CHECK LOGIN RESULT ::: user_data :::", user_data);
+
+                    saveLoginData(user_data);
+
+                    openLandingScreen();
+
+                },
+                function (error) {
+
+                    console.log("CHECK LOGIN ERROR ::: error, firebase_user :::", error);
+
+                    let error_message = error.message;
+
+                    if(error_message === null || error_message === ""){
+                        error_message = "Error occured while loggin in...";
+                    }
+
+                    $f7.toast.create({
+                        text: error_message,
+                        position: 'bottom',
+                        closeTimeout: 3000,
+                        on: {
+                            opened: function () { }
+                        }
+                    }).open();
+
+                }
+            );
+
+        };
+
+        let isSendingPasswordResetCode = false;
+
+        const doSendPasswordResetCode = (type, payload) => {
+
+            isSendingPasswordResetCode = true;
+
+            $update();
+
+            sendPasswordResetCodeSheetModal.close();
+
+            window.app.appFirebase.module.auth.doSendPasswordResetCode(
+                type,
+                payload,
+                $f7,
+                function (result) {
+
+                    console.log("SEND PASSWORD RESET CODE RESULT ::: result :::", result);
+
+                    isSendingPasswordResetCode = false;
+
+                    $update();
+
+                    $f7.appModules.plugin.CapLocalNotifications.toast(result.message);
+
+                    setTimeout(function () {
+
+                        const eventName = "PASSWORD_RESET_CODE_VALUE";
+
+                        const passCodeType = "PASSWORD";
+
+                        const passCodeLength = 6;
+
+                        $f7.on(eventName, function ( passcodeValue ) {
+
+                            console.log("COMPARE PASSCODE:::"+`CODE_${passwordResetCode}` === `CODE_${passcodeValue}`, `CODE_${passwordResetCode} === CODE_${passcodeValue}`)
+
+                            if( `CODE_${passwordResetCode}` === `CODE_${passcodeValue}`){
+
+                                recoverAccount();
+
+                            }else{
+
+                                setTimeout(function () {
+
+                                    if(passwordResetCodeAttempts > 3){
+
+                                        $f7.appModules.plugin.CapLocalNotifications.toast('Could not verify your reset code. Please try again later.');
+
+                                        sendPasswordResetCodeSheetModal.open();
+
+                                    }else {
+
+                                        $f7.appModules.plugin.CapLocalNotifications.toast('Invalid password reset code. Please try again');
+
+                                        $f7.appModules.plugin.NavigatorModel.gotoUrl(`/app-auth-passcode/${eventName}/${passCodeType}/${passCodeLength}/`);
+
+                                    }
+
+                                    passwordResetCodeAttempts++;
+
+                                },500);
+
+                            }
+
+                        });
+
+                        $f7.appModules.plugin.NavigatorModel.gotoUrl(`/app-auth-passcode/${eventName}/${passCodeType}/${passCodeLength}/`);
+
+                    },50);
+
+                    $update();
+
+                },
+                function (error) {
+
+                    console.log("SEND PASSWORD RESET CODE ERROR ::: error:::", error);
+
+                    isSendingPasswordResetCode = false;
+
+                    $update();
+
+                    let error_message = error.message;
+
+                    if(error_message === null || error_message === ""){
+                        error_message = "Error occured while sending password reset code...";
+                    }
+
+                    app.appModules.plugin.CapLocalNotifications.toast(error_message);
+
+                }
+            );
+
+        };
+
+        let isResettingPassword = false;
+
+        const doResetPassword = (type, payload) => {
+
+            isResettingPassword = true;
+
+            window.app.appFirebase.module.auth.doResetPassword(
+                type,
+                payload,
+                $f7,
+                function (result) {
+
+                    console.log("DO PASSWORD RESET CODE RESULT ::: result :::", result);
+
+                    isResettingPassword = false;
+
+                    app.appModules.plugin.CapLocalNotifications.toast('Your password has been updated! You may now login with a new password');
+
+                    firebase.auth().signOut();
+
+                    passwordResetSheetModal.close();
+
+                    sendPasswordResetCodeSheetModal.close();
+
+                    $update();
+
+                },
+                function (error) {
+
+                    console.log("DO PASSWORD RESET CODE ERROR ::: error:::", error);
+
+                    isResettingPassword = false;
+
+                    $update();
+
+                    let error_message = error.message;
+
+                    if(error_message === null || error_message === ""){
+                        error_message = "Error occured while resetting your password...";
+                    }
+
+                    app.appModules.plugin.CapLocalNotifications.toast(error_message);
+
+                }
+            );
+
+        };
+
+        const saveLoginData = (user_data) => {
+
+            let enc_user_data = GibberishAES.enc(JSON.stringify(user_data), appConfigData.appID);
+
+            window.app.appFirebase.module.auth.save_login_data(
+                enc_user_data,
+                function () {
+
+                    console.log("User data saved successfully");
+
+                },
+                function (error) {
+
+                    console.log("Error saving data", error);
+
+                });
+
+        };
+
+        const openLandingScreen = () => {
+
+            //
+
+            window.app.appModules.plugin.NavigatorModel.gotoUrl("/app-landing-screen/");
+
+            showToolbar();
+
+        };
+
+        const openRegistrationScreen = () => {
+
+            //
+
+            window.app.appModules.plugin.NavigatorModel.gotoUrl("/app-auth-register/");
+
+            console.log("APP-AUTH-REGISTER::::CREATE ACCOUNT");
+
+        };
+
+        let sendPasswordResetCodeSheetModal;
+
+        const sendResetCode = () => {
+
+            sendPasswordResetCodeSheetModal = $f7.sheet.create({
+                el: '.sheet-modal-send-code',
+                swipeToClose: true,
+                push: true,
+                backdrop: true,
+            });
+
+            sendPasswordResetCodeSheetModal.open();
+
+            console.log("APP-AUTH-LOGIN::::SEND PASSWORD RESET CODE MODAL");
+
+        };
+
+        let passwordResetSheetModal;
+
+        const recoverAccount = () => {
+
+            passwordResetSheetModal = $f7.sheet.create({
+                el: '.sheet-modal-reset-password',
+                swipeToClose: true,
+                push: true,
+                backdrop: true,
+            });
+
+            passwordResetSheetModal.open();
+
+            console.log("APP-AUTH-LOGIN::::PASSWORD RESET MODAL");
+
+        };
+
+        const loginAccountByBiometric = () => {
+
+            //
+            console.log("APP-AUTH-LOGIN::::BIOMETRIC LOGIN");
+
+            // Check if biometrics are available and which type is supported
+            CapNativeBiometric.isAvailable().then(
+                (result) => {
+
+                    const isAvailable = result.isAvailable;
+                    const isFaceId = result.biometryType === BiometryType.FACE_ID;
+
+                    showBiometricArea = true;
+
+                    if (isAvailable) {
+                        // Get user's credentials
+                        CapNativeBiometric.getCredentials({
+                            server: appConfigData.appID,
+                        }).then((credentials) => {
+                            // Authenticate using biometrics before logging the user in
+                            CapNativeBiometric.verifyIdentity({
+                                reason: "For easy log in",
+                                title: appConfigData.appName,
+                                subtitle: "Login with your fingerprint",
+                                description: "Your data is safe and only stays on this device",
+                            }).then(
+                                () => {
+                                    // Authentication successful
+                                    let password_login_data = { email: credentials.username, password: credentials.password};
+
+                                    doLogin('BIOMETRIC', password_login_data);
+
+                                },
+                                (error) => {
+                                    // Failed to authenticate
+                                }
+                            );
+                        });
+                    }
+                },
+                (error) => {
+                    // Couldn't check availability
+                }
+            );
+
+
+
+            let optionalParams = {description: "You are about to login using a fingerprint scan. No password is required"};
+
+            MainAppAuth.biometric.unLockData(
+                function (result) {
+
+                    doLogin('BIOMETRIC', result);
+
+                },
+                function (error) {
+
+                    switch(error){
+
+                        case "BIOMETRIC_NO_SECRET_FOUND" : {
+
+                            window.app.toast.create({
+                                text: 'Biometric login not yet enabled. Please login with password and enable this feature under settings.',
+                                position: 'bottom',
+                                closeTimeout: 6000,
+                                on: {
+                                    opened: function () {
+                                        console.log('Toast opened')
+                                    }
+                                }
+                            }).open();
+
+                            break;
+                        }
+
+                        default : {
+
+                            break;
+
+                        }
+
+                    }
+
+                },
+                optionalParams
+            );
+
+        };
+
+        const loginAccountByPassword = () => {
+
+            //
+
+            console.log("APP-AUTH-LOGIN::::PASSWORD LOGIN");
+
+            let password_login_data = { email:$$("#login-email").val(), password: $$("#login-password").val() };
+
+            doLogin('PASSWORD', password_login_data);
+
+        };
+
+        const hideToolbar = () => {
+
+            toolbarEl.hide();
+
+        };
+
+        const showToolbar = () => {
+
+            toolbarEl.show();
+
+        };
+
+        $f7ready(() => {
+
+
+
+        });
+
+        $on('pageInit', (e, page) => {
+
+            toolbarEl = $$('#app-toolbar');
+
+            hideToolbar();
+
+            checkLogin();
+
+            window.app.on("FIREBASE_USER_AUTH_LOGIN_EVENT", function (user) {
+
+                console.log(":: AUTH LOGIN USER LOG IN EVENT >>>> :3:", user);
+                openLandingScreen();
+
+            });
+
+            $update();
+
+        });
+
+        return $render;
+    }
+
+</script>

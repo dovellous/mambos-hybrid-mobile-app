@@ -1,27 +1,189 @@
 <template>
-<div class="page">
-  <div class="navbar">
-    <div class="navbar-bg"></div>
-    <div class="navbar-inner sliding">
-      <div class="left">
-        <a href="#" class="link back">
-          <i class="icon icon-back"></i>
-          <span class="if-not-md">Back</span>
-        </a>
-      </div>
-      <div class="title">Not found</div>
+    <div class="page">
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner sliding">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title">Cart</div>
+            </div>
+        </div>
+        <div class="page-content">
+            <div class="block-title">BASKET ITEMS</div>
+            <div class="list cart-list-basket">
+                <ul class="no-chevron">
+                    <li>
+                        <a href="#" class="item-link item-content">
+                            <div class="item-inner">
+                                <div class="item-title">
+                                    Prince Meal
+                                    <div class="item-header cart-items cart-subitems">
+                                        SUBTOTAL: USD 3.58 each
+                                    </div>
+                                    <div class="item-header cart-items cart-subtotal">
+                                        SUBTOTAL: USD 3.58 each
+                                    </div>
+                                </div>
+                                <div class="item-after">
+                                    <div class="stepper stepper-raised stepper-init">
+                                        <div class="stepper-button-minus reset-w"></div>
+                                        <div class="stepper-input-wrap">
+                                            <input type="text" min="0" max="100" step="1" readonly=""
+                                                class="input-with-value" />
+                                        </div>
+                                        <div class="stepper-button-plus reset-w"></div>
+                                    </div> 
+                                </div>
+                            </div>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="block-title">CALCULATIONS</div>
+            <div class="cart-list-calculations list">
+                <ul class="no-chevron">
+                    <li>
+                        <a href="#" class="item-link item-content">
+                            <div class="item-inner">
+                                <div class="item-title cart-calculations-subtotal-title strong-text">
+                                    Subtotal
+                                    <div class="item-header cart-items cart-calculations-subtotal-except">
+
+                                    </div>
+                                </div>
+                                <div class="item-after cart-calculations-amount strong-text">
+                                    <code>$8.93</code>
+                                </div>
+                            </div>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="item-link item-content">
+                            <div class="item-inner">
+                                <div class="item-title cart-calculations-subtotal-title">
+                                    Delivery Fee
+                                    <div class="item-header cart-items cart-calculations-subtotal-except">
+
+                                    </div>
+                                </div>
+                                <div class="item-after cart-calculations-amount">
+                                    <code>$8.93</code>
+                                </div>
+                            </div>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="item-link item-content">
+                            <div class="item-inner">
+                                <div class="item-title cart-calculations-subtotal-title">
+                                    Tax
+                                    <div class="item-header cart-items cart-calculations-subtotal-except">
+
+                                    </div>
+                                </div>
+                                <div class="item-after cart-calculations-amount">
+                                    <code>$8.93</code>
+                                </div>
+                            </div>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="item-link item-content">
+                            <div class="item-inner">
+                                <div class="item-title cart-calculations-subtotal-title">
+                                    Discount
+                                    <div class="item-header cart-items cart-calculations-subtotal-except">
+
+                                    </div>
+                                </div>
+                                <div class="item-after cart-calculations-amount">
+                                    <code>$8.93</code>
+                                </div>
+                            </div>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="item-link item-content">
+                            <div class="item-inner">
+                                <div class="item-title cart-calculations-subtotal-title strong-text">
+                                    Grand Total
+                                    <div class="item-header cart-items cart-calculations-subtotal-except">
+
+                                    </div>
+                                </div>
+                                <div class="item-after cart-calculations-amount strong-text">
+                                    <code>$8.93</code>
+                                </div>
+                            </div>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
     </div>
-  </div>
-  <div class="page-content">
-    <div class="block block-strong">
-      <p>Sorry</p>
-      <p>Requested content not found.</p>
-    </div>
-  </div>
-</div>
 </template>
+<style>
+    .stepper-button-minus.reset-w,
+    .stepper-button-plus.reset-w {
+        width: 50px;
+    }
+
+    .list.cart-list-basket .item-link .item-inner {
+            padding-right: calc(var(--f7-list-chevron-icon-area) + var(--f7-list-item-padding-horizontal) + var(--f7-safe-area-right) - var(--menu-list-offset));
+            position: relative;
+            width: 100%;
+            min-width: 0;
+            display: flex;
+            justify-content: space-between;
+            box-sizing: border-box;
+            align-items: flex-start;
+            align-self: stretch;
+            padding-top: var(--f7-list-item-padding-vertical);
+            padding-bottom: var(--f7-list-item-padding-vertical);
+            min-height: calc(var(--f7-list-item-min-height) - var(--menu-list-offset));
+            padding-right: calc(var(--f7-list-item-padding-horizontal) + var(--f7-safe-area-right) - var(--menu-list-offset));
+            flex-wrap: nowrap;
+            flex-direction: row;
+            align-content: center;
+    }
+
+    .list.cart-list-calculations .item-link .item-inner {
+            padding-right: calc(var(--f7-list-chevron-icon-area) + var(--f7-list-item-padding-horizontal) + var(--f7-safe-area-right) - var(--menu-list-offset));
+            position: relative;
+            width: 100%;
+            min-width: 0;
+            display: flex;
+            justify-content: space-between;
+            box-sizing: border-box;
+            align-items: center;
+            align-self: stretch;
+            padding-top: var(--f7-list-item-padding-vertical);
+            padding-bottom: var(--f7-list-item-padding-vertical);
+            min-height: calc(var(--f7-list-item-min-height) - var(--menu-list-offset));
+            padding-right: calc(var(--f7-list-item-padding-horizontal) + var(--f7-safe-area-right) - var(--menu-list-offset));
+            flex-wrap: nowrap;
+            flex-direction: row;
+            align-content: center;
+    }
+
+    .cart-calculations-amount code{
+      font-size: 20px;
+    }
+
+    .item-header.cart-items {
+        margin-top: 3px;
+    }
+
+    .strong-text{
+        font-weight: bold !important;
+    }
+</style>
 <script>
-export default () => {
-  return $render;
-};
+    export default () => {
+        return $render;
+    };
 </script>

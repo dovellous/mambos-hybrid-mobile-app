@@ -1,0 +1,49 @@
+<template>
+<div class="page">
+  <div class="navbar">
+    <div class="navbar-bg"></div>
+    <div class="navbar-inner sliding">
+      <div class="left">
+        <a href="#" class="link back">
+          <i class="icon icon-back"></i>
+          <span class="if-not-md">Back</span>
+        </a>
+      </div>
+      <div class="title">Cart</div>
+    </div>
+  </div>
+    <div class="page-content">
+      <div class="block-title">Simple List</div>
+      <div class="list"><ul><li><a href="#" class="item-link item-content"><div class="item-media"><i class="icon icon-f7"></i></div><div class="item-inner"><div class="item-title"><div class="item-header">Phone</div>+7 90 111-22-3344</div><div class="item-after">Edit</div></div></a></li></ul></div>
+    </div>
+  </div>
+</template>
+<style>
+  .icon-f7 {
+    background: #EE350F;
+    color: #fff !important;
+    border-radius: 50%;
+    text-align: center;
+  }
+
+  .icon-f7:before {
+    content: '7';
+  }
+
+  .ios .icon-f7 {
+    width: 29px;
+    height: 29px;
+    line-height: 29px;
+  }
+
+  .md .icon-f7 {
+    width: 24px;
+    height: 24px;
+    line-height: 24px;
+  }
+</style>
+<script>
+export default () => {
+  return $render;
+};
+</script>

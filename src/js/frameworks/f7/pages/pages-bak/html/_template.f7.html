@@ -1,0 +1,130 @@
+<template>
+    <div class="page">
+        <div class="navbar navbar-current navbar-large">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a class="link icon-only panel-open" data-panel="left" href="#">
+                        <i class="icon material-icons md-only">menu</i>
+                    </a>
+                </div>
+                <div class="title sliding" style="text-align: center; width: 100%">
+                    ${page_title}
+                </div>
+                <div class="right">
+                    <a class="link icon-only panel-open" data-panel=".panel-right-default" href="#">
+                        <i class="icon f7-icons ios-only">more</i>
+                        <i class="icon material-icons md-only">more_vert</i>
+                    </a>
+                </div>
+                ${page_title && $h`
+                <div class="title-large">
+                    <div class="title-large-text">
+                        ${page_title}
+                    </div>
+                </div>
+                `}
+            </div>
+        </div>
+
+        <div class="page-content page-content-bg page-with-navbar-large">
+
+        </div>
+
+    </div>
+
+</template>
+<script>
+    export default (props, {$f7ready, $f7, $f7route, $on, $update}) => {
+
+        let page_title, logoPath;
+
+        let productObject = {};
+
+        $f7ready(() => {
+
+            //
+
+        });
+
+        const functionName = function () {
+
+            //
+
+        };
+
+        const getData = function () {
+
+            // Must return an object
+
+            const categorySlug = $f7route.params.categorySlug;
+
+            const productIndex = $f7route.params.productIndex;
+
+            const categoryProducts = window.app.appData.module.data.getData().firebaseDataLocalObject.data.categoryProducts;
+
+            let productData = {};
+
+            if(categorySlug in categoryProducts){
+
+                if("products" in categoryProducts[categorySlug]){
+
+                    if(productIndex in categoryProducts[categorySlug]["products"]) {
+
+                        productData = categoryProducts[categorySlug]["products"][productIndex];
+
+                        page_title = productData.product_name;
+
+                    }
+
+                }
+
+            }
+
+            window.app.params.methods.product_view(categorySlug, productIndex);
+
+            return { product: window.app.data.selected_product};
+
+        };
+
+        $on('pageInit', () => {
+
+            page_title = "My Orders";
+
+            logoPath = window.app.appRenderer.module.styling.getNavBarLogo();
+
+            productObject = getData();
+
+            console.error(":: PRODUCT OBJECT >>>> :2:", productObject);
+
+            // trigger re-render
+            $update();
+
+        });
+
+        $on('pageMounted', (e, page) => {
+            console.log('page_title:', page_title, 'page mounted');
+        });
+        $on('pageBeforeIn', (e, page) => {
+            console.log('page_title:', page_title, 'page before in');
+        });
+        $on('pageAfterIn', (e, page) => {
+            console.log('page_title:', page_title, 'page after in');
+        });
+        $on('pageBeforeOut', (e, page) => {
+            console.log('page_title:', page_title, 'page before out');
+        });
+        $on('pageAfterOut', (e, page) => {
+            console.log('page_title:', page_title, 'page after out');
+        });
+        $on('pageBeforeUnmount', (e, page) => {
+            console.log('page_title:', page_title, 'page before unmount');
+        });
+        $on('pageBeforeRemove', (e, page) => {
+            console.log('page_title:', page_title, 'page before remove');
+        });
+
+        return $render;
+
+    }
+</script>

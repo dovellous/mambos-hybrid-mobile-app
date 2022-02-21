@@ -1,0 +1,1390 @@
+<template>
+    <div class="page">
+        <div class="navbar navbar-current navbar-large">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a class="link icon-only panel-open" data-panel="left" href="#">
+                        <i class="icon material-icons md-only">menu</i>
+                    </a>
+                </div>
+                <div class="title sliding" style="text-align: center; width: 100%">
+                    ${page_title}
+                </div>
+                <div class="right">
+                    <a class="link icon-only panel-open" data-panel=".panel-right-default" href="#">
+                        <i class="icon f7-icons ios-only">more</i>
+                        <i class="icon material-icons md-only">more_vert</i>
+                    </a>
+                </div>
+                ${page_title && $h`
+                <div class="title-large">
+                    <div class="title-large-text">
+                        ${page_title}
+                    </div>
+                </div>
+                `}
+            </div>
+        </div>
+
+        <div class="page-content">
+
+            <div class="block inset">
+                <h4>No Messages</h4>
+            </div>
+        </div>
+
+    </div>
+
+</template>
+<script>
+    export default (props, {$f7ready, $f7, $f7route, $on, $update}) => {
+
+        let page_title, logoPath;
+
+        let messageObject = {
+            chatHistoryListViewMenuItems: [],
+            chatHistoryTabData: [],
+            chatRoomMenuItems: []
+        };
+
+        $f7ready(() => {
+
+            //
+
+        });
+
+        const renderIMChatHistory = function( templateType, templateID, dataObject, el ){
+
+            //
+            console.log(":::::: RENDERER ", templateType, templateID, dataObject, el);
+
+        };
+
+        const renderNotificationsChatHistory = function( templateType, templateID, dataObject, el ){
+
+            //
+            console.log(":::::: RENDERER ", templateType, templateID, dataObject, el);
+
+        };
+
+        const initializeVaidaMessenger = function () {
+
+            let userData = $f7.appFirebase.module.authentication.getUserData();
+
+            console.log("***** initializeVaidaMessenger ", userData, self, this);
+
+            if(typeof userData !== "undefined" && userData !== null) {
+
+                console.log("DISPLAY NAME FOUND", userData);
+
+                $f7.appFirebase.events.OnFirebaseUserProfileUpdated({userData:userData});
+
+                $f7.appMessenger.module.server.init(
+                    userData.id,
+                    userData.displayName,
+                    userData,
+                    $f7.id
+                );
+
+            } else {
+
+                console.log("WAITING FOR DISPLAY NAME ++++", userData);
+
+                setTimeout(function () {
+
+                    initializeVaidaMessenger();
+
+                }, 1000);
+
+            }
+
+        };
+
+        /**
+         *
+         * @param originType
+         */
+        const messagesRenderHistoryList = function ( userData ) {
+
+            $f7.appMessenger.module.server.getOptimisedGroupList( false, function (groups) {
+
+
+                for (let groupId in groups) {
+
+                    let group = groups[groupId];
+
+                    if (group){
+
+                        if (group.groupType === "private"){
+
+                            $f7.appMessenger.module.runtime.chatMessagesPrivate[groupId] = group;
+
+                        }else if (group.groupType === "public"){
+
+                            $f7.appMessenger.module.runtime.chatMessagesPublic[groupId] = group;
+
+                        }else if (group.groupType === "sms"){
+
+                            $f7.appMessenger.module.runtime.chatMessagesSMS[groupId] = group;
+
+                        }else if (group.groupType === "notifications"){
+
+                            $f7.appMessenger.module.runtime.chatMessagesNotifications[groupId] = group;
+
+                        }else{
+
+                            $f7.appMessenger.module.runtime.chatMessagesPublic[groupId] = group;
+
+                        }
+
+                    }
+
+                }
+
+                setTimeout(function () {
+
+                    renderIMChatHistoryList(
+                        $f7.appMessenger.module.runtime.chatMessagesPrivate,
+                        '#chatHistoryPrivateList'
+                    );
+
+                    renderIMChatHistoryList(
+                        $f7.appMessenger.module.runtime.chatMessagesPublic,
+                        '#chatHistoryPublicList'
+                    );
+
+                    renderIMChatHistoryList(
+                        $f7.appMessenger.module.runtime.chatMessagesSMS,
+                        '#chatHistorySMSList'
+                    );
+
+                    renderIMChatHistoryList(
+                        $f7.appMessenger.module.runtime.chatMessagesNotifications,
+                        '#chatHistoryNotificationsList',
+                        'cards',
+                        'templateElementCardMoHCCSMS'
+                    );
+
+                }, 10);
+
+                setTimeout(function () {
+
+                    timeago.cancel();
+
+                    setTimeout(function () {
+
+                        $f7.appMessenger.events.OnChatHistoryListRenderingComplete( {} );
+
+                        const nodes = document.querySelectorAll('.timeago');
+
+                        timeago.cancel();
+
+                        try{
+
+                            // use render method to render nodes in real time
+                            timeago.render(nodes, 'en_US');
+
+                        } catch(e){
+
+                            console.log("TIME AGO ERROR", nodes, e);
+
+                        }
+
+                        $$("li.list-item-chat-object").off('click').on('click', function (e) {
+
+                            let elem = $$(e.target).closest("li");
+
+                            onChatHistoryListItemClick(elem);
+
+                        });
+
+                        $f7.ptr.done();
+
+                    }, 100);
+
+                }, 200);
+
+            });
+
+        };
+
+        /**
+         *
+         * @param dataObject
+         * @param element
+         */
+        const renderIMChatHistoryList = function (dataObject, element, templateType, templateID) {
+
+            if(templateType == null){
+                templateType = 'listviews';
+                templateID = 'imChatHistoryList';
+            }
+
+            if(templateType === null && templateID === null){
+
+                return;
+
+            }
+
+            renderIMChatHistory(
+                    templateType,
+                    templateID,
+                    {chats: dataObject},
+                $$(element)
+            );
+
+        };
+
+        /**
+         *
+         * @param instantMessage
+         */
+        const chatOnNewPrivateMessage = function (e) {
+
+            let self = this;
+
+            let data = e.detail;
+
+            if(!("messages" in $f7.appMessenger.module.runtime.chatMessagesPrivate[data.groupId])){
+
+                $f7.appMessenger.module.runtime.chatMessagesPrivate[data.groupId]["messages"] = {};
+
+            }
+
+            $f7.appMessenger.module.runtime.chatMessagesPrivate[data.groupId]["messages"][data.messageId] = data;
+
+            let authourIds = $f7.appMessenger.module.local.getGroupSenderIds(data);
+
+            if(authourIds.userId === currentUser.id){
+
+                console.log("OWN MESSAGE --- NO NOTIFICATION");
+
+            }else {
+
+                $f7.appModules.plugin.NotificationsManager.localNotification(
+                    data.messageText,
+                    "New message from "+$f7.appMessenger.module.local.getGroupSenderName(data),
+                    app.name,
+                    {
+                        icon: {
+                            source: $f7.appMessenger.module.local.getGroupSenderIcon(data),
+                            type: "image"
+                        },
+                    rightText: timeago.format(data.dateSent, 'en_US')
+
+                    }
+                );
+
+            }
+
+        };
+
+        /**
+         *
+         * @param instantMessage
+         */
+        const chatOnNewPublicMessage = function (e) {
+
+            let self = this;
+
+            let data = e.detail;
+
+            if(!("messages" in $f7.appMessenger.module.runtime.chatMessagesPublic[data.groupId])){
+
+                $f7.appMessenger.module.runtime.chatMessagesPublic[data.groupId]["messages"] = {};
+
+            }
+
+            $f7.appMessenger.module.runtime.chatMessagesPublic[data.groupId]["messages"][data.messageId] = data;
+
+            let authourIds = $f7.appMessenger.module.local.getGroupSenderIds(data);
+
+            if(authourIds.userId === currentUser.id){
+
+                console.log("OWN MESSAGE --- NO NOTIFICATION");
+
+            }else {
+
+                $f7.appModules.plugin.NotificationsManager.localNotification(
+                    $f7.appMessenger.module.local.getGroupSenderName(data) + ": " + data.messageText,
+                    $f7.appMessenger.module.local.getGroupName(data.groupId),
+                    app.name,
+                    {
+                        icon: {
+                            source: $f7.appMessenger.module.local.getGroupSenderIcon(data),
+                            type: "image"
+                        },
+                        rightText: timeago.format(data.dateSent, 'en_US')
+
+                    }
+                );
+
+            }
+
+
+        };
+
+        /**
+         *
+         * @param instantMessage
+         */
+        const chatOnNewNotificationMessage = function (e) {
+
+            let data = e.detail;
+
+            console.log(" :::: NEW NOTIFICATION",data);
+
+        };
+
+        /**
+         *
+         * @param instantMessage
+         */
+        const chatOnNewSMSMessage = function (e) {
+
+            let data = e.detail;
+
+            console.log(" :::: NEW SMS",data);
+
+        };
+
+        /**
+         *
+         * @param instantMessage
+         */
+        const chatOnNewMessage = function (e, repeat) {
+
+
+
+            let self = this;
+
+            let data = null;
+
+            let groupType = "";
+
+            if('detail' in e){
+
+                data = e.detail;
+
+            }else{
+
+                if('messagePayload' in e){
+
+                    data = e;
+
+                }
+
+            }
+
+            if(isDefined(data)) {
+
+                if (data.messagePayload.userId === currentUser.id) {
+
+                    data.messageClass = "message-sent";
+
+                    data.receivedMessage = false;
+
+                    $f7.appMessenger.module.server.acknowledgeMessageSent(data.groupId, data.messagePayload.id, data.groupType);
+
+                } else {
+
+                    $f7.appMessenger.module.server.acknowledgeMessageDelivered(data.groupId, data.messagePayload.id, data.groupType);
+
+                    data.messageClass = "message-received";
+
+                    data.receivedMessage = true;
+
+                }
+
+                if (Object.keys($f7.appMessenger.module.runtime.chatMessagesPrivate).length === 0) {
+
+                    //TODO - Why previously = e???
+
+                    $f7.appMessenger.module.runtime.messagesPendingToBeReceived[data.messageId] = data;
+
+                } else {
+
+                    if (data.groupId in $f7.appMessenger.module.runtime.chatMessagesPrivate) {
+
+                        groupType = "private"
+                        data.groupType = groupType;
+                        $f7.appMessenger.events.OnNewPrivateMessage(data);
+                        $f7.appMessenger.events.OnNewChatMessage(data);
+
+                        console.log("NEW MESSAGE ARRIVAL :chatMessagesPrivate ", data);
+
+                    }
+
+                }
+
+                if (Object.keys($f7.appMessenger.module.runtime.chatMessagesPublic).length === 0) {
+
+                    //TODO - Why previously = e???
+
+                    $f7.appMessenger.module.runtime.messagesPendingToBeReceived[data.messageId] = data;
+
+                } else {
+
+                    if (data.groupId in $f7.appMessenger.module.runtime.chatMessagesPublic) {
+
+                        groupType = "public"
+                        data.groupType = groupType;
+                        $f7.appMessenger.events.OnNewPublicMessage(data);
+                        $f7.appMessenger.events.OnNewGroupMessage(data);
+
+                        console.log("NEW MESSAGE ARRIVAL :chatMessagesPublic ", data);
+
+                    }
+
+                }
+
+                if (Object.keys($f7.appMessenger.module.runtime.chatMessagesSMS).length === 0) {
+
+                    //TODO - Why previously = e???
+
+                    $f7.appMessenger.module.runtime.messagesPendingToBeReceived[data.messageId] = data;
+
+                } else {
+
+                    if (data.groupId in $f7.appMessenger.module.runtime.chatMessagesSMS) {
+
+                        groupType = "sms";
+                        data.groupType = groupType;
+                        $f7.appMessenger.events.OnNewSMSMessage(data);
+
+                    }
+
+                }
+
+                if (Object.keys($f7.appMessenger.module.runtime.chatMessagesNotifications).length === 0) {
+
+                    //TODO - Why previously = e???
+
+                    $f7.appMessenger.module.runtime.messagesPendingToBeReceived[data.messageId] = data;
+
+                } else {
+
+                    if (data.groupId in $f7.appMessenger.module.runtime.chatMessagesNotifications) {
+
+                        groupType = "notification";
+                        data.groupType = groupType;
+                        $f7.appMessenger.events.OnNewNotificationMessage(data);
+
+                    }
+
+                }
+
+            }else{
+
+                console.log("MESSAGE RECEIVED WITH ERROR :::: params :::: ", e);
+
+            }
+
+        };
+
+        /**
+         *
+         * @param element
+         */
+        const onChatHistoryListRenderingComplete = function (element) {
+
+            let self = this;
+
+            console.log("$f7.appMessenger.module.runtime.messagesPendingToBeReceived", $f7.appMessenger.module.runtime.messagesPendingToBeReceived);
+
+            // check if we have some messages
+
+            for(messageId in $f7.appMessenger.module.runtime.messagesPendingToBeReceived) {
+
+                if(typeof chatOnNewMessage === "function"){
+
+                    chatOnNewMessage($f7.appMessenger.module.runtime.messagesPendingToBeReceived[messageId], true);
+
+                    delete $f7.appMessenger.module.runtime.messagesPendingToBeReceived[messageId];
+
+                }
+            }
+
+        };
+
+        /**
+         *
+         * @param element
+         */
+        const onChatHistoryListPopoverClick = function (element) {
+
+            let elementData = {
+                action: element.attr("data-action"),
+                uuid: element.attr("data-uuid"),
+                id: element.attr("data-id"),
+            }
+
+            let axn = elementData.action.split(":");
+
+            console.log("::axn::", axn);
+
+            switch (axn[0]) {
+
+                case "prompt": {
+
+                    switch (axn[1]) {
+
+                        case "chatNewGroup":  {
+
+                            $f7.dialog.prompt(
+                                "Enter the group name below",
+                                "Group Name",
+                                function ( groupName ) {
+
+                                    $f7.dialog.prompt(
+                                        "Enter the description of the group below",
+                                        "Group Description",
+                                        function ( groupStatus ) {
+
+                                            doCreateNewGroup( groupName, groupStatus);
+
+                                        },
+                                        function () {
+
+                                        },
+                                        ''
+                                    );
+
+                                },
+                                function () {
+
+                                },
+                                ''
+                            );
+
+                            break;
+
+                        }
+
+                        default: {
+
+                            break;
+
+                        }
+
+                    }
+
+                    break;
+
+                }
+
+                case "popup": {
+
+                    switch (axn[1]) {
+
+                        case "groupCreateNew":  {
+
+                            $f7.dialog.prompt(
+                                "Enter the group name below",
+                                "Group Name",
+                                function ( groupName ) {
+
+                                    $f7.dialog.prompt(
+                                        "Enter the description of the group below",
+                                        "Group Description",
+                                        function ( groupStatus ) {
+
+                                            doCreateNewGroup( groupName, groupStatus);
+
+                                        },
+                                    function () {
+
+                                    },
+                                    ''
+                                )},
+                                function () {
+
+                                },
+                                ''
+                            );
+
+                            break;
+
+                        }
+
+                        default: {
+
+                            break;
+
+                        }
+
+                    }
+
+                    break;
+
+                }
+
+                case "panel": {
+
+                    switch (axn[1]) {
+
+                        case "groupCreateNew":  {
+
+                            $f7.dialog.prompt(
+                                "Enter the group name below",
+                                "Group Name",
+                                function ( groupName ) {
+
+                                    $f7.dialog.prompt(
+                                        "Enter the description of the group below",
+                                        "Group Description",
+                                        function ( groupStatus ) {
+
+                                            doCreateNewGroup( groupName, groupStatus);
+
+                                        },
+                                        function () {
+
+                                        },
+                                        ''
+                                    )},
+                                function () {
+
+                                },
+                                ''
+                            );
+
+                            break;
+
+                        }
+
+                        default: {
+
+                            break;
+
+                        }
+
+                    }
+
+                    break;
+
+                }
+
+                default: {
+
+                    break;
+
+                }
+
+            }
+
+        };
+
+        /**
+         *
+         * @param element
+         */
+        const onChatRoomPopoverClick = function (element) {
+
+            let elementData = {
+                action: element.attr("data-action"),
+                uuid: element.attr("data-uuid"),
+                id: element.attr("data-id"),
+            }
+
+            let axn = elementData.action.split(":");
+
+            console.log("::axn::", axn);
+
+            switch (axn[0]) {
+
+                case "prompt": {
+
+                    switch (axn[1]) {
+
+                        case "chatNewGroup":  {
+
+                            $f7.dialog.prompt(
+                                "Enter the group name below",
+                                "Group Name",
+                                function ( groupName ) {
+
+                                    $f7.dialog.prompt(
+                                        "Enter the description of the group below",
+                                        "Group Description",
+                                        function ( groupStatus ) {
+
+                                            doCreateNewGroup( groupName, groupStatus);
+
+                                        },
+                                        function () {
+
+                                        },
+                                        ''
+                                    )},
+                                function () {
+
+                                },
+                                ''
+                            );
+
+                            break;
+
+                        }
+
+                        default: {
+
+                            break;
+
+                        }
+
+                    }
+
+                    break;
+
+                }
+
+                case "popup": {
+
+                    switch (axn[1]) {
+
+                        case "groupCreateNew":  {
+
+                            $f7.dialog.prompt(
+                                "Enter the group name below",
+                                "Group Name",
+                                function ( groupName ) {
+
+                                    $f7.dialog.prompt(
+                                        "Enter the description of the group below",
+                                        "Group Description",
+                                        function ( groupStatus ) {
+
+                                            doCreateNewGroup( groupName, groupStatus);
+
+                                        },
+                                        function () {
+
+                                        },
+                                        ''
+                                    )},
+                                function () {
+
+                                },
+                                ''
+                            );
+
+                            break;
+
+                        }
+
+                        default: {
+
+                            break;
+
+                        }
+
+                    }
+
+                    break;
+
+                }
+
+                case "panel": {
+
+                    switch (axn[1]) {
+
+                        case "groupCreateNew":  {
+
+                            $f7.dialog.prompt(
+                                "Enter the group name below",
+                                "Group Name",
+                                function ( groupName ) {
+
+                                    $f7.dialog.prompt(
+                                        "Enter the description of the group below",
+                                        "Group Description",
+                                        function ( groupStatus ) {
+
+                                            doCreateNewGroup( groupName, groupStatus);
+
+                                        },
+                                        function () {
+
+                                        },
+                                        ''
+                                    )},
+                                function () {
+
+                                },
+                                ''
+                            );
+
+                            break;
+
+                        }
+
+                        default: {
+
+                            break;
+
+                        }
+
+                    }
+
+                    break;
+
+                }
+
+                default: {
+
+                    break;
+
+                }
+
+            }
+
+        };
+
+        /**
+         *
+         * @param element
+         */
+        const onChatHistoryListItemClick = function (element) {
+
+            let groupType = element.attr("data-group-type");
+
+            let groupId = element.attr("data-group-id");
+
+            let url = '/chats/' + groupType + '/' + groupId + '/';
+
+            console.log(url);
+
+            $f7.appModules.plugin.NavigatorModel.gotoUrl(url);
+
+        };
+
+        /**
+         *
+         * @param instantMessage
+         */
+        const chatOnNewInvite = function (e) {
+
+            let self = this;
+
+            let data = e.detail;
+
+            console.log("INVITE DATA::::", data)
+
+            $f7.appMessenger.module.runtime.userInvitations[data.id] = data;
+
+            let invite = {
+                id: data.id,
+                uid: data.userMeta.id,
+                displayName: data.userMeta.displayName,
+                photoURL: data.userMeta.photoURL,
+                email: data.userMeta.email,
+                groupDisplayName: data.groupMeta.name,
+                groupStatus: data.groupMeta.data.status.text,
+                groupType: data.groupMeta.type,
+                groupPhotoURL: '', //data.groupMeta.data.photo.url,
+                raw: data
+            }
+
+            doPromptInvitation(invite);
+
+        };
+
+        /**
+         *
+         * @param instantMessage
+         */
+        const getInvitationsFromOthers = function (e) {
+
+            //TODO get this users chats invites
+
+        };
+
+        /**
+         *
+         * @param groupName
+         * @param groupId
+         */
+        const doCreateNewGroup = function (groupName, status) {
+
+            let self = this;
+
+            $f7.appMessenger.module.server.createGroup(groupName, 'public', {status: {text: status}}, true, messagesRenderHistoryList);
+
+        };
+
+        /**
+         *
+         * @param groupName
+         * @param groupId
+         */
+        const doPromptInvitation = function (invite) {
+
+            let self = this;
+
+            $$("#invite-container-div").attr("data-invite-id", invite.id);
+
+            $$("#invite-user-photo-url").attr("src", invite.photoURL);
+
+            $$("#invite-user-display-name").html(invite.displayName);
+
+            $$("#invite-group-name").html(invite.groupName);
+
+            $$("#invite-group-photo-url").attr("src", invite.groupPhotoURL);
+
+            inviteSheetModal.open();
+
+        };
+
+        /**
+         *
+         * @param userId
+         * @param groupId
+         */
+        const doSendInvite = function (userId, groupId,) {
+
+            $f7.appMessenger.module.server.inviteUser(userId, groupId, {});
+
+        };
+
+        /**
+         *
+         * @param groupName
+         * @param groupId
+         */
+        const doAcceptInvite = function (inviteId) {
+
+            let self = this;
+
+            if(isDefined(inviteId)) {
+
+                $f7.appMessenger.module.server.acceptInvite(inviteId, function (data) {
+
+                    console.log("ACCEPTED INVITE: ", inviteId, data);
+
+                });
+
+            }else{
+
+                for(_inviteId in $f7.appMessenger.module.runtime.userInvitations){
+
+                    $f7.appMessenger.module.server.acceptInvite(_inviteId, function (data) {
+
+                        console.log("ACCEPTED INVITE: ", _inviteId, data);
+
+                    });
+
+                }
+
+            }
+
+            inviteSheetModal.close();
+
+        };
+
+        /**
+         *
+         * @param groupName
+         * @param groupId
+         */
+        const doDeclineInvite = function (inviteId) {
+
+            let self = this;
+
+            if(isDefined(inviteId)) {
+
+                $f7.appMessenger.module.server.declineInvite(inviteId, function (data) {
+
+                    console.log("DECLINED INVITE: ", data);
+
+                });
+
+            }else{
+
+                for(_inviteId in $f7.appMessenger.module.runtime.userInvitations){
+
+                    $f7.appMessenger.module.server.declineInvite(_inviteId, function (data) {
+
+                        console.log("DECLINED INVITE: ", data);
+
+                    });
+
+                }
+
+            }
+
+            inviteSheetModal.close();
+
+        };
+
+        const setListItemTitleText = function(id, text, temporary){
+
+            let element = $$("#chat-"+id+"> div > div.item-inner > div:nth-child(1) > div.item-subtitle");
+
+            let elementText = element.text();
+
+            element.text(text);
+
+            return {
+                old: elementText,
+                new: text
+            }
+
+        };
+
+        const setListItemSubtitleText = function(id, text, badge){
+
+            let element = $$("#chat-"+id+"> div > div.item-inner > div:nth-child(2) > div.item-subtitle");
+
+            let elementBadgeContainer = $$("#chat-"+id+"> div > div.item-inner > div:nth-child(2)");
+
+            let elementText = element.text();
+
+            element.text(text);
+
+            if(badge){
+
+                let badgeCounter = '<div id="list-item-badge-div-${this.groupId}" class="item-after list-item-badge-div"><span id="list-item-badge-span-${this.groupId}" class="badge color-green list-item-badge-span">'+badge+'</span></div>';
+
+                elementBadgeContainer.append(badgeCounter);
+
+            }
+
+            return {
+                old: elementText,
+                new: text
+            }
+
+        };
+
+        const getData = function () {
+
+            // Must return an object
+
+            const message_object = $f7.appFirebase.module.authentication.databaseAppDataLocalGetObject().settings.ui.locale.en.appPagesMessenger.index;
+
+            //Object.keys(message_object.chatHistoryListViewMenuItems).map((key) => [key, message_object.chatHistoryListViewMenuItems[key]])
+
+            const _messageObject = {
+                chatHistoryListViewMenuItems: message_object.chatHistoryListViewMenuItems,
+                chatHistoryTabData: message_object.chatHistoryTabData,
+                chatRoomMenuItems: message_object.chatRoomMenuItems
+            };
+
+            console.error(":: MESSAGE OBJECT >>>> :1:", message_object, _messageObject);
+
+            return _messageObject;
+
+        };
+
+        $on('pageInit', () => {
+
+            page_title = "Messages";
+
+            logoPath = window.app.appRenderer.module.styling.getNavBarLogo();
+
+            console.error(":: MESSAGE OBJECT >>>> :0:", messageObject);
+
+            messageObject = getData();
+
+            console.error(":: MESSAGE OBJECT >>>> :2:", messageObject);
+            //TODO - remove if not working freezing
+
+
+            const ptrContentPrivate = $$('.ptr-content.ptr-TabPrivateChats');
+
+            ptrContentPrivate.on('ptr:refresh', function (e) {
+
+                messagesRenderHistoryList();
+
+            });
+
+
+            $$("li.app-pages-messenger-index-popover").click(function(e){
+
+                $f7.appRenderer.Module.popup.close("#chatHistoryListViewMenu");
+
+                const elem = $$(e.target).closest("a");
+
+                onChatHistoryListPopoverClick(elem);
+
+            });
+
+            $$("li.app-pages-messenger-index-popover-chat").click(function(e){
+
+                $f7.appRenderer.Module.popup.close("#chatRoomMenu");
+
+                const elem = $$(e.target).closest("a");
+
+                onChatRoomPopoverClick(elem);
+
+            });
+
+            $$("li.app-pages-messenger-index-fab-popover-").click(function(e){
+
+                $f7.appRenderer.Module.popup.close("#chatHistoryFabListViewMenu");
+
+                const elem = $$(e.target).closest("a");
+
+                onChatHistoryListFabPopoverClick(elem);
+
+            });
+
+            window.addEventListener($f7.appFirebase.events.ON_FIREBASE_AUTH_STATE_CHANGED, function (e) {
+
+                console.log("###### initializeVaidaMessenger WAIT FOR A DUPLICATE", self);
+
+                // Check if the user is logged in
+                if(e.detail.loggedIn){
+
+                    console.log("###### initializeVaidaMessenger ######", self);
+
+                    if (typeof initializeVaidaMessenger === 'function') {
+
+                        initializeVaidaMessenger();
+
+                    }
+
+                }
+
+            });
+
+
+            window.addEventListener($f7.appFirebase.events.ON_FIREBASE_AUTH_USER_DATA_UPDATED, function (e) {
+
+                console.log("###### initializeVaidaMessenger ###### ON_FIREBASE_AUTH_USER_DATA_UPDATED", e.detail);
+
+                // Check if the user is logged in
+                if(e.detail){
+
+                    console.log("###### initializeVaidaMessenger ######", self);
+
+                    if (typeof initializeVaidaMessenger === 'function') {
+
+                        initializeVaidaMessenger();
+
+                    }
+
+                }
+
+            });
+
+
+            window.addEventListener($f7.appMessenger.events.ON_NEW_MESSAGE, function (data) {
+
+                console.log("******* WAIT >>>>> ON_NEW MESSAGE", data);
+
+                if(typeof chatOnNewMessage === "function") {
+
+                    console.log("****** ON_NEW MESSAGE", data);
+
+                    chatOnNewMessage(data);
+
+                }
+
+            });
+
+            window.addEventListener($f7.appMessenger.events.ON_CHAT_HISTORY_LIST_RENDERING_COMPLETE, function (data) {
+
+                console.log("ON_CHAT_HISTORY_LIST_RENDERING_COMPLETE");
+
+                if(typeof onChatHistoryListRenderingComplete === "function"){
+
+                    onChatHistoryListRenderingComplete();
+
+                }
+
+            });
+
+            window.addEventListener($f7.appMessenger.events.ON_NEW_PRIVATE_MESSAGE, function (data) {
+
+                console.log("ON_NEW_PRIVATE_MESSAGE");
+
+                if(typeof chatOnNewPrivateMessage === "function") {
+
+                    chatOnNewPrivateMessage(data);
+
+                }
+
+            });
+
+            window.addEventListener($f7.appMessenger.events.ON_NEW_PUBLIC_MESSAGE, function (data) {
+
+                console.log("ON_NEW_PUBLIC_MESSAGE");
+
+                if(typeof chatOnNewPublicMessage === "function") {
+
+                    chatOnNewPublicMessage(data);
+
+                }
+
+            });
+
+            window.addEventListener($f7.appMessenger.events.ON_NEW_SMS_MESSAGE, function (data) {
+
+                console.log("ON_NEW_SMS_MESSAGE");
+
+                if(typeof chatOnNewSMSMessage === "function") {
+
+                    chatOnNewSMSMessage(data);
+
+                }
+
+            });
+
+            window.addEventListener($f7.appMessenger.events.ON_CHAT_INVITE, function (data) {
+
+                console.log("ON_CHAT_INVITE");
+
+                if(typeof chatOnNewInvite === "function") {
+
+                    chatOnNewInvite(data);
+
+                }
+
+            });
+
+            window.addEventListener($f7.appMessenger.events.ON_USER_CONNECTED, function (data) {
+
+                if(typeof messagesRenderHistoryList === "function"){
+
+                    messagesRenderHistoryList(data.detail);
+
+                }
+
+            });
+
+            const inviteSheetModal = app.sheet.create({
+                el: '#invite-container-div',
+                swipeToClose: true,
+                backdrop: true,
+            });
+
+
+            // Login Screen Demo
+            $$('#btn-chat-invite-accept').on('click', function () {
+
+                const inviteId = $$('#invite-container-div').attr("data-invite-id");
+
+                doAcceptInvite(inviteId);
+
+            });
+
+            // Login Screen Demo
+            $$('btn-chat-invite-decline').on('click', function () {
+
+                const inviteId = $$('#invite-container-div').attr("data-invite-id");
+
+                doDeclineInvite(inviteId);
+
+            });
+
+
+
+            if ($f7.appFirebase.module.authentication.authIsLoggedIn()) {
+
+                initializeVaidaMessenger();
+
+            }
+
+            // trigger re-render
+            $update();
+
+        });
+
+        $on('pageMounted', (e, page) => {
+            console.log('page_title:', page_title, 'page mounted');
+        });
+        $on('pageBeforeIn', (e, page) => {
+            console.log('page_title:', page_title, 'page before in');
+
+            window.addEventListener($f7.appFirebase.events.ON_FIREBASE_REMOTE_DATA_CHANGED, function (e) {
+
+                const user = $f7.appFirebase.module.authentication.getUserData();
+
+                const data = e.detail;
+
+                if(data.path === "/sms/{0}".format(user.uid)) {
+
+                    if(data.value !== null)
+                    {
+
+                        const uiData = {sms: data.value};
+
+                        if(typeof chatOnNewSMSMessage === "function") {
+
+                            //chatOnNewSMSMessage(data);
+
+                            console.log("##REMOTE##: ", user.uid, data.path, data.value, "/sms/{0}".format(user.uid));
+
+                            $f7.appModules.plugin.NotificationsManager.localNotification(data.value.text, data.value.title, "Afrimom Messenger", {}, console.log, []);
+
+                            renderNotificationsChatHistory(
+                                    'cards',
+                                    'templateElementCardSMS',
+                                    {sms: data.value},
+                                    $$('#notificationsHistoryList')
+                                );
+
+                            if(0) {
+
+                                let messages = [];
+
+                                let lastMessage = ["", ""];
+
+                                for (messageID in data.value || data.value.hasOwnProperty(messageID)) {
+
+                                    const _message = data.value[messageID];
+
+                                    messages.push('<i class="f7-icons icon app-theme-color small-iconic-font">envelope_badge</i> '+_message.text);
+
+                                    lastMessage = [_message.text, _message.title];
+
+                                }
+
+                                if (messages.length === 1) {
+
+                                    $f7.appModules.plugin.NotificationsManager.localNotification(lastMessage[0], lastMessage[1], "Afrimom Message", {}, console.log, []);
+
+                                } else {
+
+                                    $f7.appModules.plugin.NotificationsManager.localNotification(messages.join("<br>"), 'New Messages', "Afrimom Messenger", {}, console.log, []);
+
+                                }
+
+                            }
+                            else
+                            {
+                                $f7.appModules.plugin.NotificationsManager.localNotification(data.value.text, data.value.title, "Afrimom Messenger", {}, console.log, []);
+                            }
+
+                        }
+
+                    }
+
+                }
+
+            });
+
+        });
+        $on('pageAfterIn', (e, page) => {
+            console.log('page_title:', page_title, 'page after in');
+        });
+        $on('pageBeforeOut', (e, page) => {
+            console.log('page_title:', page_title, 'page before out');
+        });
+        $on('pageAfterOut', (e, page) => {
+            console.log('page_title:', page_title, 'page after out');
+        });
+        $on('pageBeforeUnmount', (e, page) => {
+            console.log('page_title:', page_title, 'page before unmount');
+        });
+        $on('pageBeforeRemove', (e, page) => {
+            console.log('page_title:', page_title, 'page before remove');
+        });
+
+        return $render;
+
+    }
+</script>

@@ -1,0 +1,698 @@
+<template>
+    <div class="page">
+        <div class="navbar navbar-current  ${cartObject.products_count > 0 ? 'navbar-large' : 'navbar-normal'}">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a class="link icon-only panel-open" data-panel="left" href="#">
+                        <i class="icon material-icons md-only">menu</i>
+                    </a>
+                </div>
+                <div class="title sliding" style="text-align: center; width: 100%">
+                    <img src="${logoPath}" style="max-height: 45px;vertical-align: middle; "/>
+                </div>
+                <div class="right">
+
+                    ${cartObject.products_count > 0 ? $h`
+                    <a class="link icon-only initiate-a-transaction" href="#">
+                        <i class="icon f7-icons">money_dollar_circle</i>
+                    </a>
+                    `: $h`
+                    <a class="link icon-only start-new-order" href="#">
+                        <i class="icon f7-icons">bag_badge_plus</i>
+                    </a>
+                    `}
+                </div>
+
+                <div class="subnavbar">
+                    <div class="subnavbar-inner">
+                        <div class="display-flex padding-left-0 padding-right-0 justify-content-space-between align-items-center"  style=" width: -webkit-fill-available; ">
+                            <div style="/*font-size: 24px*/">Cart ${cartObject.products_count > 0 ? $h`Total:`: $h`<!--- --->`}</div>
+                            ${cartObject.products_count > 0 ? $h`
+                            <div style="font-size: 24px"><b class="payment-total-amount asap-font">${cartObject.currency} ${cartObject.cart_total}</b></div>
+                            `: $h`<!--- --->`}
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="page-content ${cartObject.products_count > 0 ? 'page-with-navbar-large page-content-bg' : 'page-bg-startup'}">
+
+            <div class="block padding-0" id="cart_items_container">
+
+                ${cartObject.products_count > 0 ? $h`
+
+                <div class="card list media-list not-empty-cartx">
+                    <ul id="cart-items-list" class="cart-items-list">
+                        ${cartObject.cart_items.map((item, index) => $h`
+                        <li id="${item[1].product_id}"
+                            data-id="${item[1].product_id}"
+                            data-name="${item[1].product_name}"
+                            data-index="${item[0]}"
+                            data-price="${item[1].product_price_regular}"
+                            class="product message-list">
+                            <div class="item-content">
+                                <div class="item-inner">
+                                    <div class="item-title-row title">
+                                        <div class="item-title"><h3><strong>${item[1].product_name}</strong></h3></div>
+                                        <div class="item-after" ><strong>$ ${item[1].product_price_regular}</strong></div>
+                                    </div>
+                                    <div class="item-title-row subtitle">
+                                        <div class="item-subtitle">
+                                            <span class="color-gray">${item[1].product_except}</span>
+                                            <br />
+                                            Quantity: x <strong><span id="list-item-${item[0]}">${item[1].product_qty}</span></strong>
+                                            <input class="" type="hidden" id="list-item-input-${item[0]}" value="${item[1].product_qty}" />
+                                        </div>
+                                        <div class="stepper stepper-init stepper-small stepper-raised" data-value="${item[1].product_qty}" data-value-el="#list-item-input-${item[0]}" style="margin-top: 10px;">
+                                            <div class="stepper-button-minus update-cart-item" data-key="${item[0]}" data-id="${item[1].product_id}" data-cart-item="-1|${item[0]}|${item[1].product_category_slug}|${item[1].product_index}"></div>
+                                            <div class="stepper-button-plus update-cart-item"  data-key="${item[0]}" data-id="${item[1].product_id}" data-cart-item="1|${item[0]}|${item[1].product_category_slug}|${item[1].product_index}"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    `)}
+                    </ul>
+                </div>
+
+                <div class="block list">
+                    <ul class="transparent-bg">
+                        <li class="checkout-btn-container">
+                            <button class="colx button button-large button-raised button-fill button-large-x1-2x initiate-a-transaction">
+                                CHECKOUT
+                            </button>
+                        </li>
+                        <li class="reset-cart-btn-container">
+                            <button class="colx button button-large button-raised button-fill button-large-x1-2x color-orange margin-top-x3  margin-bottom-x3 reset-cart">
+                                EMPTY CART
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+
+                ` : $h`
+
+                <!--- {cartObject.products_count} has empty products --->
+
+                <div class="block text-align-center">
+                    <img src="static/images/png/001-shopping cart.png" style="width: 75%; margin: auto;" align="center" class="margin-top-x3" />
+                    <h2>
+                        Cart Empty!
+                    </h2>
+
+                    <p class="eligible-font">There are no items in your cart. To start an order, please click the button below.</p>
+
+                    <div class="block list">
+                        <ul>
+                            <li class="login-btn-container">
+                                <button class="colx button button-large button-raised button-fill button-large-x1-2x start-new-order">
+                                    START AN ORDER
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
+
+                </div>
+
+                `}
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+</template>
+<script>
+    export default (props, {$f7ready, $f7, $f7route, $on, $update}) => {
+
+        let logoPath, cartTotal;
+
+        let page_title = "Cart";
+
+        let cartObject = {
+            cart_items:  [],
+            products_count: 0,
+            currency: "USD",
+            cart_total: 0,
+            payment_methods: {},
+        };
+
+        $f7ready(() => {
+
+            //
+
+        });
+
+        const checkout = () => {
+
+            console.log(":::: CHECKOUT");
+
+        };
+
+        const clearCart = () => {
+
+            console.log(":::: CLEAR CART");
+
+            $f7.dialog.confirm(
+                "You are about clear your shopping cart. All cart items across your devices will be lost also. Do you want to clear your cart?",
+                "Clear Cart?",
+                function(){
+
+                    $f7.params.methods.cart_clear_firebase();
+
+                    window.SweetAlert({
+                        title: "Cart Cleared!",
+                        text: `Your cart is now empty. You can add items again by visiting the Cart tab.`,
+                        icon: "success",
+                        buttons: false,
+                    });
+
+                    $f7.appModules.plugin.CapLocalNotifications.fire(
+                        `Cart Cleared!`,
+                        null,
+                        `Your cart is now empty. You can add items again by visiting the Cart tab.`,
+                        20,
+                        {}
+                    );
+
+                    $f7.emit("CART_CLEARED");
+
+                },
+                function () { });
+
+            refreshCart();
+
+        };
+
+        const debug_cart_object = () => {
+
+            console.log(cartObject);
+
+        };
+
+        const refreshCart = (_cart) => {
+
+            let _cart_items = [];
+
+            //console.log("::::::::::::::::;; REFRESH CART 1" , _cart);
+
+            if(typeof _cart !== "undefined" && _cart !== null && _cart.hasOwnProperty("cart")){
+
+                _cart_items = _cart;
+
+                //console.log("::::::::::::::::;; REFRESH CART 1A" , _cart_items);
+
+            }else {
+
+                _cart_items = $f7.data.metaDataFirebaseUserCart;
+
+            }
+
+            //console.log("::::::::::::::::;; REFRESH CART 2" , _cart_items);
+
+            if(typeof _cart_items !== "undefined" && _cart_items !== null && _cart_items.hasOwnProperty("cart")) {
+
+                $f7.data.cart = _cart_items.cart;
+                $f7.data.cart_amount = formatMoney(_cart_items.cart_amount);
+                $f7.data.cart_qty = _cart_items.cart_qty;
+                $f7.data.cart_total = formatMoney(_cart_items.cart_total);
+                $f7.data.cart_total_items = _cart_items.cart_total_items;
+
+                cartObject.cart_items = Object.keys(_cart_items.cart).map((key) => [key, _cart_items.cart[key]]);
+                cartObject.products_count = $f7.data.cart_total_items;
+                cartObject.currency = $f7.data.cart_currency;
+                cartObject.cart_total = $f7.data.cart_total;
+                cartObject.meta = _cart_items;
+
+            }else{
+
+                cartObject = {
+                    cart_items:  [],
+                        products_count: 0,
+                    currency: "USD",
+                    cart_total: "0.00",
+                    payment_methods: {},
+                };
+
+            }
+
+            // trigger re-render
+            $update();
+
+            //console.log("::::::::::::::::;; REFRESH CART 4" , _cart_items);
+
+            console.log("::::::::::::::::;; REFRESH CART", cartObject);
+
+        };
+
+        const initiateTransaction = () => {
+
+            // Preloader with custom text
+            $f7.dialog.preloader('Please wait...');
+
+            const payment_method = document.querySelector('input[name="demo-radio-end"]:checked').value;
+
+            setTimeout(function () {
+
+                app.dialog.close();
+
+                const date = new Date();
+
+                const order_id = date.toJSON().replace(/[^\w\.]/gi, '');
+
+                let payload = self.cart_calc_payload();
+
+                payload.order_id = order_id;
+
+                const uid = firebase.auth().currentUser.uid;
+
+                const userMetaDataPath = 'accounts/users/' + uid;
+
+                if (uid) {
+
+                    if (uid) {
+
+                        payload.firstname = $f7.data.user_account_details.firstname;
+                        payload.lastname = $f7.data.user_account_details.lastname;
+                        payload.email = $f7.data.user_account_details.email;
+                        payload.mobile = $f7.data.user_account_details.phoneNumber;
+                        payload.uid = uid;
+                        payload.order_currency = $f7.data.cart_currency;
+                        payload.order_amount = $f7.params.methods.cart_calc_grand_total();
+
+                        payload.paypal_subtotal = ($f7.params.methods.cart_calc_grand_total() - $f7.params.methods.cart_calc_delivery_fee()).toFixed(2);
+
+                        payload.paypal_shipping = ($f7.params.methods.cart_calc_delivery_fee()).toFixed(2);
+
+                        console.log("::MAKE PAYMENT::", payload, self.cart_payment_method.options.id, self.cart_calc_grand_total);
+
+                        setTimeout(function () {
+
+                            $f7.data.cart_placing_order = false;
+
+                            switch (self.cart_payment_method.options.id) {
+
+                                case "mobile": {
+
+                                    const mobile_url = appConfigData.URL_INITIATE_TRANSACTION;
+
+                                    $f7.dialog.prompt(
+                                        'Enter your mobile wallet number to pay' + self.cart_currency + ' ' + self.cart_calc_grand_total.toFixed(2),
+                                        function (inputValue) {
+
+                                            console.log(inputValue);
+
+                                            payload.mobile = inputValue;
+
+                                            $f7.request.post(mobile_url, payload)
+                                                .then(function (res) {
+                                                    console.log(res.data);
+
+                                                    //console.log(":: MOBILE INITIATE ::", result);
+
+                                                    if (typeof result !== "object") {
+
+                                                        try {
+
+                                                            result = JSON.parse(result);
+
+                                                        } catch (error) {
+
+                                                        }
+
+                                                    }
+
+                                                    if(result.response.messageId === "SVC0007"){
+
+                                                        window.MambosJQueryApp.snippets.toast(result.response.text, "Error", "warning", 30000);
+
+                                                    }else{
+
+
+                                                        if("transactionOperationStatus" in result.response){
+
+                                                            self.cart_place_pre_order($f7.data.user_account_details.uid, result.response, "Mobile");
+
+                                                        }
+
+
+                                                    }
+
+                                                    //console.log("MOBILE PAYMENT RESULT :: ", result);
+
+                                                });
+
+
+                                        },
+                                        function (error) {
+                                            console.log(data);
+                                        }
+                                    );
+
+                                    break;
+                                }
+
+                                case "paypal": {
+
+                                    var url = `${base_url}pay/initiate/paypal`;
+
+                                    //
+                                    window.MambosJQueryApp.snippets.ajax.post(url, payload, function (result) {
+
+                                        console.log(":: PAYPAL INITIATE ::", result);
+
+                                        if (typeof result !== "object") {
+
+                                            try {
+
+                                                result = JSON.parse(result);
+
+                                            } catch (error) {
+
+                                            }
+
+                                        }
+
+                                        const request_id = result.request_id;
+
+                                        if (request_id) {
+
+                                            var url = `${base_url}pay/request/paypal/${request_id}`;
+
+                                            window.open(url, '_blank', 'location=yes,height=600,width=800,scrollbars=yes,status=yes');
+
+                                            console.log("::WATCH FOR", result);
+
+                                            self.cart_place_pre_order($f7.data.user_account_details.uid, result, "Paypal");
+
+                                        }
+
+                                    });
+
+                                    break;
+
+                                }
+
+                                case "card": {
+
+                                    //
+                                    self.cart_place_order(order_id, "CARD");
+
+                                    break;
+
+                                }
+
+                                case "cash": {
+
+                                    //
+                                    self.cart_place_order(order_id, "CASH");
+
+                                    break;
+
+                                }
+
+                                default: {
+
+                                    break;
+
+                                }
+                            }
+
+                        }, 1000);
+
+                    }
+
+                }
+
+            }, 3000);
+
+        };
+
+        const getData = function () {
+
+            // Must return an object
+
+            const resource = $f7.appEcommerce.module.cart.getCartProducts();
+
+            console.log( "resource", resource );
+
+            const local_cart_items = localStorage.cart_object;
+
+            let _cart_items = [];
+
+            try{
+
+                _cart_items = JSON.parse(local_cart_items);
+
+                $f7.data.cart = _cart_items.cart;
+                $f7.data.cart_amount = _cart_items.cart_amount;
+                $f7.data.cart_qty = _cart_items.cart_qty;
+                $f7.data.cart_total = _cart_items.cart_total;
+                $f7.data.cart_total_items = _cart_items.cart_total_items;
+
+            }catch (e) {
+
+
+
+            }
+
+            _cart_items = Object.keys(_cart_items).map((key) => [key, _cart_items[key]]);
+
+            const _cartObject = {
+                cart_items:  _cart_items,
+                products_count: !resource ? 0 : resource.length,
+                currency: $f7.data.cart_currency,
+                cart_total: formatMoney($f7.data.cart_total),
+                payment_methods: {},
+            };
+
+
+
+            console.error(":: CART OBJECT >>>> :2:", _cartObject);
+
+            return _cartObject;
+
+        };
+
+        $on('pageInit', () => {
+
+            $f7.on("DEBUG_CART_OBJECT", debug_cart_object);
+
+            //$f7.emit('DEBUG_CART_OBJECT');
+
+            console.log('page_title:', page_title, 'page before in');
+
+            //console.error(":: CART OBJECT >>>> :1:", cartObject);
+
+            logoPath = window.app.appRenderer.module.styling.getNavBarLogo();
+
+            cartObject = getData();
+
+            //console.error(":: CART OBJECT >>>> :3:", cartObject);
+
+            $$('.start-new-order').on('click', function () {
+
+                $f7.emit("CREATE_ORDER", true);
+
+            });
+
+            $$('.initiate-a-transaction').on('click', function () {
+
+                $f7.emit("INITIATE_A_TRANSACTION", true);
+
+            });
+
+            $$('.reset-cart').on('click', function () {
+
+                $f7.emit("RESET_CART", true);
+
+            });
+
+            window.paymentCreate = app.sheet.create({
+                el: 'div.sheet-modal.my-sheet-swipe-to-steps',
+                swipeToClose: true,
+                swipeToStep: true,
+                backdrop: true,
+            });
+
+            $$('.generate-payment-button').on('click', function (event) {
+
+                window.paymentCreate.open();
+
+            });
+
+            $f7.on("CART_ITEM_QTY_CHANGED", function (element) {
+
+                console.log("::: ON CART_ITEM_QTY_CHANGED", element);
+
+                const _qty = parseInt(element[0]);
+
+                const cart_key = element[1];
+
+                const current_qty = parseInt($$("#list-item-input-"+cart_key).val());
+
+                const new_qty = current_qty+_qty;
+
+                const cart_product = $f7.data.cart[cart_key];
+
+                console.log("CART_CURRENT_PRODUCT", current_qty, new_qty, cart_key, cart_product);
+
+                $$("#list-item-input-"+element[1]).val(new_qty);
+
+                $f7.params.methods.cart_update_product_qty(cart_product.product_category_slug, cart_product.product_index, cart_product.product_id, (_qty===1), current_qty, new_qty);
+
+                if(_qty > 0){
+
+                    $f7.params.methods.product_qty_increase();
+
+                }else{
+
+                    $f7.params.methods.product_qty_increase();
+
+                }
+
+                $f7.params.methods.product_calculate_cart_grand_total_amount();
+
+            });
+
+            $f7.on("CART_UPDATE", function ( cart ) {
+
+                console.log("::: UPDATE CART :::", cart);
+
+                cartObject.cart_items = cart;
+
+                refreshCart(cart);
+
+            });
+
+            $f7.on("REFRESH_CART", function () {
+
+                refreshCart();
+
+            });
+
+            refreshCart();
+
+            // trigger re-render
+            $update();
+
+        });
+
+        $on('pageMounted', (e, page) => {
+            console.log('page_title:', page_title, 'page mounted');
+        });
+        $on('pageBeforeIn', (e, page) => {
+            console.log('page_title:', page_title, 'page before in');
+
+
+            $f7.on('INITIATE_A_TRANSACTION', function () {
+
+                checkout();
+
+            });
+
+            $f7.on('RESET_CART', function () {
+
+                clearCart();
+
+            });
+
+
+        });
+        $on('pageAfterIn', (e, page) => {
+
+            console.log('page_title:', page_title, 'page after in');
+
+            setTimeout(function(){
+
+                $$(".update-cart-item").on('click', function () {
+
+                    const cart_item_vars = $$(this).attr("data-cart-item");
+
+                    const cart_item_array = cart_item_vars.split("|");
+
+                    setTimeout(function(){
+
+                        $f7.emit('CART_ITEM_QTY_CHANGED', cart_item_array);
+
+                    },333);
+
+                    $f7.params.methods.product_view(cart_item_array[2], cart_item_array[3]);
+
+                    console.log("::: FIRE CART_ITEM_QTY_CHANGED ", cart_item_array);
+
+                });
+
+            },2000);
+
+            if(typeof $f7.data.cart === "object"){
+
+                if($f7.data.cart_total_items > 0) {
+
+                    $$(".cart_counter").text($f7.data.cart_total_items);
+                    $$(".cart_counter").show();
+
+                }else{
+
+                    $$(".cart_counter").text($f7.data.cart_total_items);
+                    $$(".cart_counter").hide();
+
+                }
+
+                cartObject.cart_total = $f7.data.cart_amount;
+
+            }
+
+            // Progress
+            $$('.payment-generate-button').on('click', function () {
+
+                let progress = 0;
+                const dialog = $f7.dialog.progress('Preparing transaction...', progress);
+                dialog.setText('Connecting...');
+                const interval = setInterval(function () {
+                    progress += 10;
+                    dialog.setProgress(progress);
+
+                    if (progress === 30) {
+                        dialog.setText('Connected!');
+                    }
+                    if (progress === 40) {
+                        dialog.setText('Initiating a payment request...');
+                    }
+                    if (progress === 100) {
+
+                        clearInterval(interval);
+
+                        dialog.close();
+
+                        initiateTransaction();
+
+                    }
+                }, 2000)
+            });
+
+            refreshCart();
+
+        });
+        $on('pageBeforeOut', (e, page) => {
+            console.log('page_title:', page_title, 'page before out');
+        });
+        $on('pageAfterOut', (e, page) => {
+            console.log('page_title:', page_title, 'page after out');
+        });
+        $on('pageBeforeUnmount', (e, page) => {
+            console.log('page_title:', page_title, 'page before unmount');
+        });
+        $on('pageBeforeRemove', (e, page) => {
+            console.log('page_title:', page_title, 'page before remove');
+        });
+
+        return $render;
+
+    }
+</script>

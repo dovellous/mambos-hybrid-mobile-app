@@ -1,0 +1,362 @@
+<template>
+    <div class="appstore-page appstore-page-no-collapsed-navbar page page-with-navbar-large page-current page-with-card-opened">
+        <!-- additional "navbar-large" class -->
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <!-- ... -->
+                </div>
+                <!-- usual title will be visible when larger title collapsed -->
+                <div class="title">${page_title}</div>
+                <div class="right">
+                    <!-- Link to close popup -->
+                    <a class="link order-menu-popup-close-button">
+                        <i class="icon f7-icons">multiply</i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="page-content page-bg-startup padding-top-x2">
+            <div class="appstore-card-grid ">
+
+                ${menuObject.categoryProducts.map((item, index) => $h`
+
+                ${(item[1].hasOwnProperty('products')) ? $h`
+
+                <div class="appstore-card card card-expandable">
+                    <div class="card-content">
+                        <div
+                                data-background="static/images/cat/${getCategoryFromID(item[1].category_id)}.png"
+                                class="card-header card-menu-header appstore-card-header appstore-card-header-text-bottom align-items-flex-end lazy lazy-fade-in"
+                                style="
+                                background-size: contain;
+                                background-position: center top;
+                                background-color: black;
+                            ">
+                            <div class="appstore-card-header-text">
+                                <div class="appstore-card-subtitle" style="color: rgb(0, 0, 0);"></div>
+                                <div class="appstore-card-title"
+                                     style="color: rgb(255, 255, 255); font-size: 44px; font-weight: 800; line-height: 1;">
+                                    <span></span>
+                                </div>
+                            </div>
+                            <div class="apps-table-list list no-hairlines no-chevron" style="color: rgb(255, 255, 255);">
+                                <ul>
+                                    <li class=""><a class="item-link steem-keychain-checked" href="#">
+                                        <div class="item-content">
+                                            <div class="item-media">
+                                                <img
+                                                        data-src="static/images/icons-flat/${item[1].category_image}"
+                                                        class="apps-table-list-image lazy" slot="media"
+                                                        alt="${item[1].category_name}" />
+                                            </div>
+                                            <div class="item-inner">
+                                                <div class="item-title">
+                                                    <div class="apps-table-list-title" slot="title">${item[1].category_name}</div>
+                                                    <div class="apps-table-list-subtitle item-text" slot="title">
+                                                        ${item[1].products.length} Products
+                                                    </div>
+                                                </div>
+                                                <div class="apps-table-list-button" slot="inner">
+                                                    <span></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="appstore-card-close-button card-opened-fade-in">
+                            <a href="#" class="link card-close steem-keychain-checked">
+                                <i class="f7-icons" style="color: rgb(255, 255, 255);">multiply_circle_fill</i>
+                            </a>
+                        </div>
+                        <div class="appstore-card-content card-content-padding">
+
+                            <div class="list media-list">
+                                <ul>
+                                    ${item[1].products.map((product, product_index) => $h`
+                                        <li id="product-id-${product.product_id}" class="product message-list product-list-item" data-href="/app-menu-product-details/${item[0]}/${product_index}/"
+                                            @click=${(e) => setCurrentProductAndOpenPopup(item[0], product.product_id, product, product_index)} >
+                                            <div class="item-content">
+                                                <div class="item-media" >
+                                                <img data-src="static/images/products/${product.product_image}" class="lazy" width="64" height="64" alt="${product.product_name}" @error=${setAltImg} />
+                                            </div>
+                                            <div class="item-inner">
+                                                <div class="item-title-row title" >
+                                                    <div class="item-title"><strong>${product.product_name}</strong></div>
+                                                    <div class="item-after text-color-primary" ><strong>USD ${product.product_price_regular}</strong></div>
+                                                </div>
+                                                <div class="item-title-row subtitle">
+                                                    <div class="item-subtitle" >
+                                                        ${product.product_except}
+                                                        <br />
+                                                        <small style="opacity: 1; font-size: 60%;">⭐⭐⭐⭐⭐</small>
+                                                        <small style="opacity: 0.5; font-size: 70%; padding-top: 3px;"> <strong>SKU#: ${product.product_code}</strong></small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    `)}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                ` : $h` <!--- ${item[1].category_id} ${item[1].category_name} has empty products --->` }
+
+                `)}
+
+            </div>
+        </div>
+
+
+        <!--- SHEET MODAL - NOTES --->
+
+        <div class="sheet-modal online-order-sheet-modal-show-selected-product" style="height:auto; --f7-sheet-bg-color: #fff;">
+            <div class="sheet-modal-inner">
+                <div class="page-content">
+
+
+                   ${(currentProduct.hasOwnProperty('product')) ? $h`
+
+                        <div class="block-title block-title-large">${currentProduct.product.product_name}</div>
+
+                        <div class="block">
+
+                            <img data-src="static/images/products/${currentProduct.product.product_image}" class="lazy" width="100%" />
+
+                            <div class="block block-strong list media-list no-ios-edges block row">
+
+                                <p>${currentProduct.product.product_description}</p>
+
+                                <p class="full-width">
+                                    <hr />
+                                    <span>
+                                        Category: <strong>${currentProduct.product.product_category_main}</strong>
+                                    </span>
+                                    <br />
+                                    <span>
+                                        Item Code: <strong>${currentProduct.product.product_code}</strong>
+                                    </span>
+                                    <hr />
+                                </p>
+
+                                <h2 class="full-width text-theme-color product-price ">Price: USD ${currentProduct.product.product_price_regular}</h2>
+
+                            </div>
+
+                            <div class="block block-strong list media-list no-ios-edges block padding-top-x2">
+
+                                <div class="margin-bottom-x2">
+                                    <div class="stepper stepper-raised stepper-large stepper-init"  data-autorepeat="true">
+                                        <div class="stepper-button-minus current-product-cart-qty" @click=${(e) => currentProductCartQtyDecrease()} ></div>
+                                        <div class="stepper-input-wrap stepper-block">
+                                            <input type="text" value="0" min="0" max="100" step="1" id="current-product-cart-qty" readonly />
+                                        </div>
+                                        <div class="stepper-button-plus current-product-cart-qty" @click=${(e) => currentProductCartQtyIncrease()} ></div>
+                                    </div>
+                                </div>
+
+                                <button class="button button-large button-raised button-fill margin-bottom-x2" id="current-product-cart-add"
+                                        @click=${(e) => currentProductAddToCart()} >ADD TO CART</button>
+
+                                <button class="button button-large button-raised margin-bottom-x2" id="current-product-wishlist-add"
+                                        @click=${(e) => currentProductAddToWishlist()} >ADD TO WISHLIST</button>
+
+                             </div>
+
+                        </div>
+
+                    ` : $h` <!--- Product not found --->` }
+
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+<script>
+    export default (props, {$f7ready, $f7, $on, $update}) => {
+
+        let page_title = "The Mambo's Menu Card";
+
+        let menuObject = {
+            categoryProducts: [],
+        };
+
+        let sheetModalSelectedMenuProduct;
+
+        let productObject = {
+            product_name: "",
+        };
+
+        let currentProduct = {
+            categoryProducts: [],
+        };
+
+        $f7ready(() => {
+
+            console.log("MAMBO'S MENU&& F7 READY EVENT", page_title);
+
+            $f7.lazy.create('.lazy');
+
+        });
+
+        const getData = function () {
+
+            // Must return an object
+
+            const localData = window.app.appData.module.data.getData().firebaseDataLocalObject;
+
+            window.app.data.products = localData.data.categoryProducts;
+
+            let _menuObject = {
+                categoryProducts: Object.keys(localData.data.categoryProducts).map((key) => [key, localData.data.categoryProducts[key]]),
+            };
+
+            return _menuObject;
+
+        };
+
+        const getCategoryFromID = (id) => {
+
+            return id;
+
+        };
+
+        const setAltImg = function(event) {
+            event.target.src = 'static/images/products/MBS-CKN-002.jpg'; //'static/images/sys/no-image.png';
+        };
+
+        const setCurrentProductAndOpenPopup = (categorySlug, productId, productIndex, product) => {
+
+            currentProduct = {
+                categorySlug: categorySlug,
+                productId: productId,
+                productIndex: productIndex,
+                product: product
+            };
+
+            productObject = product;
+
+            console.log("::: OPEN PRODUCT POPUP ::: ", currentProduct, productObject, categorySlug, productId, productIndex, product);
+
+            $f7.params.methods.product_view(categorySlug, product);
+
+            // Select
+            sheetModalSelectedMenuProduct = $f7.sheet.create({
+                el: '.online-order-sheet-modal-show-selected-product',
+                swipeToClose: true,
+                backdrop: true,
+                // Events
+                on: {
+                    open: function (sheet) {
+                        console.log('Sheet open');
+                    },
+                    opened: function (sheet) {
+                        console.log('Sheet opened');
+                    },
+                }
+            });
+
+            sheetModalSelectedMenuProduct.open();
+
+        };
+
+        const currentProductCartQtyIncrease = function () {
+
+            setTimeout(function () {
+
+                const _selected_product_qty = parseInt($$("#current-product-cart-qty").val());
+
+                console.log("ADD::", _selected_product_qty);
+
+                window.app.params.data.selected_product_qty = _selected_product_qty;
+
+                window.app.params.methods.product_qty_increase();
+
+            }, 1000);
+
+        };
+
+        const currentProductCartQtyDecrease = function () {
+
+            setTimeout(function () {
+
+                const _selected_product_qty = parseInt($$("#current-product-cart-qty").val());
+
+                console.log("MINUS::", _selected_product_qty);
+
+                window.app.params.data.selected_product_qty = _selected_product_qty;
+
+                window.app.params.methods.product_qty_decrease();
+
+            }, 1000);
+
+        };
+
+        const currentProductAddToCart = function () {
+
+            window.app.params.methods.product_add_current_to_cart();
+
+            window.app.emit("REFRESH_CART", []);
+
+        };
+
+        const currentProductAddToWishlist = function () {
+
+            window.app.params.methods.product_add_current_to_wishlist();
+
+            window.app.emit("REFRESH_WISHLIST", []);
+
+        };
+
+        $on('pageInit', (e, page) => {
+
+            page_title = "Our Mambo's Menu ...";
+
+            menuObject = getData();
+
+            $$('.order-menu-popup-close-button').on('click', function () {
+
+                $f7.appRenderer.module.popup.close("#popup-menu");
+
+            });
+
+            $update();
+
+            $f7.lazy.create('.lazy');
+
+        });
+
+        $on('pageMounted', (e, page) => {
+            console.log('page_title:', page_title, 'page mounted');
+        });
+        $on('pageBeforeIn', (e, page) => {
+            console.log('page_title:', page_title, 'page before in');
+        });
+        $on('pageAfterIn', (e, page) => {
+            console.log('page_title:', page_title, 'page after in');
+        });
+        $on('pageBeforeOut', (e, page) => {
+            console.log('page_title:', page_title, 'page before out');
+        });
+        $on('pageAfterOut', (e, page) => {
+            console.log('page_title:', page_title, 'page after out');
+        });
+        $on('pageBeforeUnmount', (e, page) => {
+            console.log('page_title:', page_title, 'page before unmount');
+        });
+        $on('pageBeforeRemove', (e, page) => {
+            console.log('page_title:', page_title, 'page before remove');
+        });
+
+        return $render;
+
+    }
+
+</script>

@@ -1,0 +1,297 @@
+<template>
+    <div class="page">
+        <div class="navbar navbar-current navbar-large">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a class="link icon-only panel-open" data-panel="left" href="#">
+                        <i class="icon material-icons md-only">menu</i>
+                    </a>
+                </div>
+                <div class="title sliding" style="text-align: center; width: 100%">
+                    ${page_title}
+                </div>
+                <div class="right">
+                    <a class="link icon-only refresh-orders" href="#">
+                        <i class="icon f7-icons">arrow_2_circlepath_circle</i>
+                    </a>
+                </div>
+                ${page_title && $h`
+                <div class="title-large">
+                    <div class="title-large-text">
+                        ${page_title}
+                    </div>
+                </div>
+                `}
+
+                ${Array.isArray(ordersObject.orders)  ? $h`
+
+                <div class="subnavbar">
+                    <!-- Searchbar with auto init -->
+                    <form class="searchbar with-search margin-left margin-right">
+                        <div class="searchbar-inner">
+                            <div class="searchbar-input-wrap">
+                                <input type="search" placeholder="Search" />
+                                <i class="searchbar-icon"></i>
+                                <span class="input-clear-button"></span>
+                            </div>
+                            <span class="searchbar-disable-button if-not-aurora">Cancel</span>
+                        </div>
+                    </form>
+                </div>
+
+                ` : $h` <!--- --->`}
+
+            </div>
+        </div>
+
+        <div class="page-content ${ordersObject.hasOwnProperty('orders') && Array.isArray(ordersObject.orders) && ordersObject.orders.length > 0 ? 'page-with-navbar-large page-content-bg' : 'page-bg-startup'}">
+
+            ${Array.isArray(ordersObject.orders)  ? $h`
+
+            <!-- Begin Page Content Here -->
+            <!-- Searchbar backdrop -->
+            <div class="searchbar-backdrop"></div>
+            <!-- hide-on-search element -->
+            <div class="block searchbar-hide-on-search block-minimum-margin">
+                <p>Filter the list below by typing keywords</p>
+            </div>
+
+            <div class="list media-list card margin-bottom-x3 searchbar-found" id="ordersListContainer">
+
+                <ul>
+
+                    ${ordersObject.orders.map((item, index) => $h`
+
+                    <li>
+                        
+                        <a href="/app-ecommerce-orders-details/${item[1].order_id}/?order_tab=none" class="item-link item-content order-list-item">
+                            
+                            <div class="item-media">
+                                <img src="static/images/icons-flat/order.png" width="44" />
+                            </div>
+                            
+                            <div class="item-inner">
+
+                                <div class="item-title font-size-125">
+                                    <strong>
+                                        ${item[1].cart_title}
+                                    </strong>
+                                </div>
+                                
+                                <div class="item-title-row no-arrow">
+                                    
+                                    <div class="item-text">
+                                        Order Reference No.: ${item[1].order_id} <span style="opacity: 0.34"></span>
+                                    </div>
+                                    
+                                    <div class="item-after">
+                                        <strong style="color: var(--f7-theme-color);">${item[1].order_currency} ${formatMoney(item[1].order_total)}</strong>
+                                        <i class="f7-icons text-color-green"
+                                           style="font-size: 16px;clear: both;display: block;position: absolute;bottom: -15px;right: -3px;">
+                                            ${getOrderIcon(item[1].state)}
+                                        </i>
+                                    </div>
+                                    
+                                </div>
+                                
+                                <div class="item-title">
+                                    
+                                    <small>
+                                        ${getDate(item[1].order_date)}
+                                    </small>
+                                    
+                                </div>
+                                
+                            </div>
+                            
+                        </a>
+                        
+                    </li>
+
+                    `)}
+
+                </ul>
+
+            </div>
+
+            <div class="block list margin-bottom-x3">
+                <ul class="transparent-bg">
+                    <li class="checkout-btn-container">
+                        <button class="colx button button-large button-raised button-fill button-large-x1-2x start-new-order">
+                            CREATE A NEW ORDER
+                        </button>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Nothing found message -->
+            <div class="block searchbar-not-found">
+                <div class="block-inner">Nothing found</div>
+            </div>
+
+            <!-- // End Page Content Here -->
+
+            ` : $h`
+
+            <!--- {ordersObject} has no items --->
+
+            <div class="block text-align-center">
+                <img src="static/images/png/037-shopping bag.png" style="width: 75%; margin: auto;" align="center" class="margin-top-x3" />
+                <h2>
+                    No Orders to show
+                </h2>
+
+                <p class="eligible-font">There are no orders available in your account. To start an order, please click the button below.</p>
+
+                <div class="block list">
+                    <ul>
+                        <li class="login-btn-container">
+                            <button class="colx button button-large button-raised button-fill button-large-x1-2x start-new-order">
+                                START AN ORDER
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+
+            </div>
+
+            `}
+
+        </div>
+
+    </div>
+
+</template>
+<script>
+    export default (props, {$f7ready, $f7, $f7route, $on, $update}) => {
+
+        let page_title, logoPath;
+
+        let ordersObject = {orders: []};
+
+        let searchObject = null;
+
+        $f7ready(() => {
+
+            //
+
+        });
+
+        const refreshOrders = () => {
+
+            ordersObject.orders = $f7.data.metaDataFirebaseUserOrdersArray;
+
+            // trigger re-render
+            $update();
+
+            console.log("::::::::::::::::;; REFRESH ORDERS : F7 DATA", ordersObject );
+
+        };
+
+        const debug_orders_object = () => {
+
+            console.log(ordersObject);
+
+        };
+
+        const getData = function () {
+
+            // Must return an object
+            refreshOrders();
+
+            return { orders: $f7.data.metaDataFirebaseUserOrdersArray};
+
+        };
+
+        $on('pageInit', () => {
+
+            $f7.on("DEBUG_ORDER_OBJECT", debug_orders_object);
+
+            //$f7.emit('DEBUG_ORDER_OBJECT');
+
+            page_title = "Online Orders";
+
+            logoPath = window.app.appRenderer.module.styling.getNavBarLogo();
+
+            //console.error(":: ORDERS OBJECT >>>> :1:", ordersObject);
+
+            ordersObject = getData();
+
+            console.error(":: ORDERS OBJECT >>>> :2:", ordersObject);
+
+            $f7.on("SNAPSHOT_ORDERS", function(new_orders){
+
+                console.log("NEW-ORDER  : ", new_orders);
+
+                refreshOrders( new_orders );
+
+                // trigger re-render
+                $update();
+
+                setTimeout(function () {
+
+                    searchObject = $f7.searchbar.create({
+                        el: '.searchbar',
+                        searchContainer: '.list',
+                        searchIn: '.item-title, .item-after, .item-text, .item-subtitle',
+                        on: {
+                            search(sb, query, previousQuery) {
+                                console.log(query, previousQuery);
+                            }
+                        }
+                    });
+
+                },1000);
+
+            });
+
+            $$('.start-new-order').on('click', function (event) {
+
+                $f7.emit("CREATE_ORDER", true);
+
+            });
+
+            $$('.refresh-orders').on('click', function (event) {
+
+                $f7.emit("REFRESH_ORDERS", true);
+
+            });
+
+            $f7.on("REFRESH_ORDERS", function () {
+
+                refreshOrders();
+
+            });
+
+            // trigger re-render
+            $update();
+
+        });
+
+        $on('pageMounted', (e, page) => {
+            console.log('page_title:', page_title, 'page mounted');
+        });
+        $on('pageBeforeIn', (e, page) => {
+            console.log('page_title:', page_title, 'page before in');
+        });
+        $on('pageAfterIn', (e, page) => {
+            console.log('page_title:', page_title, 'page after in');
+        });
+        $on('pageBeforeOut', (e, page) => {
+            console.log('page_title:', page_title, 'page before out');
+        });
+        $on('pageAfterOut', (e, page) => {
+            console.log('page_title:', page_title, 'page after out');
+        });
+        $on('pageBeforeUnmount', (e, page) => {
+            console.log('page_title:', page_title, 'page before unmount');
+        });
+        $on('pageBeforeRemove', (e, page) => {
+            console.log('page_title:', page_title, 'page before remove');
+        });
+
+        return $render;
+
+    }
+</script>

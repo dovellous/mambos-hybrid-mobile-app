@@ -1,0 +1,352 @@
+<template>
+
+    <div class="page">
+        <!-- additional "navbar-large" class -->
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner sliding">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title">Register Phone Number</div>
+                <div class="right">
+                    ${currentState === "RETRY" ? $h`
+                    <a class="link icon-only refresh-orders" href="#" @click=${(e) => reload()}>
+                        <i class="icon f7-icons">arrow_2_circlepath_circle</i>
+                    </a>
+                    ` : $h`<!--- --->`}
+                </div>
+            </div>
+        </div>
+
+        <div class="page-content page-bg-startup padding">
+
+            ${currentState === "RETRY" ? $h`
+
+            <div class="block row margin-top-x7 text-align-center">
+
+                <div class="col-100">
+
+                    <img class="margin-top-x2" src="static/images/png/045-wifi.png" width="80%" />
+
+                </div>
+
+                <div class="col-100">
+
+                    <p class="eligible-font">
+                        Could not initilize the phone registration service. Please check your internet connection and try again.
+                    </p>
+
+                </div>
+
+                <div class="col-20"></div>
+
+                <div class="col-60">
+
+                    <button
+                            class="bg-color-white button button-fill button-large button-raised button-white margin-top-x2"
+                            style="display: flex;flex-wrap: nowrap;align-items: center;justify-content: flex-start;align-content: space-around;flex-direction: column; text-align: center;color: var(--f7-theme-color);"
+                            @click=${(e) => reload()}>
+                        Retry
+                    </button>
+
+                </div>
+
+                <div class="col-20"></div>
+
+            </div>
+
+            ` : $h`
+
+            <iframe @load=${(e) => onIframeLoaded()}
+                    id="firebase-phone-iframe"
+                    style="width: 100%; height: 100vh; border: none; " frameborder="0" scrolling="auto" class="margin-top-x5 padding-top-x2">
+            </iframe>
+
+            `}
+
+        </div>
+
+    </div>
+
+</template>
+<script>
+    export default (props, {$f7ready, $f7, $on, $update}) => {
+
+        let toolbarEl, token, uuid, loaded, loadCount;
+
+        const maxLoadCount = 3;
+
+        const loadCountTimeout = 15000;
+
+        let loaderFirebaseListenerRegistered = false;
+
+        let currentState = "IFRAME";
+
+        const hideToolbar = () => {
+
+            toolbarEl.hide();
+
+        };
+
+        const setState = (state) => {
+
+            currentState = state;
+
+            $update();
+
+        };
+
+        const reload = () => {
+
+            setTimeout(function () {
+
+                $f7.preloader.show();
+
+            },1000);
+
+            setState("IFRAME");
+
+            loaded = false;
+
+            loadCount = 0;
+
+            openPhoneRegistrationUrl();
+
+        };
+
+        const onIframeLoaded = (e) => {
+
+            $f7.preloader.show();
+
+            console.log("IFRAME_LOADED", e);
+
+            try{
+
+                const iframe = document.getElementById("firebase-phone-iframe");
+
+                if(iframe.contentWindow === null || typeof iframe.contentWindow !== "object") {
+
+                    loaded = false;
+
+                    setState("RETRY");
+
+                    console.log("IFRAME ERROR", `>>>${url}:${len}<<<`);
+
+                    setTimeout(function () {
+
+                        $f7.preloader.show();
+
+                    },1000);
+
+                }else {
+
+                    loaded = true;
+
+                    setState("IFRAME");
+
+                    console.log("IFRAME CONTENT WINDOW", `>>>iframe.contentWindow<<<`);
+
+                    $f7.preloader.hide();
+
+                }
+
+            }catch (e) {
+
+                loaded = false;
+
+                setState("RETRY");
+
+                console.log("IFRAME ERROR",e);
+
+                $f7.preloader.hide();
+
+            }
+
+            $f7.preloader.hide();
+
+        };
+
+        const loaderFirebaseRegisterListener = (e) => {
+
+            console.log("IFRAME_LOADED", e);
+
+            loaderFirebaseListenerRegistered = true;
+
+            let devicePath = 'devices/' + token + '/phones/'+uuid;
+
+            let firebaseRefDevice = firebase.database().ref(devicePath);
+
+            firebaseRefDevice.on('value', function (snapshot) {
+
+                console.warn(":: DEVICE SNAPSHOT [snapshot.exists()]::", snapshot.exists(), devicePath);
+
+                let device_data = snapshot.val();
+
+                if (device_data === false || device_data === null || device_data.length === 0 && typeof device_data !== "object" || !snapshot.exists()) {
+
+                    console.warn(":: DEVICE SNAPSHOT [NULL]::", device_data);
+
+                } else {
+
+                    console.warn(":: DEVICE SNAPSHOT [OK]::", device_data);
+
+                    $f7.data.phoneRegistered = true;
+
+                    $f7.data.phoneRegisteredNumber = device_data.phoneNumber;
+
+                    $f7.data.phoneRegisteredNumberUID = device_data.uid;
+
+                    $f7.data.phoneRegisteredNumberToken = token;
+
+                    $f7.data.phoneRegisteredNumberGUUID = uuid;
+
+                    $f7.appModules.plugin.NavigatorModel.gotoUrl("/app-auth-register-details/"+$f7.data.phoneRegisteredNumber+"/"+$f7.data.phoneRegisteredNumberUID+"/"+$f7.data.phoneRegisteredNumberToken+"/"+$f7.data.phoneRegisteredNumberGUUID+"/");
+
+                }
+
+                $$('#firebase-phone-iframe').attr('src', appConfigData.URL_PHONE_REG + '?token='+token+'&guuid='+uuid);
+
+            });
+
+        };
+
+        const openPhoneRegistrationUrl = () => {
+
+            //$f7.preloader.show();
+
+            loaded = false;
+
+            setState("IFRAME");
+
+            loadCount++;
+
+            if(loadCount === 1){
+
+                console.log("OPENING URL......", token, uuid);
+
+                openPhoneRegistrationUrl();
+
+            }else {
+
+                 setTimeout(function () {
+
+                    if (!loaded) {
+
+                        if (loadCount > maxLoadCount) {
+
+                            $f7.preloader.hide();
+
+                            console.log("MAXIMUM RETRIES REACHED, STOPPING......");
+
+                            $f7.appModules.plugin.CapLocalNotifications.toast('Could not initilize phone registration. Please check your network settings.');
+
+                            loadCount = 0;
+
+                            loaded = false;
+
+                            setState("RETRY");
+
+                        } else {
+
+                            const iframe = document.getElementById("firebase-phone-iframe");
+
+                            try {
+
+                                const iframe = document.getElementById("firebase-phone-iframe");
+
+                                if(iframe.contentWindow === null || typeof iframe.contentWindow !== "object") {
+
+                                    console.log("ATTEMPTING CONNECTION......", loadCount, "of", maxLoadCount);
+
+                                    $f7.appModules.plugin.CapLocalNotifications.toast('Connection attempt : ' + loadCount + " of " + maxLoadCount, 3000);
+
+                                    openPhoneRegistrationUrl();
+
+                                } else {
+
+                                    loadCount = 0;
+
+                                    loaded = true;
+
+                                    $f7.preloader.hide();
+
+                                    setState("IFRAME");
+
+                                }
+
+                            }catch (e) {
+
+                                loaded = false;
+
+                                setState("RETRY");
+
+                                console.log("IFRAME ERROR",e);
+
+                                $f7.preloader.hide();
+
+                            }
+
+                        }
+
+                    } else {
+
+                        $f7.preloader.hide();
+
+                    }
+
+                }, loadCountTimeout);
+
+            }
+
+            if( !loaderFirebaseListenerRegistered ){
+
+                loaderFirebaseRegisterListener();
+
+            }
+
+        };
+
+        $f7ready(() => {
+
+        });
+
+        $on('pageInit', (e, page) => {
+
+            toolbarEl = $$('#app-toolbar');
+
+            $f7.preloader.show();
+
+            hideToolbar();
+
+            token = 'ABC12345';
+
+            uuid = guuid();
+
+            store.set("GUUID", uuid);
+
+            store.set("TOKEN", token);
+
+            loaded = false;
+
+            loadCount = 0;
+
+            openPhoneRegistrationUrl();
+
+            $f7.on("RELOAD_REG_IFRAME", function () {
+
+                reload();
+
+            });
+
+            $update();
+
+        });
+
+        return $render;
+    }
+
+</script>

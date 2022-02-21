@@ -1,0 +1,625 @@
+<template>
+    <div class="page" data-name="home">
+        <div class="navbar navbar-current">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner sliding">
+                <div class="left">
+                    <a class="link icon-only panel-open" data-panel="left" href="#">
+                        <i class="icon material-icons md-only">menu</i>
+                    </a>
+                </div>
+                <div class="title sliding" style="text-align: center; width: 100%">
+                    <img src="${logoPath}" style="max-height: 45px;vertical-align: middle; "/>
+                </div>
+                <div class="right">
+                    <a class="link icon-only panel-open" data-panel=".panel-right-default" href="#">
+                        <i class="icon f7-icons ios-only">more</i>
+                        <i class="icon material-icons md-only">more_vert</i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="page-content page-content-bg">
+
+            <div
+                    data-pagination='{"el": ".swiper-pagination"}'
+                    data-space-between="0"
+                    data-slides-per-view="auto"
+                    data-centered-slides="false"
+                    class="swiper-container swiper-init demo-swiper demo-swiper-auto"
+            >
+                <div class="swiper-pagination"></div>
+                <div class="swiper-wrapper home-slider">
+                    <div class="swiper-slide"><img data-src="static/images/sliders/1.jpg" class="lazy lazy-fade-in" width="100%" style="display: block; clear: both;"/></div>
+                    <div class="swiper-slide"><img data-src="static/images/sliders/4.jpg" class="lazy lazy-fade-in" width="100%" style="display: block; clear: both;"/></div>
+                    <div class="swiper-slide"><img data-src="static/images/sliders/5.jpg" class="lazy lazy-fade-in" width="100%" style="display: block; clear: both;"/></div>
+                    <div class="swiper-slide"><img data-src="static/images/sliders/7.jpg" class="lazy lazy-fade-in" width="100%" style="display: block; clear: both;"/></div>
+                    <div class="swiper-slide"><img data-src="static/images/sliders/8.jpg" class="lazy lazy-fade-in" width="100%" style="display: block; clear: both;"/></div>
+                </div>
+            </div>
+
+
+            <div data-pagination='{"el": ".swiper-pagination"}' data-space-between="10" data-slides-per-view="3" class="swiper-container swiper-init demo-swiper" id="categoryListSwiperContainerx" style="height: 34% !important;">
+
+                <div class="swiper-pagination"></div>
+
+                <div class="swiper-wrapper margin-top margin-left" id="categoryListContainerx">
+
+                    ${menuObject.categoryProducts.map((item, index) => $h`
+
+                    <div class="swiper-slide align-items-baseline">
+                        <a href="/app-menu-category-details/${item[0]}/" @click=${(e) => openCategoryDetails(item[0])} >
+                        <div class="card margin-0">
+                            <img alt="cat-logo" class="home-tile lazy" data-src="static/images/cat/c-${item[1].category_id}.jpg"
+                                 @error=${error_loading_image} />
+                            <h2>${item[1].category_name}</h2>
+                        </div>
+                        </a>
+                    </div>
+
+                    `)}
+
+                </div>
+            </div>
+
+
+
+            <div class="list inset row menu-3-btns margin-bottom-x2">
+
+                <div class="col-33 tablet-33">
+                    <a href="#" class="open-popup-promotions">
+                        <div class="card margin-0">
+                            <img alt="logo" class="home-tile lazy lazy-fade-in" data-src="static/images/svg/flash-sale.svg"/>
+                            <p class="home-tile">Promotions</p>
+                        </div>
+                    </a>
+                </div>
+
+                <div class="col-33 tablet-33">
+                    <a href="#" class="open-popup-wishlist">
+                        <div class="card margin-0">
+                            <img alt="logo" class="home-tile lazy lazy-fade-in" data-src="static/images/svg/wishlist.svg"/>
+                            <p class="home-tile">Favourites</p>
+                        </div>
+                    </a>
+                </div>
+
+                <div class="col-33 tablet-33">
+                    <a href="#" class="open-tab-orders">
+                        <div class="card margin-0">
+                            <img alt="logo" class="home-tile lazy lazy-fade-in" data-src="static/images/svg/shopping-bag.svg"/>
+                            <p class="home-tile">My Orders</p>
+                        </div>
+                    </a>
+                </div>
+
+            </div>
+
+            <div class="block-title appstore-block-title" ><span>On Promotion</span><a
+                    class="link steem-keychain-checked" href="#">See All</a></div>
+
+            <div data-pagination='{"el": ".swiper-pagination"}' data-space-between="10" data-slides-per-view="auto" data-centered-slides="true" class="swiper-container swiper-init demo-swiper demo-swiper-auto unset-height">
+                <div class="swiper-pagination"></div>
+                <div class="swiper-wrapper promo-slider">
+                    
+                    ${dataObject.promoSmall.map((item, index) => $h`
+                    
+                    <div class="swiper-slide align-items-baseline product-list-item"
+                         data-href="/app-menu-product-details/${item.category_slug}/${index}/"
+                         @click=${(e) => setCurrentProduct(item.category_slug, item.product_id, item, index)}>
+                        <div class="block margin-0 padding-0">
+                            <div class="card shadow-sm border-0 mb-4">
+                                <div class="card-content">
+                                    <figure class="product-image margin-0">
+                                        <img data-src="static/images/products/${item.product_image}" alt="${item.product_name}" class="lazy lazy-fade-in"  @error=${setAltImg}  style="width: 100%;"/>
+                                        <span class="rating-stars-promo" >⭐⭐⭐⭐⭐</span>
+                                    </figure>
+                                </div>
+                                <div class="card-content card-content-padding">
+                                    <h2 href="#" class="text-dark promo-card-product-title margin-bottom-0 margin-top-0">
+                                        ${item.product_name}
+                                    </h2>
+                                    <p class="text-secondary margin-0">${item.product_except}</p>
+                                    <h3 class="text-color-primary font-weight-normal no-margin">
+                                        <strong><span class="text-color-gray">USD</span> ${item.product_price_regular}</strong>
+                                    </h3>
+                                    <button class="button button-fill bg-color-primary text-color-white button-fab button-round home-on-promo-fab">
+                                        <i class="material-icons md-18">shopping_cart</i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    `)}
+
+                </div>
+            </div>
+
+            <div class="block block-strong" style="width: 100%; margin: 20px auto;">
+
+                <img id="home-banner-ad" class="home-banner-ad lazy lazy-fade-in" data-src="${homeBannerAd}" width="100%" style="display: block; clear: both;"/>
+
+            </div>
+
+            <div class="block-title appstore-block-title" ><span>Popular Items</span><a
+                    class="link steem-keychain-checked" href="#">See All</a></div>
+            
+            <div class="block block-strong apps-table-list list no-hairlines no-chevron padding-top-x2 padding-bottom-x2 margin-top home-popular-items-bg">
+                <ul>
+
+                    ${dataObject.dataPopular.map((item, index) => $h`
+
+                    <li  data-href="/app-menu-product-details/${item.category_slug}/${index}/"
+                         @click=${(e) => setCurrentProduct(item.category_slug, item.product_id, item, index)}>
+                        <a class="item-link steem-keychain-checked" >
+                            <div class="item-content">
+                                <div class="item-media">
+                                    <img @error=${setAltImg} class="apps-table-list-image lazy lazy-fade-in" slot="media" data-src="static/images/products/${item.product_image}" alt="${item.product_name}" />
+                                </div>
+                                <div class="item-inner">
+                                    <div class="item-title">
+                                        <div class="apps-table-list-title" slot="title"><strong>${item.product_name}</strong></div>
+                                        <div class="apps-table-list-subtitle item-text" slot="title">
+                                            ${item.product_except}
+                                        </div>
+                                    </div>
+                                    <div class="apps-table-list-button" slot="inner">
+                                        <button class="prevent-active-state-propagation button button-round" type="button">
+                                            USD ${item.product_price_regular}
+                                        </button>
+                                        <span> ${item.product_id}</span></div>
+                                </div>
+                            </div>
+                        </a>
+                    </li>
+
+                    `)}
+
+                </ul>
+            </div>
+
+            <div class="block list">
+                <ul>
+                    <li class="login-btn-container">
+                        <button class="colx button button-large button-raised button-fill button-large-x1-2x start-new-order">
+                            CREATE AN ORDER
+                        </button>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="block block-strong setup-biometric" id="home-biometric-notification">
+                <div class="row">
+                    <div class="col-25">
+                        <img data-src="static/images/sys/biometric.jpg" class="lazy lazy-fade-in" style="width: 100%;"/>
+                    </div>
+                    <div class="col-75">
+                        <span class=""><strong>Biometric device detected!</strong></span><br />
+                        <span class="" style="line-height: initial;">Enable login using your fingerprint. Your biometric data will remain on this device.</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- If we have a coupon render below -->
+
+            <div class="row theme-bg-drawer">
+                <div class="block">
+                    <div class="row ">
+                        <div class="col">
+                            <h1 class="mb-3 mambos-h2" style="text-transform: lowercase;">
+                                ${dataObject.dataCoupon.title}
+                            </h1>
+                            <p class="margin-bottom">
+                                Use the Coupon Code:
+                            </p>
+                            <h3 class="text-dark">
+                                <strong>
+                                    <code>${dataObject.dataCoupon.code}</code>
+                                </strong>
+                            </h3>
+                            <p>${dataObject.dataCoupon.description}</p>
+                            <p>
+                                <small>Coupon Expires: ${dataObject.dataCoupon.expires}</small>
+                            </p>
+                            <p>
+                                <small>Terms & Conditions Apply</small>
+                            </p>
+                        </div>
+                        <!--
+                        <div class="col-30">
+                            <img src="img/banana.png" alt="" class="width-100">
+                        </div>
+                        -->
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</template>
+<script>
+    export default (props, {$f7ready, $f7, $on, $update}) => {
+
+        let page_title, logoPath, homeBannerAd;
+
+        let bannerAdCounter = 1;
+
+        let bannerAdCounterTotal = 2;
+
+        let currentProduct = {};
+
+        let dataObject = {
+            dataFeatured: [],
+            dataPopular: [],
+            dataCategories: [],
+            dataAddresses: [],
+            promoBig: [],
+            promoSmall: [],
+            dataPromos: {promoBig: [], promoSmall: []},
+            dataCoupon: {},
+        };
+
+        let menuObject = {
+            categoryProducts: []
+        };
+
+        $f7ready(() => {
+
+            $f7.lazy.create('.lazy');
+
+        });
+
+        const setAltImg = function(event) {
+            event.target.src = 'static/images/products/MBS-CKN-002.jpg'; //'static/images/sys/no-image.png';
+        };
+
+        const startAnOrder = function () {
+
+            console.log("startAnOrder");
+
+        };
+
+        const openPopupPromotions = function () {
+
+            $f7.appRenderer.module.popup.open('popup-promotions');
+
+        };
+
+        const openPopupWishlist = function () {
+
+            $f7.appRenderer.module.popup.open('popup-wishlist');
+
+        };
+
+        const openTabOrders = function () {
+
+            $f7.tab.show('#view-orders');
+
+        };
+
+        const setCurrentProduct = (categorySlug, productId, productIndex, product) => {
+
+            currentProduct = {
+                categorySlug: categorySlug,
+                productId: productId,
+                productIndex: productIndex,
+                product: product
+            };
+
+            openProduct(currentProduct.categorySlug, currentProduct.productId, currentProduct.productIndex, currentProduct.product);
+
+        };
+
+        const openProduct = (category_slug, product_id, product_index, product) => {
+
+            const url = $$("#product-id-"+product_id).attr("data-href");
+
+            console.log("::: OPEN PRODUCT ::: ", url, category_slug, product_id, product_index, product );
+
+            window.app.appModules.plugin.NavigatorModel.gotoUrl(url);
+
+        };
+
+        const beginAd = function () {
+
+            setInterval(function(){
+
+                if(bannerAdCounter>bannerAdCounterTotal){
+                    bannerAdCounter = 1;
+                }
+
+                homeBannerAd = `static/images/banners/ad-${bannerAdCounter}.jpg`;
+
+                bannerAdCounter++;
+
+                // trigger re-render
+                $update();
+
+            }, 5000);
+
+        };
+
+        const getData = function (productsData) {
+
+            // Must return an object
+
+            console.log("::Getting data...::", productsData);
+
+            const localData = window.app.appData.module.data.getData().firebaseDataLocalObject;
+
+            console.log("::localData::", localData);
+
+            const setProducts = localData.data.set.products.home;
+
+            $f7.data.setProducts = setProducts;
+
+            const categoryProducts = productsData.productObject;
+
+            menuObject.categoryProducts = productsData.productArray;
+
+            const categories_object = productsData.productObject;
+            const featured_object = setProducts.featured.featured;
+            const popular_object = setProducts.popular;
+            const big_object = setProducts.promos.promoBig;
+            const small_object = setProducts.promos.promoSmall;
+            const coupon_object = setProducts.coupon;
+
+            let featured = [];
+
+            for(let i in featured_object){
+
+                //console.log("::Featured featured_object::", featured_object);
+
+                const _object = featured_object[i];
+
+                //console.log("::Featured::", _object);
+
+                featured.push(_object);
+
+            }
+
+            let popular = [];
+
+            for(let i in popular_object){
+
+                //console.log("::popular popular_object::", popular_object);
+
+                const _object = popular_object[i];
+
+                //console.log("::popular i ::", i);
+
+                //console.log("::popular [i] <_object> ::", _object);
+
+                const _product_ids = _object.toString().split(",");
+
+                //console.log("::popular [] <_product_ids> ::", _product_ids);
+
+                for(let j in _product_ids){
+
+                    //console.log("::popular [categories_object, [i]] <> ::", categories_object, [i], (typeof categories_object[i]));
+
+                    if(typeof categories_object[i] !== "undefined") {
+
+                        if ("products" in categoryProducts[i]) {
+
+                            console.log("::popular \"products\" in categoryProducts[i] <> ::", ("products" in categoryProducts[i]));
+
+                            let _product = categoryProducts[i]["products"][_product_ids[j]];
+
+                            _product.category_slug = i;
+
+                            popular.push(_product);
+
+                        }
+
+                    }
+
+                    console.log("::popular [FINAL]] <> ::", popular);
+
+                }
+
+                console.log("::// popular popular_object::", popular_object);
+
+            }
+
+            let promoBig = [];
+
+            for(let i in big_object){
+
+                //console.log("::popular popular_object::", big_object);
+
+                const _object = big_object[i];
+
+                //console.log("::big_object i ::", i);
+
+                //console.log("::big_object [i] <_object> ::", _object);
+
+                const _product_ids = _object.toString().split(",");
+
+                //console.log("::big_object [] <_product_ids> ::", _product_ids);
+
+                for(let j in _product_ids){
+
+                    //console.log("::popular [categories_object, [i]] <> ::", categories_object, [i], (typeof categories_object[i]));
+
+                    if(typeof categories_object[i] !== "undefined") {
+
+                        if ("products" in categoryProducts[i]) {
+
+                            //console.log("::big_object \"products\" in categoryProducts[i] <> ::", ("products" in categoryProducts[i]));
+
+                            let _product = categoryProducts[i]["products"][_product_ids[j]];
+
+                            _product.category_slug = i;
+
+                            promoBig.push(_product);
+
+                        }
+
+                    }
+
+                    console.log("::big_object [FINAL]] <> ::", popular);
+
+                }
+
+                console.log("::// popular popular_object::", big_object);
+
+            }
+
+            let promoSmall = [];
+
+            for(let i in small_object){
+
+                //console.log("::popular popular_object::", small_object);
+
+                const _object = small_object[i];
+
+                //console.log("::small_object i ::", i);
+
+                //console.log("::small_object [i] <_object> ::", _object);
+
+                const _product_ids = _object.toString().split(",");
+
+                //console.log("::small_object [] <_product_ids> ::", _product_ids);
+
+                for(let j in _product_ids){
+
+                    //console.log("::popular [categories_object, [i]] <> ::", categories_object, [i], (typeof categories_object[i]));
+
+                    if(typeof categories_object[i] !== "undefined") {
+
+                        if ("products" in categoryProducts[i]) {
+
+                            //console.log("::small_object \"products\" in categoryProducts[i] <> ::", ("products" in categoryProducts[i]));
+
+                            let _product = categoryProducts[i]["products"][_product_ids[j]];
+
+                            _product.category_slug = i;
+
+                            promoSmall.push(_product);
+
+                        }
+
+                    }
+
+                    console.log("::small_object [FINAL]] <> ::", small_object);
+
+                }
+
+                console.log("::// popular popular_object::", popular_object);
+
+            }
+
+            console.log(":: // DONE // popular popular_object::", popular_object);
+
+            let addresses = window.app.data.addresses;
+
+            console.log("::// addresses ::", addresses);
+
+            dataObject = {
+                dataFeatured: featured,
+                dataPopular: popular,
+                dataCategories: localData.data.categoryProducts,
+                dataAddresses: window.app.data.addresses,
+                promoBig: promoBig,
+                promoSmall: promoSmall,
+                dataPromos: {promoBig: promoBig, promoSmall: promoSmall},
+                dataCoupon: coupon_object,
+            };
+
+            console.log("::dataObject::", dataObject);
+
+            return dataObject;
+
+        };
+
+        $on('pageInit', () => {
+
+            page_title = "Mambo's Chicken";
+
+            logoPath = window.app.appRenderer.module.styling.getNavBarLogo();
+
+            beginAd();
+
+            $f7.on("PRODUCTS_LOADED", function (productsData) {
+
+                getData(productsData);
+
+            });
+
+            // trigger re-render
+            $update();
+
+            $f7.on("REFRESH_USER_DATA", function(userData){
+
+                console.warn('REFRESH_USER_DATA', userData);
+
+            });
+
+            $$(".open-popup-promotions").on("click", function(){
+
+                const el = $$(this);
+
+                openPopupPromotions();
+
+            });
+
+            $$(".open-popup-wishlist").on("click", function(){
+
+                const el = $$(this);
+
+                openPopupWishlist();
+
+            });
+
+            $$(".open-tab-orders").on("click", function(){
+
+                const el = $$(this);
+
+                openTabOrders();
+
+            });
+
+            $$('.start-new-order').on('click', function () {
+
+                $f7.emit("CREATE_ORDER", true);
+
+            });
+
+            $$('.setup-biometric').on('click', function () {
+
+                $f7.emit("SETUP_BIOMETRIC", true);
+
+            });
+
+            $update();
+
+            $f7.lazy.create('.lazy');
+
+        });
+
+        $on('pageMounted', (e, page) => {
+            console.log('page_title:', page_title, 'page mounted');
+        });
+        $on('pageBeforeIn', (e, page) => {
+            console.log('page_title:', page_title, 'page before in');
+        });
+        $on('pageAfterIn', (e, page) => {
+            console.log('page_title:', page_title, 'page after in');
+        });
+        $on('pageBeforeOut', (e, page) => {
+            console.log('page_title:', page_title, 'page before out');
+        });
+        $on('pageAfterOut', (e, page) => {
+            console.log('page_title:', page_title, 'page after out');
+        });
+        $on('pageBeforeUnmount', (e, page) => {
+            console.log('page_title:', page_title, 'page before unmount');
+        });
+        $on('pageBeforeRemove', (e, page) => {
+            console.log('page_title:', page_title, 'page before remove');
+        });
+        return $render;
+    }
+</script>

@@ -1,0 +1,162 @@
+<template>
+
+    <div class="page" >
+        <div class="page-content page-content-bg">
+            <div data-pagination="{'el': '.swiper-pagination', 'hideOnClick': true}"
+                 class="swiper-container swiper-init demo-swiper swiper-container-initialized swiper-container-horizontal">
+                <div class="swiper-pagination swiper-pagination-bullets"><span
+                        class="swiper-pagination-bullet swiper-pagination-bullet-active"></span><span
+                        class="swiper-pagination-bullet"></span><span class="swiper-pagination-bullet"></span></div>
+                <div class="swiper-wrapper" style="transform: translate3d(0px, 0px, 0px);">
+
+                    ${swipersWelcomeSlides.map((item) => $h`
+
+                    <div class="swiper-slide bg-warning swiper-slide-active welcome-slider-padding-top bg-welcome-slider ${item.backgroundClass}"
+                         style="width: 360px; background-image: url(${item.backgroundImage}); background-color: ${item.backgroundColor}; ;">
+                        <!--
+                        <img src="img/orange-slices.png" alt="" class="orange-slice right-image align-self-center">
+                        -->
+                        <div class="row">
+                            <div class="color-white col-100 padding-left padding-right padding-top-x5 text-align-center">
+                                <img src="${item.thumb}" width="200px" />
+                                <h2 class="welcome-slider-heading">${item.title}</h2>
+                                <p style="font-size: 125%;">${item.description}</p>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    `)}
+
+                </div>
+                <span class="swiper-notification" aria-live="assertive" aria-atomic="true"></span>
+            </div>
+            <div class="fab fab-right-top">
+                <a id="btn-fab-open-login" href="#" class="button button-raised button-round button-rounded-54 color-pink" @click=${goNextScreen}>
+                    <i class="icon f7-icons">money_dollar_round</i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+</template>
+
+<script>
+
+    export default (props, {$f7ready, $f7, $on, $update}) => {
+
+        const page_title = ":: WELCOME ::";
+
+        const swipersWelcomeSlides = [
+            {
+                thumb: "static/images/thumbs/t2.png",
+                title: "Choose from our best menu",
+                description: "Get a Mambo's Free Delivery if you order via our app from 1st September 2020 to 31st October 2020",
+                backgroundImage: "static/images/welcome/w2.jpg",
+                backgroundColor: "",
+                backgroundClass: "slider-2"
+            },
+            {
+                thumb: "static/images/thumbs/t3.png",
+                title: "Secure payment gateway system",
+                description: "Get a Mambo's Free Delivery if you order via our app from 1st September 2020 to 31st October 2020.",
+                backgroundImage: "static/images/welcome/w3.jpg",
+                backgroundColor: "",
+                backgroundClass: "slider-3"
+            },
+            {
+                thumb: "static/images/thumbs/t4.png",
+                title: "Guaranteed quick delivery service",
+                description: "Get a Mambo's Free Delivery if you order via our app from 1st September 2020 to 31st October 2020.",
+                backgroundImage: "static/images/welcome/w4.jpg",
+                backgroundColor: "",
+                backgroundClass: "slider-4"
+            },
+
+        ];
+
+        const goNextScreen = () => {
+
+            console.log("::: GO NEXT SCREEN :::", page_title, swipersWelcomeSlides);
+
+            window.app.appRenderer.appViewsObject.popups.welcomePopupView.close();
+
+            openLoginScreen();
+
+        };
+
+        const openLoginScreen = () => {
+
+            console.log("::: OPEN LOGIN SCREEN :::", page_title, swipersWelcomeSlides);
+
+            window.app.appModules.plugin.NavigatorModel.gotoUrl("/app-auth-login/");
+
+        };
+
+        const openRegistrationScreen = () => {
+
+            console.log("::: OPEN REGISTRATION SCREEN :::", page_title, swipersWelcomeSlides);
+
+            window.app.appModules.plugin.NavigatorModel.gotoUrl("/app-auth-register/");
+
+        };
+
+        $f7ready(() => {
+
+            //
+            console.log("::: F7 READY EVENT :::", page_title, swipersWelcomeSlides);
+
+        });
+
+        $on('pageInit', () => {
+
+            console.log('page_title:', page_title, 'page init');
+
+            setTimeout(function () {
+
+                console.log("::: PAGE INIT EVENT :::", page_title);
+
+                $f7.dialog.close();
+
+            },3500);
+
+            $$("#btn-fab-open-login").click(function () {
+
+                console.log("::: FAB BUTTON CLICKED :::", page_title);
+
+                goNextScreen();
+
+            });
+
+            // trigger re-render
+            $update();
+
+        });
+
+        $on('pageMounted', (e, page) => {
+            console.log('page_title:', page_title, 'page mounted');
+        });
+        $on('pageBeforeIn', (e, page) => {
+            console.log('page_title:', page_title, 'page before in');
+        });
+        $on('pageAfterIn', (e, page) => {
+            console.log('page_title:', page_title, 'page after in');
+        });
+        $on('pageBeforeOut', (e, page) => {
+            console.log('page_title:', page_title, 'page before out');
+        });
+        $on('pageAfterOut', (e, page) => {
+            console.log('page_title:', page_title, 'page after out');
+        });
+        $on('pageBeforeUnmount', (e, page) => {
+            console.log('page_title:', page_title, 'page before unmount');
+        });
+        $on('pageBeforeRemove', (e, page) => {
+            console.log('page_title:', page_title, 'page before remove');
+        });
+
+        return $render;
+
+    }
+
+</script>

@@ -1,0 +1,963 @@
+<template>
+    <div class="page">
+        <!-- additional "navbar-large" class -->
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link ripple-inset" @click=${closeThisPopup}>
+                        <i class="icon icon-back"></i>
+                    </a>
+                </div>
+                <!-- usual title will be visible when larger title collapsed -->
+                <div class="title">${page_title}</div>
+                <div class="right">
+                    <!-- Link to close popup -->
+                    <a class="link ripple-inset" @click=${AddressAutoComplete.useCurrentLocation} >
+                        <i class="icon f7-icons">scope</i>
+                    </a>
+                </div>
+
+                <div id="subnavbar-map" class="subnavbar padding searching" >
+                    <div class="searchbar margin-0 border-radius-5">
+                        <div class="searchbar-inner">
+                            <div class="searchbar-input-wrap">
+                                <input id="user-autocomplete-address" type="text" class="padding padding-left-x3 border-radius-5 subnavbar-input" placeholder="Enter address" autocomplete="off"   />
+                                <input id="user-autocomplete-name" type="text" class="padding padding-left-x3 margin-top border-radius-5 subnavbar-input show-in-saving" placeholder="Enter address name"  />
+                                <input id="user-autocomplete-instructions" type="text" class="padding padding-left-x3 margin-top border-radius-5 subnavbar-input show-in-saving" placeholder="Enter delivery instructions"  />
+                                <div class="show-in-saving">
+                                    <p class="segmented segmented-strong ">
+                                        <button data-address-type="home" class="button button-active address-type"><small>Home</small></button>
+                                        <button data-address-type="office" class="button address-type"><small>Office</small></button>
+                                        <button data-address-type="school" class="button address-type"><small>School</small></button>
+                                        <button data-address-type="other" class="button address-type"><small>Other</small></button>
+                                        <span class="segmented-highlight"></span>
+                                    </p>
+                                </div>
+                                <i class="searchbar-icon"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="page-content page-content-map">
+
+            <div id="app-address-map" style="height: calc(100vh - calc(var(--f7-navbar-height) + var(--f7-safe-area-top) + calc(var(--f7-subnavbar-height) * 1.5)) - 80px)  !important; width: 100% !important; position: relative; overflow: hidden;">
+               Loading map ...
+            </div>
+
+            <img src="static/images/map/destination-map-pin.svg"
+                 style="
+                    display:block;
+                    margin-left: auto;
+                    margin-right: auto;
+                    position: fixed;
+                    top: calc(50vh - 36px);
+                    width: 72px;
+                    left: calc(50vw - 36px);
+                 " />
+
+            <div id="app-address-info-window" class="down-arrow">Locating ...</div>
+
+            ${currentState === "SETUP" ? $h`
+
+            <div class="block block-strong margin-0" style=" position: fixed; bottom: 0; width: 100%; ">
+                <button class="button button-large button-fill color-orange"
+                        @click=${setupLocation}>
+                    Use This Location
+                </button>
+            </div>
+
+            ` : $h`
+
+            <div class="block block-strong margin-0" style=" position: fixed; bottom: 0; width: 100%; ">
+                <button class="button button-large button-fill button-preloader ${isSavingLocation ? 'button-loading' : ''}"
+                        @click=${saveLocation}>
+                    <span class="preloader"></span>
+                    <span>Save Location</span>
+                </button>
+            </div>
+
+            `}
+
+        </div>
+
+    </div>
+</template>
+<script>
+    export default (props, {$f7ready, $f7, $on, $update}) => {
+
+        let page_title = "Setup Delivery Address";
+
+        let currentState = "SETUP";
+
+        $f7ready(() => {
+
+            console.log("DELIVERY ADDRESS SETUP && F7 READY EVENT", page_title);
+
+            $f7.lazy.create('.lazy');
+
+        });
+
+        let isSavingLocation = false;
+
+        let addressSelectedObject = null;
+
+        const closeThisPopup = () => {
+
+            $f7.appRenderer.appViewsObject.popups.addressSetupPopup.close();
+
+        };
+
+        const setupLocation = () => {
+
+            currentState = "SAVING";
+
+            $update();
+
+            $$("#subnavbar-map").addClass("saving");
+
+            $$("#subnavbar-map").removeClass("searching");
+
+            $$(".address-type").on("click", function(e){
+
+                console.log( "address-type ::1:", e );
+
+                $$(".address-type").removeClass("button-active");
+
+                let elm = $$(this);
+
+                elm.addClass("button-active");
+
+                elm.attr("data-address-type");
+
+            });
+
+        };
+
+        const saveLocation = () => {
+
+            isSavingLocation = true;
+
+            currentState = "SAVING";
+
+            AddressAutoComplete.addressSelectedObject.address_text = $$("#user-autocomplete-address").val();
+
+            AddressAutoComplete.addressSelectedObject.address_name = $$("#user-autocomplete-name").val();
+
+            AddressAutoComplete.addressSelectedObject.instructions = $$("#user-autocomplete-instructions").val();
+
+            AddressAutoComplete.addressSelectedObject.address_type = $$(".button.button-active.address-type").attr("data-address-type");
+
+            AddressAutoComplete.addressSelectedObject.duration = AddressAutoComplete.duration;
+            AddressAutoComplete.addressSelectedObject.distance = AddressAutoComplete.distance;
+            AddressAutoComplete.addressSelectedObject.start_address = AddressAutoComplete.start_address;
+            AddressAutoComplete.addressSelectedObject.end_address = AddressAutoComplete.end_address;
+            AddressAutoComplete.addressSelectedObject.start_location = AddressAutoComplete.start_location;
+            AddressAutoComplete.addressSelectedObject.end_location = AddressAutoComplete.end_location;
+            AddressAutoComplete.addressSelectedObject.directions = AddressAutoComplete.directions;
+
+            $update();
+
+            const addressSlug = `${getTimestamp()}_${alphanumeric(AddressAutoComplete.addressSelectedObject.address_name)}`;
+
+            app.appFirebase.module.auth.doAddressSave(
+                addressSlug,
+                AddressAutoComplete.addressSelectedObject,
+                function () {
+
+                    isSavingLocation = false;
+
+                    currentState = "SETUP";
+
+                    $update();
+
+                    $$("#subnavbar-map").addClass("searching");
+
+                    $$("#subnavbar-map").removeClass("saving");
+
+                    let locationName = AddressAutoComplete.addressSelectedObject.address_name;
+
+                    let locationType = AddressAutoComplete.addressSelectedObject.address_type;
+
+                    console.log("::: SAVE LOCATION :::", AddressAutoComplete.addressSelectedObject);
+
+                    $f7.appModules.plugin.CapLocalNotifications.toastIcon(
+                        `Location <strong>${locationName}</strong> (${locationType}) has been saved successfully!`,
+                        6000
+                    );
+
+                    const parsedAddressObject = {};
+
+                    parsedAddressObject.step_1_address_name = AddressAutoComplete.addressSelectedObject.address_name;
+                    parsedAddressObject.step_1_address_type = AddressAutoComplete.addressSelectedObject.address_type;
+                    parsedAddressObject.step_1_order_type = "DELIVERY";
+                    parsedAddressObject.step_1_address_location = AddressAutoComplete.addressSelectedObject.address;
+                    parsedAddressObject.step_1_address_duration = AddressAutoComplete.addressSelectedObject.duration;
+                    parsedAddressObject.step_1_address_distance = AddressAutoComplete.addressSelectedObject.distance;
+                    parsedAddressObject.step_1_address_instructions = AddressAutoComplete.addressSelectedObject.instructions;
+                    parsedAddressObject.step_1_address_coordinates = AddressAutoComplete.addressSelectedObject.geometry;
+
+                    $f7.emit('STEP_1_ACTION_SELECTED_ADDRESS', parsedAddressObject);
+
+                    closeThisPopup();
+
+                },
+                function (error) {
+
+                    isSavingLocation = false;
+
+                    currentState = "SETUP";
+
+                    $update();
+
+                    $f7.appModules.plugin.CapLocalNotifications.toast(
+                        `There was an error saving location <strong>${locationName}</strong> (${locationType})`,
+                        6000
+                    );
+
+                    console.log("ADDRESS SAVE ERROR !!!!!!!!!!", error);
+
+                }
+
+            );
+
+        };
+
+        const AddressAutoComplete = {
+
+            // This sample uses the Places Autocomplete widget to:
+            // 1. Help the user select a place
+            // 2. Retrieve the address components associated with that place
+            // 3. Populate the form fields with those address components.
+            // This sample requires the Places library, Maps JavaScript API.
+            // Include the libraries=places parameter when you first load the API.
+            // For example: <script
+            // src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places">
+
+            directionsService : null,
+            directionsRenderer : null,
+            autocomplete: null,
+            address1Field: null,
+            address1FieldFull: null,
+            address2Field: null,
+            postalField: null,
+            userAddress: null,
+            map: null,
+
+            lat: '',
+
+            lng: '',
+
+            distance: '',
+
+            duration: '',
+
+            infoWindow: null,
+
+            mapCanvasId: '',
+
+            autoCompleteInputId: '',
+
+            centreForTheResults: [],
+
+            addressType: "",
+
+            addressName: "",
+
+            addressSelectedObject: {},
+
+            useCurrentLocation : function() {
+
+                console.log("LOCATING USER.............. ::", navigator.geolocation);
+
+                if(!AddressAutoComplete.infoWindow){
+                    AddressAutoComplete.infoWindow = new google.maps.InfoWindow();
+                }
+
+                if (navigator.geolocation) {
+
+                    navigator.geolocation.getCurrentPosition(
+
+                        (position) => {
+
+                            const pos = {
+                                lat: position.coords.latitude,
+                                lng: position.coords.longitude,
+                            };
+
+                            console.log("LOCATION FOUND 0001 ::", pos);
+
+                            AddressAutoComplete.lat = position.coords.latitude;
+
+                            AddressAutoComplete.lng = position.coords.longitude;
+
+                            AddressAutoComplete.map = new google.maps.Map(document.getElementById(AddressAutoComplete.mapCanvasId), {
+                                center: {lat: position.coords.latitude, lng: position.coords.longitude},
+                                zoom: 14,
+                                mapTypeId: google.maps.MapTypeId.ROADMAP
+                            });
+
+                            google.maps.event.addListener(AddressAutoComplete.map, "center_changed", function() {
+
+                                const center = this.getCenter();
+
+                                AddressAutoComplete.lat = center.lat();
+
+                                AddressAutoComplete.lng = center.lng();
+
+                                AddressAutoComplete.updateInfoWindow("Locating...");
+
+                                console.log("CHANGED CENTRE::", AddressAutoComplete.lat, AddressAutoComplete.lng);
+
+                            });
+
+                            google.maps.event.addListener(AddressAutoComplete.map, "dragstart", function() {
+
+                                AddressAutoComplete.updateInfoWindow("Locating...");
+
+                            });
+
+                            google.maps.event.addListener(AddressAutoComplete.map, "dragstart", function() {
+
+                                AddressAutoComplete.updateInfoWindow("Locating...");
+
+                            });
+
+                            google.maps.event.addListener(AddressAutoComplete.map, "idle", function() {
+
+                                console.log("MAP IDLE::");
+
+                                if(AddressAutoComplete.centreForTheResults.length === 0 || (AddressAutoComplete.centreForTheResults.length > 0 && AddressAutoComplete.centreForTheResults[0] !== AddressAutoComplete.lat)) {
+
+                                    console.log(":: MAP CENTRE RESULTS ::", AddressAutoComplete.centreForTheResults, AddressAutoComplete.lat);
+
+                                    setTimeout(function () {
+
+                                        /*
+
+                                        if (AddressAutoComplete.isPanning) {
+
+                                            console.log("MAP IS PANNING::");
+
+                                        } else {
+
+                                        */
+
+                                        if(true){
+
+                                            console.log("NEW CENTRE::", AddressAutoComplete.lat, AddressAutoComplete.lng);
+
+                                            const url = appConfigData.URL_GEO_CODING + `?lat=${AddressAutoComplete.lat}&lng=${AddressAutoComplete.lng}`;
+
+                                            $f7.request.postJSON(url, {})
+                                                .then(function (res) {
+
+                                                    const data = res.data;
+
+                                                    if (data.status === "OK") {
+
+                                                        AddressAutoComplete.centreForTheResults = [AddressAutoComplete.lat, AddressAutoComplete.lng];
+
+                                                        console.log(data);
+
+                                                        const address = data.results[0].formatted_address;
+
+                                                        AddressAutoComplete.updateInfoWindow(address);
+
+                                                        const place = data.results[0];
+
+                                                        console.log("NEW ADDRESS COMPONENTS::", address, place);
+
+                                                        AddressAutoComplete.userAddress = AddressAutoComplete.address1FieldFull = address;
+
+                                                        AddressAutoComplete.fillInAddress(place);
+
+                                                    } else {
+
+                                                        console.log("COULD NOT GET ADDRESS");
+
+                                                    }
+
+                                                });
+
+                                        }
+
+                                    },1000);
+
+                                }else{
+
+                                    console.log(":: MAP CENTRE RESULTS DHAKWAZ::", AddressAutoComplete.centreForTheResults, AddressAutoComplete.lat);
+
+                                }
+
+                            });
+
+                            AddressAutoComplete.updateInfoWindow("Your current position", pos);
+
+                            AddressAutoComplete.panTo(position.coords.latitude, position.coords.longitude);
+
+                        },
+                        () => {
+                            AddressAutoComplete.handleLocationError(true, AddressAutoComplete.map.getCenter());
+                        }
+                    );
+                } else {
+                    // Browser doesn't support Geolocation
+                    AddressAutoComplete.handleLocationError(false, AddressAutoComplete.map.getCenter());
+                }
+
+            },
+
+            initMap: function (lat, lng, mapCanvasId, autoCompleteInputId){
+
+                if(mapCanvasId !== null){
+
+                    AddressAutoComplete.mapCanvasId = mapCanvasId;
+
+                }
+
+                if(autoCompleteInputId !== null){
+
+                    AddressAutoComplete.autoCompleteInputId = autoCompleteInputId;
+
+                }
+                if(lat !== null){
+
+                    AddressAutoComplete.lat = lat;
+
+                }
+
+                if(lng !== null){
+
+                    AddressAutoComplete.lng = lng;
+
+                }
+
+                AddressAutoComplete.useCurrentLocation();
+
+                AddressAutoComplete.initAutocomplete();
+
+            },
+
+            initAutocomplete: function() {
+
+                AddressAutoComplete.directionsService = new google.maps.DirectionsService();
+                AddressAutoComplete.directionsRenderer = new google.maps.DirectionsRenderer();
+                AddressAutoComplete.directionsRenderer.setMap(AddressAutoComplete.map);
+
+                AddressAutoComplete.address1Field = document.getElementById(AddressAutoComplete.autoCompleteInputId);
+                AddressAutoComplete.address1FieldFull = document.querySelector("#address-setup-full-address");
+                AddressAutoComplete.address2Field = document.querySelector("#address-setup-city");
+                AddressAutoComplete.postalField = document.querySelector("#address-setup-postalcode");
+                // Create the autocomplete object, restricting the search predictions to
+                // addresses in the US and Canada.
+                AddressAutoComplete.autocomplete = new google.maps.places.Autocomplete(AddressAutoComplete.address1Field, {
+                    componentRestrictions: { country: ["zw","ca"] },
+                    fields: ["address_components", "geometry"],
+                    types: ["address"],
+                });
+
+
+                AddressAutoComplete.userAddress = AddressAutoComplete.address1FieldFull = AddressAutoComplete.address1Field.value;
+
+                // When the user selects an address from the drop-down, populate the
+                // address fields in the form.
+
+                AddressAutoComplete.autocomplete.addListener("place_changed", AddressAutoComplete.fillInAddress);
+
+            },
+
+            fillInAddress: function( place ) {
+
+                if(place === null || place === "" || typeof place === "undefined" || !place){
+
+                    // Get the place details from the autocomplete object.
+                    place = AddressAutoComplete.autocomplete.getPlace();
+
+                }
+
+                let address1A = "";
+                let address1B = "";
+                let postcode = "";
+                let cityA = "";
+                let cityB = "";
+                let country = "";
+
+                // Get each component of the address from the place details,
+                // and then fill-in the corresponding field on the form.
+                // place.address_components are google.maps.GeocoderAddressComponent objects
+                // which are documented at http://goo.gle/3l5i5Mr
+                for (const component of place.address_components) {
+                    const componentType = component.types[0];
+
+                    switch (componentType) {
+                        case "street_number": {
+                            address1A = `${component.long_name} ${address1A}`;
+                            break;
+                        }
+
+                        case "route": {
+                            address1B += component.short_name;
+                            break;
+                        }
+
+                        case "postal_code": {
+                            postcode = `${component.long_name}${postcode}`;
+                            break;
+                        }
+
+                        case "postal_code_suffix": {
+                            postcode = `${postcode}-${component.long_name}`;
+                            break;
+                        }
+                        case "locality":
+                            cityA = component.long_name;
+                            break;
+
+                        case "administrative_area_level_1": {
+                            cityB = component.short_name;
+                            break;
+                        }
+                        case "country":
+                            country = component.long_name;
+                            break;
+                    }
+                }
+
+                // After filling the form with address components from the Autocomplete
+                // prediction, set cursor focus on the second address line to encourage
+                // entry of subpremise information such as apartment, unit, or floor number.
+                AddressAutoComplete.geocoder = new google.maps.Geocoder();
+
+                AddressAutoComplete.geocodeAddress(AddressAutoComplete.geocoder, AddressAutoComplete.map);
+
+                AddressAutoComplete.address1Field.value = AddressAutoComplete.userAddress;
+
+                const addressSelectedObject = {
+                    address: AddressAutoComplete.userAddress,
+                    fullAddress: AddressAutoComplete.address1FieldFull,
+                    geometry: place.geometry.location,
+                    lat: AddressAutoComplete.lat,
+                    lng: AddressAutoComplete.lng,
+                    meta: {
+                        address1A: address1A,
+                        address1B: address1B,
+                        postcode: postcode,
+                        cityA: cityA,
+                        cityB: cityB,
+                        country: country
+                    }
+                };
+
+                AddressAutoComplete.addressSelectedObject = addressSelectedObject;
+
+                AddressAutoComplete.updateInfoWindow(AddressAutoComplete.userAddress);
+
+                $f7.emit("NEW_ADDRESS", place, addressSelectedObject);
+
+            },
+
+            geocodeAddress: function (geocoder, resultsMap) {
+                AddressAutoComplete.geocoder
+                    .geocode({ address: AddressAutoComplete.userAddress })
+                    .then(({ results }) => {
+                        resultsMap.setCenter(results[0].geometry.location);
+                        new google.maps.Marker({
+                            map: resultsMap,
+                            position: results[0].geometry.location,
+                        });
+
+
+                        console.log(results[0].geometry.location,"+++++",results);
+
+                        console.log(results[0].geometry.location.lat(),"xxxxxxx",results[0].geometry.location.lng());
+
+                        //GoogleMapsObject.setMapMarkerPositionAndCenter (lat, lng);
+
+                        AddressAutoComplete.lat = results[0].geometry.location.lat();
+
+                        AddressAutoComplete.lng = results[0].geometry.location.lng();
+
+                        var origin = "Mambos Chicken Park Street, Harare, Zimbabwe"; // "-17.8291138,31.0432784";
+                        var destination = results[0].formatted_address;// results[0].geometry.location;
+
+                        AddressAutoComplete.calculateAndDisplayRoute(AddressAutoComplete.directionsService, AddressAutoComplete.directionsRenderer, origin, destination);
+
+                        AddressAutoComplete.directionsService.route({
+
+                            origin: origin,
+
+                            destination: destination,
+
+                            travelMode: 'DRIVING'
+
+                        }, function (response, status) {
+
+                            if (status !== 'OK') {
+
+                                console.log('Directions request failed due to ' + status);
+
+                            } else {
+
+                                let wayPointsArray = [];
+
+                                for(let  i=0; i < response.routes[0].overview_path.length; i++){
+
+                                    const item = response.routes[0].overview_path[i];
+
+                                    wayPointsArray.push({lat:item.lat(), lng: item.lng()})
+
+                                }
+
+                                AddressAutoComplete.directionsRenderer.setDirections(response); // Add route to the map
+
+                                const directionsData = response.routes[0].legs[0]; // Get data about the mapped route
+
+                                if (!directionsData) {
+
+                                    console.error('Directions request failed');
+
+                                } else {
+
+                                    AddressAutoComplete.distance = directionsData.distance.text;
+                                    AddressAutoComplete.duration = directionsData.duration.text;
+
+                                    AddressAutoComplete.start_address = directionsData.start_address;
+                                    AddressAutoComplete.end_address = directionsData.end_address;
+
+                                    AddressAutoComplete.start_location = {lat: directionsData.start_location.lat(), lng: directionsData.start_location.lng()};
+                                    AddressAutoComplete.end_location = {lat: directionsData.end_location.lat(), lng: directionsData.end_location.lng()};
+
+                                    AddressAutoComplete.directions = {steps: {}, waypoints: wayPointsArray};
+
+                                    for(let i =0; i<directionsData.steps.length; i++){
+
+                                        const thisStep = directionsData.steps[i];
+
+                                        AddressAutoComplete.directions.steps[`step_${i}`] = {
+                                            maneuver: thisStep.maneuver,
+                                            instructions: thisStep.instructions,
+                                            start_location: {lat: thisStep.start_location.lat(), lng: thisStep.start_location.lng()}
+                                        };
+
+                                    }
+
+                                    console.log("::DIRECTIONS::", AddressAutoComplete.directions);
+
+                                }
+
+                            }
+
+                        }, function (error) {
+                            // handleLocationError(true, infoWindow, GoogleMapsObject.map.getCenter());
+                            console.error(error);
+
+                        });
+
+
+                    })
+                    .catch((e) => {
+                            console.warn("Geocode was not successful for the following reason: " + e);
+                        }
+                    );
+
+            },
+
+            calculateAndDisplayRoute: function (directionsService, directionsRenderer, origin, destination) {
+                AddressAutoComplete.directionsService
+                    .route({
+                        origin: {
+                            query: origin,
+                        },
+                        destination: {
+                            query: destination,
+                        },
+                        travelMode: google.maps.TravelMode.DRIVING,
+                    })
+                    .then((response) => {
+                        AddressAutoComplete.directionsRenderer.setDirections(response);
+                    })
+                    .catch((e) => {
+                        console.warn("Directions request failed due to " + status);
+                    });
+            },
+
+            panPath : [],   // An array of points the current panning action will use
+            panQueue : [],  // An array of subsequent panTo actions to take
+            STEPS : 50,    // The number of steps that each panTo action will undergo
+            isPanning: false,
+
+            panTo: function (newLat, newLng) {
+
+                if(!AddressAutoComplete.isPanning){
+
+                    AddressAutoComplete.map.setZoom(14);
+
+                }
+
+                console.log("PAN MAP TO ::", newLat, newLng);
+
+                if (AddressAutoComplete.panPath.length > 0) {
+                    // We are already panning...queue this up for next move
+
+                    console.log("PAN MAP TO :: We are already panning...queue this up for next move", AddressAutoComplete.panPath.length, AddressAutoComplete.panPath);
+
+                    AddressAutoComplete.panQueue.push([newLat, newLng]);
+
+                } else {
+
+                    // Lets compute the points we'll use
+                    AddressAutoComplete.panPath.push("LAZY SYNCRONIZED LOCK");  // make length non-zero - 'release' this before calling setTimeout
+                    const curLat = AddressAutoComplete.map.getCenter().lat();
+                    const curLng = AddressAutoComplete.map.getCenter().lng();
+                    const dLat = (newLat - curLat) / AddressAutoComplete.STEPS;
+                    const dLng = (newLng - curLng) / AddressAutoComplete.STEPS;
+
+                    for (let i = 0; i < AddressAutoComplete.STEPS; i++) {
+
+                        AddressAutoComplete.panPath.push([curLat + dLat * i, curLng + dLng * i]);
+
+                    }
+
+                    AddressAutoComplete.panPath.push([newLat, newLng]);
+
+                    AddressAutoComplete.panPath.shift();      // LAZY SYNCRONIZED LOCK
+
+                    console.log("PAN MAP TO :: Compute :: ", curLat, curLng, dLat, dLng, AddressAutoComplete.panPath );
+
+                    setTimeout(function (){
+
+                        AddressAutoComplete.doPan();
+
+                    },50);
+
+                }
+
+            },
+
+            doPan: function () {
+
+                const next = AddressAutoComplete.panPath.shift();
+
+                //console.log("DO PAN :: Next :: ", next );
+
+                if (next != null) {
+
+                    AddressAutoComplete.isPanning = true;
+
+                    // Continue our current pan action
+                    AddressAutoComplete.map.panTo(new google.maps.LatLng(next[0], next[1]));
+
+                    setTimeout(function (){
+
+                        AddressAutoComplete.doPan();
+
+                    },50);
+
+                } else {
+
+                    AddressAutoComplete.isPanning = false;
+
+                    // We are finished with this pan - check if there are any queue'd up locations to pan to
+
+                    const queued = AddressAutoComplete.panQueue.shift();
+
+                    if (queued != null) {
+
+                        AddressAutoComplete.panTo(queued[0], queued[1]);
+
+                    }else{
+
+                        AddressAutoComplete.map.setZoom(17);
+
+                    }
+
+                }
+            },
+
+            handleLocationError : function(browserHasGeolocation, pos) {
+
+                AddressAutoComplete.updateInfoWindow(
+                    browserHasGeolocation
+                        ? "Error: The Geolocation service failed."
+                        : "Error: Your browser doesn't support geolocation.",
+                    pos
+                );
+
+            },
+
+            updateInfoWindow : function( text ) {
+
+                $$("#app-address-info-window").text( text );
+
+                $$("#app-address-info-window").show();
+
+                setTimeout(function () {
+
+                    $$("#app-address-info-window").hide();
+
+                },5000);
+
+            },
+
+        };
+
+        $on('pageInit', (e, page) => {
+
+            AddressAutoComplete.initMap(-17.827344736263235, 31.0443161191940452, "app-address-map", "user-autocomplete-address");
+
+            $f7.on("PAN_TO", function(data){
+
+                AddressAutoComplete.panTo(data.lat,data.lng);
+
+            });
+
+            $f7.on("GET_MAP_OBJECT", function(){
+
+                console.log( "MAP OBJECT :::", AddressAutoComplete );
+
+            });
+
+            $f7.on("NEW_ADDRESS", function(address){
+
+                console.log( "EVENT ADDRESS NEW :::", address );
+
+                $$("#"+AddressAutoComplete.autoCompleteInputId).val(address.address);
+
+                let lat = address.lat;
+
+                let lng = address.lng;
+
+                AddressAutoComplete.panTo(lat, lng);
+
+            });
+
+            $update();
+
+        });
+
+        $on('pageMounted', (e, page) => {
+            console.log('page_title:', page_title, 'page mounted');
+        });
+        $on('pageBeforeIn', (e, page) => {
+            console.log('page_title:', page_title, 'page before in');
+        });
+        $on('pageAfterIn', (e, page) => {
+            console.log('page_title:', page_title, 'page after in');
+
+        });
+        $on('pageBeforeOut', (e, page) => {
+            console.log('page_title:', page_title, 'page before out');
+        });
+        $on('pageAfterOut', (e, page) => {
+            console.log('page_title:', page_title, 'page after out');
+        });
+        $on('pageBeforeUnmount', (e, page) => {
+            console.log('page_title:', page_title, 'page before unmount');
+        });
+        $on('pageBeforeRemove', (e, page) => {
+            console.log('page_title:', page_title, 'page before remove');
+        });
+
+        return $render;
+
+    }
+
+</script>
+
+<style>
+    .border-radius-5{ border-radius: 5px !important; }
+
+    .pac-container{ z-index: 20000; }
+
+    .page-content-map {
+        --f7-page-navbar-offset: calc(var(--f7-navbar-height) + var(--f7-safe-area-top) + calc(var(--f7-subnavbar-height) - 24px));
+    }
+
+    .subnavbar.padding.searching{
+
+        height: calc(var(--f7-subnavbar-height) * 1.5);
+
+    }
+
+    .subnavbar.padding.searching{
+
+        height: calc(var(--f7-subnavbar-height) * 1.5);
+
+    }
+
+    .subnavbar.padding.searching input.show-in-saving, .subnavbar.padding.searching div.show-in-saving{
+
+        display: none;
+
+    }
+
+    .subnavbar.padding.saving input.show-in-saving, .subnavbar.padding.saving div.show-in-saving{
+
+        display: block;
+
+    }
+
+    .subnavbar.padding.saving{
+
+        height: calc(var(--f7-subnavbar-height) * 1.5 * 4);
+        display: flex;
+        flex-direction: column;
+        flex-wrap: nowrap;
+
+    }
+
+    .subnavbar-input{
+
+        font-size: calc(var(--f7-searchbar-input-font-size) * 0.8) !important;
+
+    }
+
+    .down-arrow {
+
+        border: 2px solid #333;
+        text-decoration: none;
+        border-radius: 10px;
+        padding: 5px;
+        background-color: #333;
+
+        display:inline-block;
+        margin-left: auto;
+        margin-right: auto;
+        position: fixed;
+        top: calc(50vh - 72px);
+        width: 144px;
+        left: calc(50vw - 80px);
+        text-align: center;
+        color: #fff;
+    }
+    .down-arrow:before {
+        content: '';
+        display: block;
+        position: absolute;
+        left: 42%;
+        right: 0;
+        bottom: -28px;
+        width: 0;
+        height: 0;
+        border: 14px solid transparent;
+        border-top-color: #333;
+    }
+
+    .down-arrow:after {
+        content: '';
+        display: block;
+        position: absolute;
+        left: 42%;
+        bottom: -24px;
+        width: 0;
+        height: 0;
+        border: 14px solid transparent;
+        border-top-color: #333;
+    }
+
+</style>

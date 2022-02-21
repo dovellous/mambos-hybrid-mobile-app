@@ -1,0 +1,693 @@
+<template>
+    <div class="page">
+        <div class="navbar navbar-current">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title" style="text-align: center; width: 100%">
+                    ${page_title}
+                </div>
+                <div class="right">
+                    <a class="link icon-only reorder-same-order" href="#">
+                        <i class="icon f7-icons">bag_badge_plus</i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="toolbar tabbar-labels toolbar-top">
+            <div class="toolbar-inner">
+                <a class="tab-link tab-link-active" href="#tabIDOrders1" id="app-order-index-tab-link-tabIDOrders1">
+                    <i class="icon material-icons md-only">list_alt</i>
+                    <span class="tabbar-label">Details</span>
+                </a>
+                <a class="tab-link " href="#tabIDOrders2" id="app-order-index-tab-link-tabIDOrders2">
+                    <i class="icon material-icons md-only">lunch_dining</i>
+                    <span class="tabbar-label">Products</span>
+                </a>
+                <a class="tab-link " href="#tabIDOrders3" id="app-order-index-tab-link-tabIDOrders3">
+                    <i class="icon material-icons md-only">delivery_dining</i>
+                    <span class="tabbar-label">Status</span>
+                </a>
+                <a class="tab-link " href="#tabIDOrders4" id="app-order-index-tab-link-tabIDOrders4">
+                    <i class="icon material-icons md-only">receipt</i>
+                    <span class="tabbar-label">Transaction</span>
+                </a>
+                <span class="tab-link-highlight" style="width: 25%; transform: translate3d(0%, 0px, 0px);"></span>
+            </div>
+        </div>
+
+        <div class="tabs-animated-wrap tabs-swipeable-wrapx">
+
+            <div class="tabs">
+
+                <div class="page-content order-details-tab order-summary ptr-content ptr-tabIDOrders1 hide-navbar-on-scrollx hide-toolbar-on-scrollx tab tabClass tab-active page-content-bg"
+                     id="tabIDOrders1">
+
+                    <div class="block padding-left-0 padding-right-0">
+
+                        <div class="card">
+                            <div class="card-header">
+                                <h3><strong>Order Ref No: ${orderObject.order_details.order_id}</strong></h3>
+                            </div>
+                            <div class="card-content">
+                                <div class="list media-list no-ios-edges">
+                                    <ul>
+                                        <li class="item-content">
+                                            <div class="item-inner">
+                                                <div class="item-subtitle">
+                                                    <strong>Date</strong>
+                                                </div>
+                                                <div class="item-title-row">
+                                                    <div class="item-title">${getDate(orderObject.order_details.time)}</div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li class="item-content">
+                                            <div class="item-inner">
+                                                <div class="item-subtitle">
+                                                    <strong>Items Summary</strong>
+                                                </div>
+                                                <div class="item-title-row">
+                                                    <div class="item-title">${orderObject.order_details.cart_title}</div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li class="item-content">
+                                            <div class="item-inner">
+                                                <div class="item-subtitle">
+                                                    <strong>Order Status</strong>
+                                                </div>
+                                                <div class="item-title-row">
+                                                    <div class="item-title">
+                                                        <span class="badge color-orange">${orderObject.order_details.state}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li class="item-content">
+                                            <div class="item-inner">
+                                                <div class="item-subtitle">
+                                                    <strong>Ordered By</strong>
+                                                </div>
+                                                <div class="item-title-row">
+                                                    <div class="item-title">${orderObject.order_details.firstname} ${orderObject.order_details.lastname}</div>
+                                                </div>
+                                                <div class="item-subtitle">
+                                                    <small>${orderObject.order_details.email}</small>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="card-footer">
+                                <span> </span>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header">
+                                <h3><strong>Delivery Details</strong></h3>
+                            </div>
+
+                            ${orderObject.order_details.delivery_address ? $h`
+
+                            <div class="card-content">
+                                <div class="list media-list no-ios-edges">
+                                    <ul>
+
+                                        <li class="item-content">
+                                            <div class="item-inner">
+                                                <div class="item-subtitle">
+                                                    <strong>Delivery Address</strong>
+                                                </div>
+                                                <div class="item-title-row">
+                                                    <div class="item-title">${orderObject.order_details.delivery_address.address_full}</div>
+                                                </div>
+                                                <div class="item-subtitle">
+                                                    ${orderObject.order_details.delivery_address.address_name} ( ${orderObject.order_details.delivery_address.address_type} )
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li class="item-content">
+                                            <div class="item-inner">
+                                                <div class="item-subtitle">
+                                                    <strong>Delivery Date</strong>
+                                                </div>
+                                                <div class="item-title-row">
+                                                    <div class="item-title">${orderObject.order_details.delivery_date}</div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li class="item-content">
+                                            <div class="item-inner">
+                                                <div class="item-subtitle">
+                                                    <strong>Delivery Time</strong>
+                                                </div>
+                                                <div class="item-title-row">
+                                                    <div class="item-title">${orderObject.order_details.delivery_time}</div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li class="item-content">
+                                            <div class="item-inner">
+                                                <div class="item-subtitle">
+                                                    <strong>Address Instructions</strong>
+                                                </div>
+                                                <div class="item-title-row">
+                                                    <div class="item-title">${orderObject.order_details.delivery_address.address_instructions}</div>
+                                                </div>
+                                            </div>
+                                        </li>
+
+                                    </ul>
+                                </div>
+                            </div>
+
+                            `: $h`
+                            <div class="card-content">
+                                <p class="padding">No address information provided</p>
+                            </div>
+                            `}
+
+                            <div class="card-footer">
+                                <span></span>
+                                <span></span>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="page-content order-details-tab order-products ptr-content ptr-tabIDOrders2 hide-navbar-on-scrollx hide-toolbar-on-scrollx tab tabClass  page-content-bg  "
+                     id="tabIDOrders2">
+
+                    <div class="block padding-left-0 padding-right-0">
+
+                        <div class="card">
+                            <div class="card-header">
+                                <h3><strong>Products Ordered</strong></h3>
+                            </div>
+                            <div class="card-content">
+
+                                <div class="list media-list">
+                                    <ul>
+
+                                        ${orderObject.order_details.productsObject.map((item, index) => $h`
+
+                                        <li id="${item[0]}" class="product message-list">
+                                            <div class="item-content">
+                                                <div class="item-inner">
+                                                    <div class="item-title-row title">
+                                                        <div class="item-title"><strong>${item[1].product_name}</strong>
+                                                        </div>
+                                                        <div class="item-after text-color-primary"><strong>${orderObject.order_details.order_currency} ${formatMoney(item[1].product_price_total)}</strong>
+                                                        </div>
+                                                    </div>
+                                                    <div class="item-title-row subtitle">
+                                                        <div class="item-subtitle">
+                                                            ${item[1].product_except}
+                                                            <br />
+                                                            X ${item[1].product_qty} @ ${orderObject.order_details.order_currency} ${item[1].product_price_regular} each
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </li>
+
+                                        `)}
+
+                                    </ul>
+                                </div>
+
+                            </div>
+
+                            <div class="card-footer">
+
+                            </div>
+
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header">
+                                <h3><strong>Totals</strong></h3>
+                            </div>
+                            <div class="card-content">
+
+                                <div class="list media-list">
+                                    <ul>
+
+                                        <li id="order-details-sub-total" class="product message-list">
+                                            <div class="item-content">
+                                                <div class="item-inner">
+                                                    <div class="item-title-row title">
+                                                        <div class="item-title">Subtotal</div>
+                                                        <div class="item-after"><strong>${orderObject.order_details.order_currency} ${formatMoney(orderObject.order_details.order_subtotal)}</strong>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </li>
+
+                                        <li id="order-details-delivery-total" class="product message-list">
+                                            <div class="item-content">
+                                                <div class="item-inner">
+                                                    <div class="item-title-row title">
+                                                        <div class="item-title">Delivery Fee</div>
+                                                        <div class="item-after"><strong>${orderObject.order_details.order_currency} ${formatMoney(orderObject.order_details.delivery_fee)}</strong>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </li>
+
+                                        <li id="order-details-discount-total" class="product message-list">
+                                            <div class="item-content">
+                                                <div class="item-inner">
+                                                    <div class="item-title-row title">
+                                                        <div class="item-title">Discount</div>
+                                                        <div class="item-after"><strong>-${orderObject.order_details.order_currency} ${formatMoney(orderObject.order_details.discount_off)}</strong>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </li>
+
+                                        <li id="order-details-grand-total" class="product message-list">
+                                            <div class="item-content">
+                                                <div class="item-inner">
+                                                    <div class="item-title-row title">
+                                                        <div class="item-title text-color-primary"><strong>Grand Total</strong></div>
+                                                        <div class="item-after text-color-primary"><strong>${orderObject.order_details.order_currency} ${formatMoney(orderObject.order_details.order_total)}</strong>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </li>
+
+                                    </ul>
+                                </div>
+
+                            </div>
+
+                            <div class="card-footer">
+
+                            </div>
+
+                        </div>
+
+                        <div class="block inset">
+
+                        <!--<button class="colx button button-large button-raised button-fill reorder-same-order">ORDER AGAIN</button>-->
+
+                        </div>
+
+                    </div>
+
+
+                </div>
+
+                <div class="page-content order-details-tab order-status ptr-content ptr-tabIDOrders3 hide-navbar-on-scrollx hide-toolbar-on-scrollx tab tabClass  page-content-bg  "
+                     id="tabIDOrders3">
+
+                    <div class="block padding-0 margin-0">
+
+                        <div class="card margin-0">
+                            <div class="card-header">
+                                <h3><strong>Order Status</strong></h3>
+                            </div>
+                            <div class="card-content">
+
+                                <div class="progressContainer">
+
+                                    <ul class="progress" >
+    
+    
+                                        ${orderDetailsRawStatuses.map((item, index) => $h`
+                                        
+                                        ${ item[1].visible ? $h`
+    
+                                        <li class="progress__item ${parseInt(item[1].step) === parseInt(orderDetailsRawStatusIndex) ? 'progress__item--active':''} ${item[1].updated_time > 0 ? 'progress__item--completed':''}">
+
+                                            <div class="card card-outline">
+                                                
+                                                <div class="card-header">
+                                                    <h4 class="margin-0">Step ${index+1}: ${item[1].state}</h4>
+                                                </div>
+                                                
+                                                ${ parseInt(item[1].updated_time) > 0 ? $h`
+                                                
+                                                <div class="card-content card-content-padding">
+                                                    
+                                                    <strong>${item[1].title}:</strong><br />
+                                                    
+                                                    ${item[1].desc}
+    
+                                                    ${ typeof item[1].update_comments === "string" ? $h`
+    
+                                                    <p><em><strong>Note:</strong> "${item[1].update_comments}"</em></p>
+                                                    
+                                                    ` : $h`
+    
+                                                    <div></div>
+                                                    
+                                                    `}
+                                                    
+                                                    ${parseInt(item[1].step) === parseInt(orderDetailsRaw.status_index)} ${parseInt(item[1].step)} === ${parseInt(orderDetailsRaw.status_index)}
+
+                                                </div>
+    
+                                                <div class="card-footer">${getDate(item[1].updated_time)}</div>
+                                                
+                                                ` : $h`<div></div>`}
+                                                
+                                            </div>
+
+                                        </li>
+    
+                                        ` : $h`<div></div>`}
+    
+                                        `)}
+                                        
+                                    </ul>
+
+                                </div>
+
+                            </div>
+
+                            <div class="card-footer">
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="page-content order-details-tab order-transactions  ptr-content ptr-tabIDOrders4 hide-navbar-on-scrollx hide-toolbar-on-scrollx tab tabClass  page-content-bg  "
+                     id="tabIDOrders4">
+
+                    <div class="block padding-left-0 padding-right-0">
+
+                        <div class="card">
+                            <div class="card-header">
+                                <h3><strong>Transaction Details</strong></h3>
+                            </div>
+
+                            ${orderObject.order_details.payment.result ? $h`
+
+                            <div class="card-content">
+                                <div class="list media-list no-ios-edges">
+                                    <ul>
+
+                                        <li class="item-content">
+                                            <div class="item-inner">
+                                                <div class="item-subtitle">
+                                                    <strong>Payment Method</strong>
+                                                </div>
+                                                <div class="item-title-row">
+                                                    <div class="item-title">${orderObject.order_details.payment.method}</div>
+                                                </div>
+                                                <div class="item-subtitle">
+                                                    Currency: ${orderObject.order_details.payment.currency}
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li class="item-content">
+                                            <div class="item-inner">
+                                                <div class="item-subtitle">
+                                                    <strong>Amount</strong>
+                                                </div>
+                                                <div class="item-title-row">
+                                                    <div class="item-title">${orderObject.order_details.payment.currency} ${orderObject.order_details.payment.amount}</div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li class="item-content">
+                                            <div class="item-inner">
+                                                <div class="item-subtitle">
+                                                    <strong>Transaction Status</strong>
+                                                </div>
+                                                <div class="item-title-row">
+                                                    <div class="item-title">${orderObject.order_details.payment.result.payment_status}</div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li class="item-content">
+                                            <div class="item-inner">
+                                                <div class="item-subtitle">
+                                                    <strong>Date</strong>
+                                                </div>
+                                                <div class="item-title-row">
+                                                    <div class="item-title">${getDate(orderObject.order_details.payment.order_placed.time)}</div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li class="item-content">
+                                            <div class="item-inner">
+                                                <div class="item-subtitle">
+                                                    <strong>Order UUID</strong>
+                                                </div>
+                                                <div class="item-title-row">
+                                                    <div class="item-title">${orderObject.order_details.payment.result.order_number}</div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li class="item-content">
+                                            <div class="item-inner">
+                                                <div class="item-subtitle">
+                                                    <strong>Transaction Reference</strong>
+                                                </div>
+                                                <div class="item-title-row">
+                                                    <div class="item-title">${orderObject.order_details.payment.result.txn_id}</div>
+                                                </div>
+                                            </div>
+                                        </li>
+
+                                    </ul>
+                                </div>
+                            </div>
+
+                            `: $h`
+                            <div class="card-content">
+                                <p class="padding">No transaction found information provided.</p>
+                            </div>
+                            `}
+
+                            <div class="card-footer">
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</template>
+<script>
+    export default (props, {$f7ready, $f7, $f7route, $on, $update}) => {
+
+        let page_title, logoPath;
+        
+        let order_statuses = [];
+        
+        let orderDetailsRaw = {status: {}};
+
+        let orderDetailsRawArray = [];
+
+        let orderDetailsRawStatuses = [];
+
+        let orderDetailsRawStatusIndex = [];
+
+        let orderObject = {
+            order_details: {
+            productsObject: [],
+            payment: {
+                result: false
+            }
+            }};
+
+        $f7ready(() => {
+
+            //
+
+        });
+
+        const debug_orders_object = () => {
+
+            console.log(orderObject);
+
+        };
+
+        const getData = function () {
+
+            // Must return an object
+
+            const order_id = $f7route.params.orderId;
+            
+            let order_details_object = {};
+            
+            if($f7route.query.hasOwnProperty('order_tab')) {
+
+                const order_tab = $f7route.query.order_tab;
+
+                if (order_tab !== "none") {
+
+                    const uid = $f7.data.metaDataFirebaseUserUser.meta.uid;
+
+                    let driverOrdersRefPath = 'accounts/drivers/locations/' + uid + '/orders/' + order_tab;
+
+                    let driverOrdersRef = firebase.database().ref(driverOrdersRefPath);
+
+                    driverOrdersRef.on('value', function (snapshot) {
+
+                        let order_details_object = snapshot.val();
+
+                        console.log("::: ORDER DETAILS order_details_object ::: DRIVER :::", order_details_object, driverOrdersRefPath, [$f7route.params, $f7route.query]);
+
+                        if (order_details_object !== null) {
+
+                            for (let order_key in order_details_object) {
+
+                                if (order_details_object.hasOwnProperty(order_key)) {
+
+                                    console.log("::: ORDER DETAILS order_details_object ::: ORDER_ITEM :::", order_key, order_details_object[order_key]["order_id"], order_id, (order_details_object[order_key]["order_id"] === order_id), order_details_object);
+
+                                    if (order_details_object[order_key]["order_id"] === order_id) {
+
+                                        order_details_object = order_details_object[order_key];
+
+                                        parseData(order_details_object, true);
+
+                                    }
+
+                                }
+
+                            }
+
+                        }
+
+                    });
+
+                } else {
+
+                    order_details_object = $f7.data.metaDataFirebaseUserOrders[order_id];
+
+                    console.log("::: ORDER DETAILS order_details_object ::: USER :::", $f7.data.metaDataFirebaseUserOrders, order_id, order_details_object);
+
+                    parseData(order_details_object, false);
+
+                }
+
+            }
+
+        };
+        
+        const parseData = function(order_details_object, hasMeta){
+
+            let order_details_array = [];
+
+            if (typeof order_details_object === "undefined" || order_details_object !== "object") {
+
+                order_details_array = Object.keys(order_details_object).map((key) => [key, order_details_object[key]]);
+                
+                if(hasMeta) {
+
+                    orderDetailsRaw = order_details_object.meta;
+
+                } else {
+
+                    orderDetailsRaw = order_details_object;
+
+                }
+
+                console.log("::: ORDER DETAILS orderDetailsRaw ::: ORDER DETAILS RAW :::", orderDetailsRaw);
+
+                orderDetailsRawArray = order_details_array;
+
+                orderDetailsRawStatusIndex = orderDetailsRaw.status_index;
+
+                orderDetailsRawStatuses = Object.keys(orderDetailsRaw.status).map((key) => [key, orderDetailsRaw.status[key]]);
+
+                orderDetailsRaw.productsObject = Object.keys(orderDetailsRaw.cart_object.cart).map((key) => [key, orderDetailsRaw.cart_object.cart[key]]);
+
+                //console.log("ORDER_LOG:", order_details[1]);
+
+                page_title = "Receipt  No.: R" + orderDetailsRaw["order_id"];
+
+                // trigger re-render
+                
+                $update();
+                
+                orderObject = {order_details: orderDetailsRaw};
+                
+                return orderObject;
+
+            }
+
+        };
+
+        $on('pageInit', () => {
+
+            $f7.on("DEBUG_ORDER_OBJECT", debug_orders_object);
+
+            logoPath = window.app.appRenderer.module.styling.getNavBarLogo();
+
+            //console.error(":: ORDER OBJECT >>>> :1:", orderObject);
+
+            getData();
+
+            //console.error(":: ORDER OBJECT >>>> :2:", $f7route.params, orderObject);
+
+            $$('.reorder-same-order').on('click', function (event) {
+
+                $f7.emit("REORDER_SAME_ORDER", orderObject);
+
+            });
+
+            // trigger re-render
+            $update();
+
+        });
+
+        $on('pageMounted', (e, page) => {
+            console.log('page_title:', page_title, 'page mounted');
+        });
+        $on('pageBeforeIn', (e, page) => {
+            console.log('page_title:', page_title, 'page before in');
+        });
+        $on('pageAfterIn', (e, page) => {
+            console.log('page_title:', page_title, 'page after in');
+        });
+        $on('pageBeforeOut', (e, page) => {
+            console.log('page_title:', page_title, 'page before out');
+        });
+        $on('pageAfterOut', (e, page) => {
+            console.log('page_title:', page_title, 'page after out');
+        });
+        $on('pageBeforeUnmount', (e, page) => {
+            console.log('page_title:', page_title, 'page before unmount');
+        });
+        $on('pageBeforeRemove', (e, page) => {
+            console.log('page_title:', page_title, 'page before remove');
+        });
+
+        return $render;
+
+    }
+</script>

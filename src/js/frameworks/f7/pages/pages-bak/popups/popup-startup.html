@@ -1,0 +1,63 @@
+<template>
+    <div class="page">
+        <div class="page-content page-bg-startup">
+
+            <div class="login-screen-title" style="margin-top: 72px; margin-bottom: 72px;">
+                <img src="static/images/logo.png" style="width: 64%; vertical-align: text-top;"/>
+            </div>
+
+        </div>
+    </div>
+</template>
+<script>
+    export default (props, {$f7ready, $f7, $on, $update}) => {
+
+        let page_title = ":: POPUP STARTUP ::";
+
+        const fx = () => {
+
+            //
+
+        };
+
+        $f7ready(() => {
+
+            console.log("F7 && READY EVENT", page_title);
+
+            $update();
+
+        });
+
+        $on('pageInit', (e, page) => {
+
+            page_title = "Popup start up ...";
+
+        });
+
+        $on('pageMounted', (e, page) => {
+            console.log('page_title:', page_title, 'page mounted');
+        });
+        $on('pageBeforeIn', (e, page) => {
+            console.log('page_title:', page_title, 'page before in');
+        });
+        $on('pageAfterIn', (e, page) => {
+            console.log('page_title:', page_title, 'page after in');
+        });
+        $on('pageBeforeOut', (e, page) => {
+            console.log('page_title:', page_title, 'page before out');
+        });
+        $on('pageAfterOut', (e, page) => {
+            console.log('page_title:', page_title, 'page after out');
+        });
+        $on('pageBeforeUnmount', (e, page) => {
+            console.log('page_title:', page_title, 'page before unmount');
+        });
+        $on('pageBeforeRemove', (e, page) => {
+            console.log('page_title:', page_title, 'page before remove');
+        });
+
+        return $render;
+
+    }
+
+</script>

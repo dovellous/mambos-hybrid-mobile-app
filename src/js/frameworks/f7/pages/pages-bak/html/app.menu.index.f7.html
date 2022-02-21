@@ -1,0 +1,369 @@
+<template>
+    <div class="page" >
+        <div class="navbar navbar-current navbar-large">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a class="link icon-only panel-open" data-panel="left" href="#">
+                        <i class="icon material-icons md-only">menu</i>
+                    </a>
+                </div>
+                <div class="title sliding" style="text-align: center; width: 100%">
+                    <img src="${logoPath}" style="max-height: 45px;vertical-align: middle; "/>
+                </div>
+                <div class="right">
+                    <a class="link icon-only panel-open" data-panel=".panel-right-default" href="#">
+                        <i class="icon f7-icons ios-only">more</i>
+                        <i class="icon material-icons md-only">more_vert</i>
+                    </a>
+                </div>
+                ${page_title && $h`
+                <div class="title-large">
+                    <div class="title-large-text">
+                        ${page_title}
+                    </div>
+                </div>
+                `}
+            </div>
+        </div>
+        <div class="page-content page-bg-startup page-with-navbar-large">
+
+            <div class="block margin-left-0 margin-right-0 margin-bottom-x7 padding-0">
+
+                ${menuObject.categoryProducts.map((item, index) => $h`
+
+                ${(item[1].hasOwnProperty('products')) && Object.keys(item[1].products).length ? $h`
+
+                <div id="category-${item[1].category_id}" class="card demo-card-header-pic" style="margin-bottom: 20px;" @click=${(e) => openCategoryDetails(item[0])}>
+                    <div data-background="static/images/cat/c-${item[1].category_id}.jpg"
+                         class="card-header card-menu-header align-items-flex-end lazy lazy-fade-in">
+                    </div>
+                    <div class="card-content padding">
+
+                        <h3 class="margin-0 text-align-center card-menu-title">${item[1].category_name}</h3>
+
+                    </div>
+                </div>
+
+                ` : $h` <!--- ${item[1].category_id} ${item[1].category_name} has empty products --->` }
+
+                `)}
+
+            </div>
+
+        </div>
+
+    </div>
+
+</template>
+<script>
+    export default (props, {$f7ready, $f7, $on, $update}) => {
+
+        let page_title, logoPath, currentProduct;
+
+        let menuObject = {
+            categoryProducts: [],
+        };
+
+        $f7ready(() => {
+
+            $f7.lazy.create('.lazy');
+
+        });
+
+        const error_loading_image = function () {
+
+            console.log("IMAGE_ERROR", $$(this).attr("src"));
+
+        };
+
+        const openProduct = (category_slug, product_id, product_index, product) => {
+
+            const url = $$("#product-id-"+product_id).attr("data-href");
+
+            console.log("::: OPEN PRODUCT ::: ", url, category_slug, product_id, product_index, product );
+
+            window.app.appModules.plugin.NavigatorModel.gotoUrl(url);
+
+        };
+
+        const scrollToCategory = (categoryItem) => {
+
+            console.log("::: SCROLL TO CATEGORY::: ", categoryItem );
+        };
+
+        const openCategoryDetails = (categorySlug) => {
+
+            console.log("::: OPEN CATEGORY DETAILS::: categorySlug ::: ", categorySlug );
+
+            $f7.appModules.plugin.NavigatorModel.gotoUrl(`/app-menu-category-details/${categorySlug}/`);
+
+        };
+
+        let connectionAttemp = 0;
+
+        let maxConnectionAttempts = 5;
+
+        let hasAttemptedToConnect = false;
+
+        let connectionAttemptTimeout = 10000;
+
+        let connectionSucceded = false;
+
+        const getData = function ( callBackFunction, callBackError ) {
+
+            $f7.dialog.close();
+
+            $f7.preloader.show();
+
+            if(!connectionSucceded) {
+
+                $f7.request.post(
+                    appConfigData.URL_PRODUCTS,
+                    {}
+                ).then(function (res) {
+
+                    $f7.toast.create({
+                        text: "Connected!",
+                        position: 'bottom',
+                        closeTimeout: 3000,
+                        on: {
+                            opened: function () {
+                            }
+                        }
+
+                    }).open();
+
+                    connectionSucceded = true;
+
+                    $f7.preloader.hide();
+
+                    const products = JSON.parse(res.data);
+
+                    const productArray = Object.keys(products).map((key) => [key, products[key]]);
+
+                    console.log("PRODUCTS RESULT", products);
+
+                    $f7.emit("PRODUCTS_LOADED", {productObject: products, productArray: productArray});
+
+                    if (typeof products === "object") {
+
+                        $f7.params.data.products = products;
+
+                        $f7.data.products = products;
+
+                        $f7.params.data.productObject = products;
+
+                        $f7.data.productObject = products;
+
+                        $f7.params.data.productArray = productArray;
+
+                        $f7.data.productArray = productArray;
+
+                        menuObject = {
+                            categoryProducts: productArray,
+                        };
+
+                        console.error("PRODUCTS RESULT :: PAGE: MENU :: menuObject ::", menuObject);
+
+                        $update();
+
+                        setTimeout(function () {
+
+                            $f7.lazy.create('.lazy');
+
+                        }, 1000);
+
+                        if (typeof callBackFunction === "function") {
+                            //callBackFunction(menuObject);
+                        }
+
+                    } else {
+
+                        if (typeof callBackError === "function") {
+                            //callBackError(products);
+                        }
+
+                        console.warn("PRODUCTS ERROR", res);
+
+                    }
+
+                    console.error("PRODUCTS RESULT :: END FX ::", menuObject, $f7.params.data.productObject, $f7.params.data.productArray);
+
+                }).catch(function (err) {
+                    console.log("HTTP ERROR", err);
+                    console.log(err.xhr);
+                    console.log(err.status);
+                    console.log(err.message);
+
+                    let error_message = "An error occured while trying to retrieve the menu 0x1";
+
+                    if (err.status === 0) {
+
+                        error_message = "Network error. Please check your internet connection an try again.";
+
+                    }
+
+                    if (err.status === 500) {
+
+                        error_message = "Internal server error occured";
+
+                    }
+
+                    if (err.message !== "" && err.message !== null && typeof err.message !== "undefined") {
+
+                        error_message = err.message;
+
+                    } else {
+
+                        error_message = "An error occured while trying to retrieve the menu. 0x2";
+
+                    }
+
+                    connectionSucceded = false;
+
+                    console.log(error_message);
+
+                    $f7.dialog.close();
+
+                    $f7.preloader.hide();
+
+                    connectionAttemp++;
+
+                    setTimeout(function() {
+
+                        if(true){
+
+                            $f7.toast.create({
+                                text: "Attempting connection "+connectionAttemp+" of "+maxConnectionAttempts+"....",
+                                position: 'bottom',
+                                closeTimeout: 3000,
+                                on: {
+                                    opened: function () {
+                                    }
+                                }
+                            }).open();
+
+                            if(connectionAttemp>maxConnectionAttempts){
+
+                                $f7.toast.create({
+                                    text: "Server connection has timed out. Please check your network settings settings and try again later.",
+                                    position: 'bottom',
+                                    closeTimeout: 3000,
+                                    on: {
+                                        opened: function () {
+                                        }
+                                    }
+
+                                }).open();
+
+                                $f7.preloader.hide();
+
+                                connectionAttemp = 0;
+
+                                maxConnectionAttempts = 5;
+
+                            }else{
+
+                                $f7.preloader.show();
+
+                                getData(function (data) {
+
+                                    console.log("PRODUCTS DATA 0x3...", data);
+
+                                    $f7.preloader.hide();
+
+                                }, function ( error ) {
+
+                                    console.log("PRODUCTS DATA ERROR 0x3...", error );
+
+                                });
+
+                            }
+
+                        }
+
+                    }, connectionAttemptTimeout);
+
+                    if (typeof callBackError === "function") {
+                        callBackError(err);
+                    }
+
+                });
+
+            }else{
+
+                if(!hasAttemptedToConnect) {
+
+                    $f7.preloader.show();
+
+                    hasAttemptedToConnect = true;
+
+                }
+
+            }
+
+        };
+
+        $on('pageInit', () => {
+
+            page_title = "Our Menu";
+
+            logoPath = window.app.appRenderer.module.styling.getNavBarLogo();
+
+            getData(function (data) {
+
+                console.log("PRODUCTS DATA 0x1", data);
+
+            }, function ( error ) {
+
+                console.log("PRODUCTS DATA ERROR 0x1", error );
+
+            });
+
+            $f7.on("DEBUG_PRODUCTS", function () {
+
+                getData(function (data) {
+
+                    console.log("PRODUCTS DATA 0x2", data);
+
+                }, function ( error ) {
+
+                    console.log("PRODUCTS DATA ERROR 0x2", error );
+
+                })
+
+            });
+
+            // trigger re-render
+            $update();
+
+        });
+
+        $on('pageMounted', (e, page) => {
+            console.log('page_title:', page_title, 'page mounted');
+        });
+        $on('pageBeforeIn', (e, page) => {
+            console.log('page_title:', page_title, 'page before in');
+        });
+        $on('pageAfterIn', (e, page) => {
+            console.log('page_title:', page_title, 'page after in');
+            $f7.lazy.create('.lazy');
+        });
+        $on('pageBeforeOut', (e, page) => {
+            console.log('page_title:', page_title, 'page before out');
+        });
+        $on('pageAfterOut', (e, page) => {
+            console.log('page_title:', page_title, 'page after out');
+        });
+        $on('pageBeforeUnmount', (e, page) => {
+            console.log('page_title:', page_title, 'page before unmount');
+        });
+        $on('pageBeforeRemove', (e, page) => {
+            console.log('page_title:', page_title, 'page before remove');
+        });
+
+        return $render;
+
+    }
+</script>

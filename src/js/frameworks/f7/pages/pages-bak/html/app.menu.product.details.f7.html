@@ -1,0 +1,226 @@
+<template>
+    <div class="page">
+        <div class="navbar navbar-current navbar-large">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title sliding" style="text-align: center; width: 100%">
+                    ${page_title}
+                </div>
+                <div class="right">
+                    <a class="link icon-only panel-open" data-panel=".panel-right-default" href="#">
+                        <i class="icon f7-icons">info_circle</i>
+                    </a>
+                </div>
+                ${page_title && $h`
+                <div class="title-large">
+                    <div class="title-large-text">
+                        ${page_title}
+                    </div>
+                </div>
+                `}
+            </div>
+        </div>
+
+        <div class="page-content page-content-bg page-with-navbar-large">
+
+            ${(productObject.hasOwnProperty('product')) ? $h`
+
+            <img src="static/images/products/${productObject.product.product_image}" width="100%" @error=${error_loading_image}/>
+
+            <div class="block block-strong list media-list no-ios-edges block row">
+
+                <h2 class="full-width"><strong>${productObject.product.product_name}</strong></h2>
+
+                <p>${productObject.product.product_description}</p>
+
+                <p class="full-width">
+                    <hr />
+                    <span>
+                        Category: <strong>${productObject.product.product_category_main}</strong>
+                    </span>
+                    <br />
+                    <span>
+                        Item Code: <strong>${productObject.product.product_code}</strong>
+                    </span>
+                    <hr />
+                </p>
+
+                <h2 class="full-width text-theme-color product-price ">Price: USD ${productObject.product.product_price_regular}</h2>
+
+            </div>
+
+            <div class="block block-strong list media-list no-ios-edges block padding-top-x2">
+
+                <div class="margin-bottom-x2">
+                    <div class="stepper stepper-raised stepper-large stepper-init"  data-autorepeat="true">
+                        <div class="stepper-button-minus current-product-cart-qty" @click=${(e) => currentProductCartQtyDecrease()} ></div>
+                        <div class="stepper-input-wrap stepper-block">
+                            <input type="text" value="0" min="0" max="100" step="1" id="current-product-cart-qty" readonly />
+                        </div>
+                        <div class="stepper-button-plus current-product-cart-qty" @click=${(e) => currentProductCartQtyIncrease()} ></div>
+                    </div>
+                </div>
+
+                <button class="button button-large button-raised button-fill margin-bottom-x2" id="current-product-cart-add"
+                        @click=${(e) => currentProductAddToCart()} >ADD TO CART</button>
+
+                <button class="button button-large button-raised margin-bottom-x2" id="current-product-wishlist-add"
+                        @click=${(e) => currentProductAddToWishlist()} >ADD TO WISHLIST</button>
+
+            </div>
+
+            ` : $h` <!--- Product not found --->` }
+
+        </div>
+
+    </div>
+
+</template>
+<script>
+    export default (props, {$f7ready, $f7, $f7route, $on, $update}) => {
+
+        let page_title, logoPath;
+
+        let productObject = {};
+
+        $f7ready(() => {
+
+            //
+
+        });
+
+        const error_loading_image = function () {
+
+            console.log("IMAGE_ERROR", $$(this).attr("src"));
+
+        };
+
+        const currentProductCartQtyIncrease = function () {
+
+            setTimeout(function () {
+
+                const _selected_product_qty = parseInt($$("#current-product-cart-qty").val());
+
+                console.log("ADD::", _selected_product_qty);
+
+                window.app.params.data.selected_product_qty = _selected_product_qty;
+
+                window.app.params.methods.product_qty_increase();
+
+            }, 1000);
+
+        };
+
+        const currentProductCartQtyDecrease = function () {
+
+            setTimeout(function () {
+
+                const _selected_product_qty = parseInt($$("#current-product-cart-qty").val());
+
+                console.log("MINUS::", _selected_product_qty);
+
+                window.app.params.data.selected_product_qty = _selected_product_qty;
+
+                window.app.params.methods.product_qty_decrease();
+
+            }, 1000);
+
+        };
+
+        const currentProductAddToCart = function () {
+
+            window.app.params.methods.product_add_current_to_cart();
+
+            window.app.emit("REFRESH_CART", []);
+
+        };
+
+        const currentProductAddToWishlist = function () {
+
+            window.app.params.methods.product_add_current_to_wishlist();
+
+            window.app.emit("REFRESH_WISHLIST", []);
+
+        };
+
+        const getData = function () {
+
+            // Must return an object
+
+            const categorySlug = $f7route.params.categorySlug;
+
+            const productIndex = $f7route.params.productIndex;
+
+            const categoryProducts = window.app.appData.module.data.getData().firebaseDataLocalObject.data.categoryProducts;
+
+            let productData = {};
+
+            if(categorySlug in categoryProducts){
+
+                if("products" in categoryProducts[categorySlug]){
+
+                    if(productIndex in categoryProducts[categorySlug]["products"]) {
+
+                        productData = categoryProducts[categorySlug]["products"][productIndex];
+
+                        page_title = productData.product_name;
+
+                    }
+
+                }
+
+            }
+
+            window.app.params.methods.product_view(categorySlug, productIndex);
+
+            return { product: window.app.data.selected_product};
+
+        };
+
+        $on('pageInit', () => {
+
+            page_title = "Product Details";
+
+            logoPath = window.app.appRenderer.module.styling.getNavBarLogo();
+
+            productObject = getData();
+
+            console.error(":: PRODUCT OBJECT >>>> :2:", productObject);
+
+            // trigger re-render
+            $update();
+
+        });
+
+        $on('pageMounted', (e, page) => {
+            console.log('page_title:', page_title, 'page mounted');
+        });
+        $on('pageBeforeIn', (e, page) => {
+            console.log('page_title:', page_title, 'page before in');
+        });
+        $on('pageAfterIn', (e, page) => {
+            console.log('page_title:', page_title, 'page after in');
+        });
+        $on('pageBeforeOut', (e, page) => {
+            console.log('page_title:', page_title, 'page before out');
+        });
+        $on('pageAfterOut', (e, page) => {
+            console.log('page_title:', page_title, 'page after out');
+        });
+        $on('pageBeforeUnmount', (e, page) => {
+            console.log('page_title:', page_title, 'page before unmount');
+        });
+        $on('pageBeforeRemove', (e, page) => {
+            console.log('page_title:', page_title, 'page before remove');
+        });
+
+        return $render;
+
+    }
+</script>

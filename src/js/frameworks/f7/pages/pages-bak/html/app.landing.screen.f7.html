@@ -1,0 +1,225 @@
+<template>
+    <div class="page">
+        <div class="page-content page-bg-startup">
+
+            <div class="block inset list no-border text-align-center">
+                <img src="static/images/logo-light.png" class="big-icon-img margin-top-x2 margin-bottom-x2"/>
+            </div>
+
+            <div class="block inset list no-border">
+                <h2 class="welcome-greeting text-align-center">Hi ${displayName}, <br />Are you hungry?</h2>
+            </div>
+
+            <div class="block inset list no-border">
+                <ul class="transparent-bg">
+                    <li class="register-btn-container">
+                        <button class="colx button button-large button-raised button-fill start-new-order" >
+                        Create An Order
+                        </button>
+                    </li>
+
+                    <li class="login-btn-container margin-top-x3">
+                        <button class="colx button button-large button-raised button-fill color-orange take-me-home" >
+                            Explore The App
+                        </button>
+                    </li>
+
+                    <li class="login-btn-container margin-top-x3">
+                        <button class="colx button button-large button-raised button-fill color-green take-me-driver" >
+                            Driver's Interface
+                        </button>
+                    </li>
+
+                    <li class="login-btn-container margin-top-x3">
+                        <button class="colx button button-large button-raised button-fill color-blue take-me-call-center" >
+                            Call Center Interface
+                        </button>
+                    </li>
+
+                </ul>
+            </div>
+
+        </div>
+    </div>
+</template>
+<script>
+    export default (props, {$f7ready, $f7, $on, $update}) => {
+
+        let page_title = ":: LANDING SCREEN ::";
+
+        let toolbarEl;
+
+        let displayName = "...";
+
+        const takeMeHome = () => {
+
+            window.app.appModules.plugin.NavigatorModel.gotoUrl("/app-home-screen/");
+
+            showToolbar();
+
+        };
+
+        const takeMeDriver = () => {
+
+            window.app.appModules.plugin.NavigatorModel.gotoUrl("/app-landing-screen-driver/");
+
+            showToolbar();
+
+        };
+
+        const takeMeCallCenter = () => {
+
+            window.app.appModules.plugin.NavigatorModel.gotoUrl("/app-landing-screen-call-center/");
+
+            showToolbar();
+
+        };
+
+        const hideToolbar = () => {
+
+            toolbarEl.hide();
+
+        };
+
+        const showToolbar = () => {
+
+            toolbarEl.show();
+
+        };
+
+        $f7ready(() => {
+
+            console.log("F7 && READY EVENT ::: LANDING SCREEN", page_title);
+
+            $update();
+
+        });
+
+        $on('pageInit', (e, page) => {
+
+            page_title = "Landing screen ...";
+
+            toolbarEl = $$('#app-toolbar');
+
+            hideToolbar();
+
+            $$('.start-new-order').on('click', function () {
+
+                $f7.emit("CREATE_ORDER", true);
+
+            });
+            
+            $$('.take-me-home').on('click', function () {
+
+                takeMeHome();
+
+            });
+
+            $$('.take-me-driver').on('click', function () {
+
+                takeMeDriver();
+
+            });
+
+            $$('.take-me-call-center').on('click', function () {
+
+                takeMeCallCenter();
+
+            });
+            
+            $$('.take-me-call-center').hide();
+            
+            $$('.take-me-driver').hide();
+            
+            $f7.on("ON_FIREBASE_AUTH_USER_METADATA", function(user_metadata){
+                
+                setTimeout(function () {
+                    
+                    console.warn("USER_METADATA:::::::::::", user_metadata);
+
+                    if(user_metadata.roles.includes('DRIVER')){
+                        $$('.take-me-driver').show();
+                    }
+
+                    if(user_metadata.roles.includes('ADMIN')){
+                        $$('.take-me-call-center').show();
+                    }
+
+                },2000);
+                
+            });
+
+            $f7.on("FIREBASE_USER_AUTH_LOGIN_EVENT", function (user) {
+
+                console.log(":: LANDING SCREEN :: EVENT :: FIREBASE_USER_AUTH_LOGIN_EVENT >>>> :1:", user);
+
+                displayName = user.displayName;
+
+                $update();
+
+            });
+
+            $f7.on("ON_FIREBASE_AUTH_USER_DATA_UPDATED_F7", function (user) {
+
+                console.log(":: LANDING SCREEN :: EVENT :: ON_FIREBASE_AUTH_USER_DATA_UPDATED_F7 >>>> :2:", user);
+
+                displayName = user.displayName;
+
+                $update();
+
+            });
+
+            setTimeout(function () {
+
+                if(displayName.length < 0 || displayName === "" || displayName === null) {
+
+                    const _currentUser = firebase.auth().currentUser;
+
+                    if(_currentUser !== null){
+
+                        displayName = _currentUser.displayName;
+
+                    }
+
+                }
+
+            }, 5000);
+
+            $update();
+
+        });
+
+        $on('pageMounted', (e, page) => {
+            console.log('page_title:', page_title, 'page mounted');
+        });
+        $on('pageBeforeIn', (e, page) => {
+            console.log('page_title:', page_title, 'page before in');
+        });
+        $on('pageAfterIn', (e, page) => {
+            console.log('page_title:', page_title, 'page after in');
+
+            const firebase_user = firebase.auth().currentUser;
+
+            displayName = firebase_user.displayName;
+
+            $update();
+
+        });
+        $on('pageBeforeOut', (e, page) => {
+            console.log('page_title:', page_title, 'page before out');
+        });
+        $on('pageAfterOut', (e, page) => {
+            console.log('page_title:', page_title, 'page after out');
+        });
+        $on('pageBeforeUnmount', (e, page) => {
+            console.log('page_title:', page_title, 'page before unmount');
+        });
+        $on('pageBeforeRemove', (e, page) => {
+            console.log('page_title:', page_title, 'page before remove');
+        });
+
+        return $render;
+
+    }
+
+</script>

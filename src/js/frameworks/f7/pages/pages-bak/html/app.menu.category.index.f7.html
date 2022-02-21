@@ -1,0 +1,328 @@
+<template>
+    <div class="page" >
+        <div class="navbar navbar-current navbar-large">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title sliding" style="text-align: center; width: 100%">
+                    <img src="${logoPath}" style="max-height: 45px;vertical-align: middle; "/>
+                </div>
+                <div class="right">
+                    <a class="link icon-only panel-open" data-panel=".panel-right-default" href="#">
+                        <i class="icon f7-icons ios-only">more</i>
+                        <i class="icon material-icons md-only">more_vert</i>
+                    </a>
+                </div>
+                ${page_title && $h`
+                <div class="title-large">
+                    <div class="title-large-text">
+                        ${page_title}
+                    </div>
+                </div>
+                `}
+            </div>
+        </div>
+        <div class="page-content page-bg-startup page-with-navbar-large">
+
+            <div data-pagination='{"el": ".swiper-pagination"}' data-space-between="10" data-slides-per-view="3" class="swiper-container swiper-init demo-swiper" id="categoryListSwiperContainerx" style="height: 34% !important;">
+
+                <div class="swiper-pagination"></div>
+                <div class="swiper-wrapper margin-top margin-left" id="categoryListContainerx">
+
+                    ${categoryObject.map((item, index) => $h`
+
+                    <div class="swiper-slide align-items-baseline">
+                        <a href="/app-menu-category-details/${item[0]}/" @click=${(e) => openCategoryDetails(item[0])} >
+                            <div class="card margin-0">
+                                <img alt="cat-logo" class="home-tile lazy lazy-fade-in" data-src="static/images/cat/${item[1].category_id}.png"  />
+                                <p class="home-tile">${item[1].category_name}</p>
+                            </div>
+                        </a>
+                    </div>
+
+                    `)}
+
+                </div>
+            </div>
+
+            <div class="block margin-left-0 margin-right-0 margin-bottom-x7 padding-0">
+
+                ${menuObject.categoryProducts.map((item, index) => $h`
+
+                ${((item[1].hasOwnProperty('products')) && Object.keys(item[1].products).length > 0) ? $h`
+
+                <div id="category-${item[1].category_id}" class="card demo-card-header-pic" style="margin-bottom: 20px;">
+                    <div data-background="static/images/cat/c-${item[1].category_id}.jpg"
+                         class="card-header card-menu-header align-items-flex-end lazy lazy-fade-in">
+                    </div>
+                    <div class="card-content card-content-padding">
+
+                        <div class="list media-list">
+                            <ul>
+                                ${getProductsAsArray(item[1].products).map((product, product_index) => $h`
+                                <li id="product-id-${product[1].product_id}" class="product message-list product-list-item" data-href="/app-menu-product-details/${item[0]}/${product[0]}/"
+                                    @click=${(e) => setCurrentProduct(item[0], product[1].product_id, product[1], product[0])} >
+                                    <div class="item-content">
+                                        <div class="item-media"  @click=${(e) => openProduct(item[0], product[1].product_id, product[1], product[0])} >
+                                            <img data-src="static/images/products/${product[1].product_image}"  data-image="static/images/products/${product[1].product_image}" class="lazy lazy-fade-in" width="64" height="64"  />
+                                        </div>
+                                        <div class="item-inner">
+                                            <div class="item-title-row title"  @click=${(e) => openProduct(item[0], product[1].product_id, product[1], product[0])} >
+                                                <div class="item-title"><strong>${product[1].product_name}</strong></div>
+                                                <div class="item-after text-color-primary" ><strong>USD ${product[1].product_price_regular}</strong></div>
+                                            </div>
+                                            <div class="item-title-row subtitle">
+                                                <div class="item-subtitle"  @click=${(e) => openProduct(item[0], product[1].product_id, product[1], product[0])} >
+                                                    ${product[1].product_except}
+                                                    <br />
+                                                    <small style="opacity: 1; font-size: 60%;">⭐⭐⭐⭐⭐</small>
+                                                    <small style="opacity: 0.5; font-size: 70%; padding-top: 3px;"> ${item[1].category_name} SKU#: ${product[1].product_code}</small>
+                                                </div>
+                                                <div class="item-after">
+                                                    <a class="link open-product-menu-options popover-open color-gray" href="#" data-popover=".popover-links.product-item-options">
+
+                                                        <i class="f7-icons">ellipsis_vertical</i>
+
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                `)}
+                            </ul>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                ` : $h` <!--- ${item[1].category_id} ${item[1].category_name} has empty products --->` }
+
+                `)}
+
+            </div>
+
+        </div>
+
+        <div class="popover popover-links product-item-options">
+            <div class="popover-inner">
+                <div class="list ">
+                    <ul>
+                        <li><a class="list-button item-link add-to-cart" href="#" @click=${(e) => addProductToCart()} >Add To Cart</a></li>
+                        <li><a class="list-button item-link add-to-wish-list" href="#" @click=${(e) => addProductToWishlist()} >Add To Wish List</a></li>
+                        <li><a class="list-button item-link view-product" href="#" @click=${(e) => viewProductDetails()} >View Product</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="popover popover-links product-categories-scroller">
+            <div class="popover-inner">
+                <div class="list ">
+                    <ul>
+                        ${menuObject.categoryProducts.map((item, index) => $h`
+                        <li>
+                            <a class="list-button item-link smooth-scroll-to-category" data-scroll-to="category-${item[1].category_id}" href="#"
+                               @click=${(e) => scrollToCategory(item)} >
+                                ${item[1].category_name}
+                            </a>
+                        </li>
+                        `)}
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</template>
+<script>
+    export default (props, {$f7ready, $f7, $on, $update, $f7route}) => {
+
+        let page_title, logoPath, currentProduct;
+
+        let menuObject = {
+            categoryProducts: [],
+        };
+
+        let categoryObject = [];
+
+        $f7ready(() => {
+
+            $f7.lazy.create('.lazy');
+
+        });
+
+        const setAltImg = function(event) {
+            event.target.src = 'static/images/products/MBS-CKN-002.jpg'; //'static/images/sys/no-image.png';
+        };
+
+        const openProduct = (category_slug, product_id, product_index, product) => {
+
+            const url = $$("#product-id-"+product_id).attr("data-href");
+
+            console.log("::: OPEN PRODUCT ::: ", url, category_slug, product_id, product_index, product );
+
+            window.app.appModules.plugin.NavigatorModel.gotoUrl(url);
+
+        };
+
+        const setCurrentProduct = (categorySlug, productId, productIndex, product) => {
+
+            currentProduct = {
+                categorySlug: categorySlug,
+                productId: productId,
+                productIndex: productIndex,
+                product: product
+            };
+
+        };
+
+        const addProductToCart = () => {
+
+            console.log("::: ADD PRODUCT TO CART::: ", currentProduct );
+            $f7.popover.get(".product-item-options").close();
+        };
+
+        const addProductToWishlist = () => {
+
+            console.log("::: ADD PRODUCT TO WISHLIST::: ", currentProduct );
+            $f7.popover.get(".product-item-options").close();
+        };
+
+        const viewProductDetails = () => {
+
+            console.log("::: VIEW CURRENT PRODUCT DETAILS::: ", currentProduct );
+            $f7.popover.get(".product-item-options").close();
+            openProduct(currentProduct.categorySlug, currentProduct.productId, currentProduct.productIndex, currentProduct.product);
+
+        };
+
+        const openCategoryDetails = (categorySlug) => {
+
+            console.log("::: OPEN CATEGORY DETAILS::: categorySlug ::: ", categorySlug );
+
+            $f7.appModules.plugin.NavigatorModel.gotoUrl(`/app-menu-category-details/${categorySlug}/`);
+
+        };
+
+        const getProductsAsArray = (products) => {
+
+            return Object.keys(products).map((key) => [key, products[key]]);
+
+        };
+
+        let category_slug;
+
+        const getData = function ( callBackFunction, callBackError ) {
+
+            // Must return an object
+
+            try {
+
+                category_slug = $f7route.params.categorySlug;
+
+                menuObject.categoryProducts[category_slug] = $f7.params.data.products[category_slug];
+
+                page_title = $f7.params.data.products[category_slug]["category_name"];
+
+                menuObject.categoryProducts = Object.keys(menuObject.categoryProducts).map((key) => [key, menuObject.categoryProducts[key]]);
+
+                categoryObject = $f7.params.data.productArray;
+
+                $update();
+
+                setTimeout(function () {
+
+                    $f7.lazy.create('.lazy');
+
+                }, 3000);
+
+                callBackFunction(menuObject);
+
+            }catch (e) {
+
+                callBackError(e);
+
+            }
+
+        };
+
+        $on('pageInit', () => {
+
+            page_title = "Our Menu";
+
+            logoPath = window.app.appRenderer.module.styling.getNavBarLogo();
+
+            getData(function (data) {
+
+                console.log("PRODUCTS DATA 0x1S", data);
+
+            }, function ( error ) {
+
+                console.log("PRODUCTS DATA ERROR 0x1E", error );
+
+            });
+
+            $$("img").on("error", function(){
+                $$(this).attr('src', 'static/images/sys/no-image.png');
+            });
+
+            $f7.on("DEBUG_PRODUCTS_LIST", function () {
+
+                getData(function (data) {
+
+                    console.log("PRODUCTS DATA 0x2S", data);
+
+                }, function ( error ) {
+
+                    console.log("PRODUCTS DATA ERROR 0x2E", error );
+
+                })
+
+            });
+
+            $f7.on("RENDER_LAZY", function () {
+
+                $f7.lazy.create('.lazy');
+
+            });
+
+            // trigger re-render
+            $update();
+
+        });
+
+        $on('pageMounted', (e, page) => {
+            console.log('page_title:', page_title, 'page mounted');
+        });
+        $on('pageBeforeIn', (e, page) => {
+            console.log('page_title:', page_title, 'page before in');
+        });
+        $on('pageAfterIn', (e, page) => {
+            console.log('page_title:', page_title, 'page after in');
+            $f7.lazy.create('.lazy');
+        });
+        $on('pageBeforeOut', (e, page) => {
+            console.log('page_title:', page_title, 'page before out');
+        });
+        $on('pageAfterOut', (e, page) => {
+            console.log('page_title:', page_title, 'page after out');
+        });
+        $on('pageBeforeUnmount', (e, page) => {
+            console.log('page_title:', page_title, 'page before unmount');
+        });
+        $on('pageBeforeRemove', (e, page) => {
+            console.log('page_title:', page_title, 'page before remove');
+        });
+
+        return $render;
+
+    }
+</script>

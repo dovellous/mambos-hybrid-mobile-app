@@ -1,0 +1,2246 @@
+<template>
+
+    <div class="page page-with-navbar-large">
+        <!-- additional "navbar-large" class -->
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link popup-close">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <!-- usual title will be visible when larger title collapsed -->
+                <div class="title">${page_title}</div>
+                <div class="right">
+                    <a class="link icon-only searchbar-enable" data-searchbar=".searchbar-demo">
+                        <i class="icon f7-icons if-not-md">search</i>
+                        <i class="icon material-icons md-only">search</i>
+                    </a>
+                </div>
+                <form data-search-container=".search-list" data-search-in=".item-title" class="searchbar searchbar-expandable searchbar-demo searchbar-init">
+                    <div class="searchbar-inner">
+                        <div class="searchbar-input-wrap">
+                            <input type="search" placeholder="Search"/>
+                            <i class="searchbar-icon"></i>
+                            <span class="input-clear-button"></span>
+                        </div>
+                        <span class="searchbar-disable-button if-not-aurora">Cancel</span>
+                    </div>
+                </form>
+                <div class="title-large">
+                    <div class="title-large-text" style="">
+                        ${page_title}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="page-content page-bg-startup">
+
+            <img src="static/images/cat/c-${currentCategory}.jpg" style="width: 100%" />
+
+
+            <div class="toolbar tabbar-scrollable tabbar-labels toolbar-top" style="top: 0;">
+                <div class="toolbar-inner">
+
+                    ${menuObject.categoryProducts.map((item, index) => $h`
+
+                    ${(item[1].hasOwnProperty('products')) && Object.keys(item[1].products).length > 0 ? $h`
+
+                        <a class="tab-link p-18-12"
+                           data-category-id="${item[1].category_id}"
+                           href="#tabIDMenuCategory${item[1].category_id}"
+                           id="app-menu-popup-index-tab-link-tabIDMenuCategory${item[1].category_id}"
+                           @click=${(e) => setCurrentCategory(item[1]) }
+                        >
+                            ${item[1].category_name}
+                        </a>
+
+                    ` : $h` <!--- x --->` }
+
+                    `)}
+
+                    <!--<span class="tab-link-highlight" style="width: 25%; transform: translate3d(0%, 0px, 0px);"></span>-->
+
+                </div>
+            </div>
+
+            <div class="tabs-animated-wrap tabs-swipeable-wrap">
+
+                <div class="tabs">
+
+                    ${menuObject.categoryProducts.map((item, index) => $h`
+
+                    ${(item[1].hasOwnProperty('products')) && Object.keys(item[1].products).length ? $h`
+
+                    <div class="transparent-bg popup-menu-tab popup-category-${item[1].category_id}-tab tab tabClass ${index===0?'tab-active':''} padding-top-0"
+                         id="tabIDMenuCategory${item[1].category_id}"  data-category-id="${item[1].category_id}" style="overflow: auto;" >
+                        <div class="searchbar-backdrop"></div>
+                        <div class="list simple-list searchbar-not-found">
+                            <ul>
+                                <li>Nothing found</li>
+                            </ul>
+                        </div>
+
+                            <div class="card block padding-left-0 padding-right-0 list media-list search-list searchbar-found">
+                                <ul>
+                                    ${getProductsAsArray(item[1].products).map((product, product_index) => $h`
+
+                                    <li id="product-id-${product[1].product_id}" data-product-id="${product[1].product_id}" data-gaap-code="${product[1].gaap_code}"  data-product-code="${product[1].product_code}" data-category-id="${item[1].category_id}"  data-category-slug="${item[1].category_slug}"   data-category-name="${item[1].category_name}" class="product message-list product-list-item"
+                                        @click=${(e) => openProductAsSheetModal(item[0], product[1].gaap_code, product[1], this)} >
+                                        <div class="item-content">
+                                            <div class="item-media" >
+                                                <img data-src="static/images/products/${product[1].product_image}"  data-image="static/images/products/${product[1].product_image}" class="lazy lazy-fade-in" width="64" height="64"  />
+                                            </div>
+                                            <div class="item-inner">
+                                                <div class="item-title-row title">
+                                                    <div class="item-title"><strong>${product[1].product_name}</strong></div>
+                                                    <div class="item-after text-color-primary" ><strong>USD ${product[1].product_price_regular}</strong></div>
+                                                </div>
+                                                <div class="item-title-row subtitle">
+                                                    <div class="item-subtitle">
+                                                        ${product[1].product_except}
+                                                        <br />
+                                                        <small style="opacity: 1; font-size: 60%;">⭐⭐⭐⭐⭐</small>
+                                                        <small style="opacity: 0.5; font-size: 70%; padding-top: 3px;"> ${item[1].category_name} # ${product[1].product_code}</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    `)}
+                                </ul>
+                            </div>
+
+                    </div>
+
+                    ` : $h` <!---  --->` }
+
+                    `)}
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="sheet-modal current-product-sheet-swipe-to-close" style="height:auto">
+            <div class="sheet-modal-inner">
+                <div class="swipe-handler"></div>
+                <div class="page-content">
+                    <div class="block-title block-title-large" style="margin-right: 18px !important;">
+                        ${currentProduct.product_name}
+                        <a class="link icon-only" style="float: right; position: relative;" @click=${(e) => currentProductInfo()} >
+                            <i class="icon f7-icons">info_circle</i>
+                        </a>
+                    </div>
+                    <div class="block margin-0" style="overflow: scroll; max-height: 77vh;">
+
+                        <img src="static/images/products/${currentProduct.product_image}" style="width: 100%; display: block; max-height: 50vw;" />
+
+                        <p class="eligible-font">
+                            ${currentProduct.product_except} <br />
+                            <h3>Price: <strong><a>USD ${currentProduct.product_price_regular}</a></strong></h3>
+                        </p>
+
+                        <div class="border-color-gray margin-top margin-bottom" style="opacity: 0; height: 1px; border-top: 1px solid #ccc;" ></div>
+
+                        <div class="margin-bottom-x2 row">
+
+                            <div class="stepper stepper-raised  stepper-outline stepper-large stepper-init col-100 margin-bottom-x2"  data-autorepeat="true">
+                                <div class="stepper-button-minus current-product-cart-qty" @click=${(e) => currentProductCartQtyDecrease()} ></div>
+                                <div class="stepper-input-wrap stepper-block">
+                                    <input type="text" value="0" min="0" max="100" step="1" id="current-product-cart-qty" readonly />
+                                </div>
+                                <div class="stepper-button-plus current-product-cart-qty" @click=${(e) => currentProductCartQtyIncrease()} ></div>
+                            </div>
+
+                            <div class="col-50">
+
+                                <button
+                                        class="button button-large button-outline margin-bottom-x2 ${Object.keys(currentProduct.addons.gaap_addons_items).length === 0 ? 'opacity-3':''}"
+                                        id="current-product-add-option"
+                                        @click=${(e) => Object.keys(currentProduct.addons.gaap_addons_items).length === 0 ? void(0) : selectOption()} >Select An Option</button>
+
+                            </div>
+
+                            <div class="col-50">
+
+                                <button
+                                        class="button button-large button-outline margin-bottom-x2 ${Object.keys(currentProduct.addons.gaap_sides_items).length === 0 ? 'opacity-3':''}"
+                                        id="current-product-add-side"
+                                        @click=${(e) => Object.keys(currentProduct.addons.gaap_sides_items).length === 0 ? void(0) : selectSide()} >Add Sides</button>
+
+                            </div>
+
+                            <div class="col-100">
+
+                                <button class="button button-large button-raised button-fill margin-bottom-x2" id="current-product-cart-add" @click=${(e) => currentProductAddToCart()} >Add To Cart</button>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="sheet-modal current-product-sheet-option h-60vh">
+            <div class="toolbar toolbar-bottom">
+                <div class="toolbar-inner">
+                    <div class="left margin-left"><strong>Total Options : USD 0.00</strong></div>
+                    <div class="right">
+                        <a class="link sheet-close">
+                            <i class="f7-icons">xmark</i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="sheet-modal-inner">
+                <div class="page-content">
+                    <div class="block">
+                        <div class="block-title block-title-large">Options</div>
+
+                        ${getProductsAsArray(currentProduct.addons.gaap_addons_items).map((item, index) => $h`
+
+                        <h3 class="block-title block-title-large margin-bottom">${item[1].addon_description}</h3>
+                        <div class="block-title margin-0">Select your option below</div>
+                        <div class="list">
+                            <ul>
+
+                                ${(item[1].items).map((addon, addon_index) => $h`
+
+                                ${addon.addon_element==='radio' && parseInt(addon.addon_item_is_public) === 1 ? $h`
+
+                                <li>
+                                    <label class="item-radio item-content">
+                                        <input
+                                                data-price-regular="${addon.addon_item_price_forex}"
+                                                data-product-qty="1"
+                                                data-product-id="${addon.addon_item_code}"
+                                                data-product-name="${addon.addon_item_description}"
+                                                data-radio="option"
+                                                class="radio-selector__input option-radio current-product-addons"
+                                                type="radio"
+                                                name="${'option-checkbox-'+item[1].addon_code}"
+                                                value="${addon.addon_item_code}"
+                                                id="${'option-'+item[1].addon_code+'-'+addon.addon_item_code}"
+                                                @click=${(e)=>cart_validate_addon_item(item[1].addon_code, addon.addon_item_code)}
+                                        />
+                                        <i class="icon icon-radio"></i>
+                                        <div class="item-inner">
+                                            <div class="item-title">
+                                                ${addon.addon_item_description}
+                                            </div>
+                                        </div>
+                                    </label>
+                                </li>
+
+                                ` : $h`
+
+                                <li>
+                                    <label class="item-checkbox item-content">
+                                        <input
+                                                data-price-regular="${addon.addon_item_price_forex}"
+                                                data-product-qty="1"
+                                                data-product-id="${addon.addon_item_code}"
+                                                data-product-name="${addon.addon_item_description}"
+                                                data-checkbox="option"
+                                                class="checkbox-selector__input option-checkbox current-product-addons"
+                                                type="checkbox"
+                                                name="${'option-checkbox-'+item[1].addon_code}"
+                                                value="${addon.addon_item_code}"
+                                                id="${'option-'+item[1].addon_code+'-'+addon.addon_item_code}"
+                                                @click=${(e)=>cart_validate_addon_item(item[1].addon_code, addon.addon_item_code)}
+                                        />
+                                        <i class="icon icon-checkbox"></i>
+                                        <div class="item-inner">
+                                            <div class="item-title">
+                                                ${addon.addon_item_description}
+                                            </div>
+                                        </div>
+                                    </label>
+                                </li>
+
+                                `}
+
+                                `)}
+
+                            </ul>
+                        </div>
+
+                        `)}
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="sheet-modal current-product-sheet-side h-60vh">
+            <div class="toolbar toolbar-bottom">
+                <div class="toolbar-inner">
+                    <div class="left margin-left"><strong>Total Sides : USD 0.00</strong></div>
+                    <div class="right">
+                        <a class="link sheet-close">
+                            <i class="f7-icons">xmark</i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="sheet-modal-inner">
+                <div class="page-content">
+                    <div class="block">
+                        <h3 class="block-title block-title-large margin-bottom">Sides / Addons</h3>
+                        <div class="block-title margin-0">Choose at least one side</div>
+                        <div class="list">
+                            <ul>
+
+                                ${getProductsAsArray(currentProduct.addons.gaap_sides_items).map((side, index) => $h`
+
+                                <li>
+                                    <label class="item-checkbox item-content">
+                                        <input
+                                                data-price-regular="${side[1].gaap_forex_price}"
+                                                data-product-qty="${cart_extra_item_get_qty(side[1])}"
+                                                data-product-id="${side[1].product_id}"
+                                                data-product-name="${side[1].product_name}"
+                                                data-addons="addon-item"
+                                                data-price-total="0"
+                                                type="checkbox"
+                                                id="${'details-addon-item-'+side[1].product_id}"
+                                                class="multiple-selector__add details-addon-product details-addon-item-add current-product-addons"
+                                                @click=${(e) => cart_add_addon_item(side[1].product_id)}
+                                        />
+                                        <i class="icon icon-checkbox"></i>
+                                        <div class="item-inner">
+                                            <div class="item-title">${side[1].product_name}</div>
+                                            <div class="item-after">${side[1].gaap_forex_price}</div>
+                                        </div>
+                                    </label>
+                                </li>
+
+                                `)}
+
+                            </ul>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</template>
+
+<script>
+    export default (props, {$f7ready, $f7, $on, $update}) => {
+
+        let page_title, logoPath, currentProductSheetModal, currentProductOptionSheetModal, currentProductSideSheetModal;
+
+        let currentProduct = {
+            addons: {
+                gaap_addons_items: {
+
+                },
+                gaap_sides_items: {
+
+                },
+            }
+        };
+
+        let currentCategory = 1;
+
+        let productObject = {};
+
+        let productArray = [];
+
+        let menuObject = {
+
+            categoryProducts: [],
+
+        };
+
+        $f7ready(() => {
+
+            $f7.lazy.create('.lazy');
+
+        });
+
+        let products = false;
+
+        let product_addons = false;
+
+        let payment_methods = false;
+
+        let selected_product = false;
+
+        let selected_product_qty = 0;
+
+        let selected_product_price_unit = 0;
+
+        let selected_product_price_total = 0;
+
+        let selected_product_addons_qty = 0;
+
+        let selected_product_addons_price_total = 0;
+
+        let selected_product_addons = {};
+
+        let selected_product_addons_cart = {};
+
+        let firebaseRefRecentPaymentsList = {};
+
+        let cart_payment_method = 0;
+
+        let cart_total = 0;
+
+        let cart_extras = 0;
+
+        let cart_discount = 0;
+
+        let cart_coupon = {};
+
+        let cart_loyalty_points = 0;
+
+        let coupons = false;
+
+        let current_coupon = false;
+
+        let cart_special_instructions = "";
+
+        let cart_delivery_standard_fee = 3;
+
+        let cart_delivery_standard_kilometers = 5;
+
+        let cart_delivery_rate_extra_kilometers = 0.75;
+
+        let cart_delivery_kilometer_radius = 40;
+
+        let cart_total_items = 0;
+
+        let cart_currency = "USD";
+
+        let cart_exchange_rate = 1;
+
+        let cart_viewing_cart = false;
+
+        let cart_viewing_checkout = false;
+
+        let cart_viewing_payment_options = false;
+
+        let cart_making_payment = false;
+
+        let cart_placing_order = false;
+
+        let cart_button_show = true;
+
+        let retrieving_recent_orders = false;
+
+        let retrieving_order_details = false;
+
+        let retrieving_order_status = false;
+
+        let retrieving_recent_payments = false;
+
+        let transactions = false;
+
+        const setCurrentCategory = (category) => {
+
+            currentCategory = category.category_id;
+
+            page_title = category.category_name;
+
+            $f7.lazy.create('.lazy');
+
+            $update();
+
+        };
+
+        const currentProductCartQtyIncrease = () => {
+
+            setTimeout(function () {
+
+                const _selected_product_qty = parseInt($$("#current-product-cart-qty").val());
+
+                console.log("ADD::", _selected_product_qty);
+
+                selected_product_qty = _selected_product_qty;
+
+                product_qty_increase();
+
+            }, 1000);
+
+        };
+
+        const currentProductCartQtyDecrease = () => {
+
+            setTimeout(function () {
+
+                const _selected_product_qty = parseInt($$("#current-product-cart-qty").val());
+
+                console.log("MINUS::", _selected_product_qty);
+
+                selected_product_qty = _selected_product_qty;
+
+                product_qty_decrease();
+
+            }, 1000);
+
+        };
+
+        const currentProductAddToCart = () => {
+
+            product_add_current_to_cart();
+
+            window.app.emit("REFRESH_CART", []);
+
+        };
+
+        const product_get_addons = (category_slug, product_index) => {
+
+            let self = this;
+
+            let product_addons = products[category_slug]['products'][product_index]['product_addons_data'];
+
+            return product_addons;
+
+        };
+
+        const cart_extra_item_get_qty = (item) => {
+
+            let self = this;
+
+            if(item){
+
+                if("sides" in selected_product_addons_cart){
+
+                    let pid = "P"+item.product_id;
+
+                    if(pid in selected_product_addons_cart.sides){
+
+                        if ("qty" in selected_product_addons_cart.sides[pid]) {
+
+                            return selected_product_addons_cart.sides[pid]["qty"];
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+            return 0;
+
+        };
+
+        const cart_get_addons_list = (product_addons) => {
+
+            let self = this;
+
+            let _items = [];
+
+            if(product_addons){
+
+                for(let extras_index in product_addons){
+
+                    let extras_object = product_addons[extras_index];
+
+                    for(let product_cart_id in extras_object){
+
+                        let item = extras_object[product_cart_id];
+
+                        _items.push({name: item.name, qty: item.qty, price: item.price, price_total: item.price_total});
+
+                    }
+
+                }
+
+            }
+
+            return _items;
+
+        };
+
+        const cart_get_addons_total = (product_addons) => {
+
+            let self = this;
+
+            let _total = 0;
+
+            for(let extras_index in product_addons){
+
+                let extras_object = product_addons[extras_index];
+
+                for(let product_cart_id in extras_object){
+
+                    let item = extras_object[product_cart_id];
+
+                    _total = _total+item.price_total;
+
+                }
+
+            }
+
+            return _total;
+
+        };
+
+        const cart_update_side_item = (id) => {
+
+            let self = this;
+
+            let elm = $("#side-checkbox-"+id);
+
+            let qty =0;
+
+            if(document.getElementById("side-checkbox-"+id).checked){
+                qty = 1;
+            }else{
+                qty = 0;
+            }
+
+            elm.attr("data-product-qty", qty);
+
+            let elem_data = {
+                product_id: elm.attr("data-product-id"),
+                price: parseFloat(elm.attr("data-price-regular")),
+                name: elm.attr("data-product-name"),
+                qty: qty,
+                id: elm.attr("id"),
+            };
+
+            elem_data.price_total = elem_data.price*elem_data.qty;
+
+            elm.attr("data-price-total", elem_data.price_total);
+
+            //console.log("::ELEM DATA::", elem_data);
+
+            product_calculate_addons();
+
+        };
+
+        const cart_validate_addon_item = (addon_code, addon_item_code) => {
+
+            let self = this;
+
+            let elm = $$("#option-"+addon_code+"-"+addon_item_code);
+
+            let qty = 1;
+
+            elm.attr("data-product-qty", qty);
+
+            let elem_data = {
+                product_id: elm.attr("data-product-id"),
+                price: parseFloat(elm.attr("data-price-regular")),
+                name: elm.attr("data-product-name"),
+                qty: qty,
+                id: elm.attr("id"),
+            };
+
+            elem_data.price_total = elem_data.price*elem_data.qty;
+
+            elm.attr("data-price-total", elem_data.price_total);
+
+            console.log("::ELEM DATA::OPTIONS", "#option-"+addon_code+"-"+addon_item_code, elem_data);
+
+            product_calculate_addons();
+
+        };
+
+        const cart_add_addon_item = (id) => {
+
+            let self = this;
+
+            let elm = $$("#details-addon-item-"+id);
+
+            let qty = parseInt(elm.attr("data-product-qty"))+1;
+
+            $$('#details-addon-item-qty-'+id).html(qty+"x");
+
+            elm.attr("data-product-qty", qty);
+
+            let elem_data = {
+                product_id: elm.attr("data-product-id"),
+                price: parseFloat(elm.attr("data-price-regular")),
+                name: elm.attr("data-product-name"),
+                qty: qty,
+                id: elm.attr("id"),
+            };
+
+            elem_data.price_total = elem_data.price*elem_data.qty;
+
+            elm.attr("data-price-total", elem_data.price_total);
+
+            //console.log("::ELEM DATA::", elem_data);
+
+            product_calculate_addons();
+
+        };
+
+        const cart_remove_addon_item = (id) => {
+
+            let self = this;
+
+            let elm = $$("#details-addon-item-"+id);
+
+            let qty = parseInt(elm.attr("data-product-qty"))-1;
+
+            if(qty<1){
+                qty = 0;
+                $$('#details-addon-item-qty-'+id).html("&bull;");
+            }else{
+                $$('#details-addon-item-qty-'+id).html(qty+"x");
+            }
+
+            elm.attr("data-product-qty", qty);
+
+            let elem_data = {
+                product_id: elm.attr("data-product-id"),
+                price: parseFloat(elm.attr("data-price-regular")),
+                name: elm.attr("data-product-name"),
+                qty: qty,
+                id: elm.attr("id"),
+            };
+
+            elem_data.price_total = elem_data.price*elem_data.qty;
+
+            elm.attr("data-price-total", elem_data.price_total);
+
+            //console.log("::ELEM DATA::", elem_data);
+
+            product_calculate_addons();
+
+        };
+
+        const  product_calculate_addons = () => {
+
+            let self = this;
+
+            let _items_qty = 0;
+            let _items_amt = 0;
+
+            let _items_main_product = {
+                options: {},
+                sides: {}
+            };
+
+            // Product Sides
+
+            $$(".multiple-selector__add.details-addon-product.details-addon-item-add.current-product-addons").each(function (element, index) {
+
+                const elm = $$(element);
+
+                const qty = parseInt(elm.attr("data-product-qty"));
+
+                if(qty > 0){
+
+                    let elem_data = {
+                        product_id: elm.attr("data-product-id"),
+                        price: parseFloat(elm.attr("data-price-regular")),
+                        price_total: parseFloat(elm.attr("data-price-total")),
+                        name: elm.attr("data-product-name"),
+                        qty: qty,
+                        id: elm.attr("id"),
+                    };
+
+                    elm.attr("data-price-total", elem_data.price*qty);
+
+                    elem_data.price_total = elem_data.price*qty;
+
+                    _items_main_product.sides["P"+elem_data.product_id] = elem_data;
+
+                    _items_qty = _items_qty+elem_data.qty;
+
+                    _items_amt = _items_amt+elem_data.price_total;
+
+                }
+
+            });
+
+            // Options - Radio
+
+            $$(".radio-selector input.radio-selector__input.option-radio.current-product-addons").each(function (element, index) {
+
+                const elm = $$(element);
+
+                const id = elm.attr("id");
+
+                if(document.getElementById(id).checked){
+
+                    const qty = parseInt(elm.attr("data-product-qty"));
+
+                    let elem_data = {
+                        product_id: elm.attr("data-product-id"),
+                        price: parseFloat(elm.attr("data-price-regular")),
+                        price_total: parseFloat(elm.attr("data-price-total")),
+                        name: elm.attr("data-product-name"),
+                        qty: qty,
+                        id: id,
+                        checked: true
+                    };
+
+                    elm.attr("data-price-total", elem_data.price*qty);
+
+                    elem_data.price_total = elem_data.price*qty;
+
+                    _items_main_product.options["P"+elem_data.product_id] = elem_data;
+
+                    _items_qty = _items_qty+elem_data.qty;
+
+                    _items_amt = _items_amt+elem_data.price_total;
+
+                }
+
+            });
+
+            // Options - Checkbox
+
+            $$(".checkbox-selector input.checkbox-selector__input.option-checkbox.current-product-addons").each(function (element, index) {
+
+                const elm = $$(element);
+
+                const id = elm.attr("id");
+
+                if(document.getElementById(id).checked){
+
+                    const qty = parseInt(elm.attr("data-product-qty"));
+
+                    let elem_data = {
+                        product_id: elm.attr("data-product-id"),
+                        price: parseFloat(elm.attr("data-price-regular")),
+                        price_total: parseFloat(elm.attr("data-price-total")),
+                        name: elm.attr("data-product-name"),
+                        qty: qty,
+                        id: id,
+                        checked: true
+                    };
+
+                    elm.attr("data-price-total", elem_data.price*qty);
+
+                    elem_data.price_total = elem_data.price*qty;
+
+                    _items_main_product.options["P"+elem_data.product_id] = elem_data;
+
+                    _items_qty = _items_qty+elem_data.qty;
+
+                    _items_amt = _items_amt+elem_data.price_total;
+
+                }
+
+            });
+
+            selected_product_addons_qty = _items_qty;
+
+            selected_product_addons_price_total = _items_amt;
+
+            selected_product_addons_cart = _items_main_product;
+
+            selected_product_addons = _items_main_product;
+
+            products[selected_product_category_slug].products[selected_product_index]["product_addons_cart_data"] = _items_main_product;
+
+            products[selected_product_category_slug].products[selected_product_index]["product_addons_data"] = _items_main_product;
+
+            console.log("::selected_product_extras::", selected_product_addons);
+
+            console.log("::selected_product::", products[selected_product_category_slug].products[selected_product_index]);
+
+        };
+
+        const product_qty_decrease = function () {
+
+            selected_product_qty--;
+
+            if (selected_product_qty < 1) {
+                selected_product_qty = 0;
+            }
+
+            product_calculate_total_amount();
+
+            product_calculate_cart_grand_total_amount();
+
+            products[selected_product_category_slug].products[selected_product_index]["product_cart_qty"] = selected_product_qty;
+
+            if (selected_product_qty === 0) {
+                product_add_current_to_cart();
+            }
+
+        };
+
+        const product_qty_increase = function () {
+
+            selected_product_qty++;
+
+            product_calculate_total_amount();
+
+            product_calculate_cart_grand_total_amount();
+
+            products[selected_product_category_slug].products[selected_product_index]["product_cart_qty"] = selected_product_qty;
+
+        };
+
+        const product_calculate_total_amount = function () {
+
+            selected_product_price_total = selected_product_qty * selected_product.gaap_forex_price;
+
+        };
+
+        const product_calculate_cart_grand_total_amount = function () {
+
+            let self = this;
+
+            let total_cart_items = 0;
+
+            let total_cart_amount = 0;
+
+            for (let cart_product_id in $f7.data.cart) {
+
+                let cart_product = $f7.data.cart[cart_product_id];
+
+                //TODO get the qty of this product and use this as a factor for multiplication
+
+                total_cart_items = total_cart_items+cart_product.product_qty;
+
+                total_cart_amount += cart_product.product_price_grand_total;
+
+            }
+
+            cart_total = total_cart_amount;
+
+            cart_amount = total_cart_amount;
+
+            cart_total_items = total_cart_items;
+
+            cart_qty = total_cart_items;
+
+            let cart_object = {
+                cart_total: cart_total,
+                cart_amount: cart_amount,
+                cart_total_items: cart_total_items,
+                cart_qty: cart_qty,
+                cart: $f7.data.cart,
+            };
+
+            if (cart_qty > 0) {
+
+                store.set("cart_object", cart_object);
+
+                cart_setup_firebase(cart_object);
+
+            }
+
+            cart_setup();
+
+        };
+
+        const product_add_current_to_cart = function () {
+
+            let self = this;
+
+            let product_cart_data = {};
+
+            selected_product_price_total = selected_product.product_cart_qty * selected_product.product_price_regular;
+
+            product_cart_data.product_qty = selected_product_qty;
+            product_cart_data.product_id = parseInt(selected_product.product_id);
+            product_cart_data.product_index = parseInt(selected_product_index);
+            product_cart_data.product_category_slug = selected_product_category_slug;
+            product_cart_data.product_name = selected_product.product_name;
+            product_cart_data.product_except = selected_product.product_except;
+            product_cart_data.product_price_regular = selected_product.product_price_regular;
+            product_cart_data.product_price_total = selected_product_qty * selected_product.product_price_regular;
+            product_cart_data.product_price_grand_total = selected_product_price_total+selected_product_addons_price_total;
+            product_cart_data.product_addons = selected_product_addons_cart;
+
+            products[selected_product_category_slug].products[selected_product_index]["product_cart_data"] = product_cart_data;
+
+            $f7.data.cart["CP" + selected_product.product_id] = product_cart_data;
+
+            product_calculate_cart_grand_total_amount();
+
+            if(selected_product_qty>0) {
+                
+                $f7.appModules.plugin.CapLocalNotifications.toast('Product '+selected_product.product_name + " x" + selected_product_qty+' was added to the cart successfully!');
+
+                currentProductSheetModal.close();
+                
+            }else{
+
+                $f7.appModules.plugin.CapLocalNotifications.toast("You have removed '"+selected_product.product_name + "' from the cart. To add again update the quantities by clicking the grey button." + selected_product_qty);
+
+            }
+
+        };
+
+        const cart_update_product_qty = function (product_category_slug, product_index, product_id, increase) {
+
+            var self = this;
+
+            var element = $('#cart-product-qty-' + product_id);
+
+            var product_qty = parseInt(element.text());
+
+            console.log("::CART QTY BEFORE : ", product_id, "=", product_qty);
+
+            if (increase) {
+                product_qty++;
+            } else {
+                product_qty--;
+            }
+
+            element.text(product_qty);
+
+            products[product_category_slug].products[product_index]["product_cart_qty"] = product_qty;
+
+            var cart_object = $f7.data.cart["CP" + product_id];
+
+            var cart_product_price = parseFloat(cart_object.product_price_regular);
+
+            var cart_product_price_total = cart_product_price * product_qty;
+
+            $f7.data.cart["CP" + product_id]["product_qty"] = product_qty;
+            $f7.data.cart["CP" + product_id]["product_price_total"] = cart_product_price_total;
+            $f7.data.cart["CP" + product_id]["product_price_grand_total"] = cart_product_price_total;
+
+            product_calculate_cart_grand_total_amount();
+
+        };
+
+        const cart_setup = function () {
+
+            var self = this;
+
+            var cart_object = store.get("cart_object");
+
+            if (cart_object !== null && typeof cart_object !== "undefined") {
+
+                if ("cart_qty" in cart_object) {
+
+                    if (cart_object.cart_qty > 0) {
+
+                        cart_total = cart_object.cart_total;
+                        cart_amount = cart_object.cart_amount;
+                        cart_total_items = cart_object.cart_total_items;
+                        cart_qty = cart_object.cart_qty;
+                        $f7.data.cart = cart_object.cart;
+
+                        for (var cart_id in $f7.data.cart) {
+
+                            var cart_item = $f7.data.cart[cart_id];
+
+                            if ("product_category_slug" in cart_item) {
+
+                                products[cart_item.product_category_slug].products[cart_item.product_index]["product_cart_qty"] = cart_item.product_qty;
+                                products[cart_item.product_category_slug].products[cart_item.product_index]["product_cart_total"] = cart_item.product_price_total;
+                                products[cart_item.product_category_slug].products[cart_item.product_index]["product_cart_data"] = cart_item;
+
+                            }
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+        };
+
+        const cart_setup_firebase = function (cart_object) {
+
+            var user = firebase.auth().currentUser;
+
+            if (user !== null) {
+
+                firebase.database().ref('accounts/users/' + user.uid + '/cart').set(cart_object).then(function (user) {
+                    console.log("Finished setting cart node");
+                }).catch(function (error) {
+                    console.log(error.message, "Cart node error");
+                });
+
+            }
+
+        };
+
+        const cart_checkout = function () {
+
+            var self = this;
+
+            cart_viewing_checkout = true;
+
+            setTimeout(function () {
+
+                cart_viewing_checkout = false;
+
+                page_view("checkout");
+
+            }, 500);
+
+            //
+
+        };
+
+        const cart_view_payment_options = function () {
+
+            var self = this;
+
+            cart_viewing_payment_options = true;
+
+            setTimeout(function () {
+
+                cart_viewing_payment_options = false;
+
+                page_view("payment_method");
+
+            }, 500);
+
+            //
+
+        };
+
+        const cart_select_payment = function (group, options, index) {
+
+            self = this;
+
+            cart_viewing_payment_options = true;
+
+            setTimeout(function () {
+
+                cart_viewing_payment_options = false;
+
+                cart_payment_method = {
+                    group: group,
+                    options: options,
+                    index: index,
+                    label: options.name,
+                    image: options.image,
+                    description: options.description,
+                };
+
+                console.log('label: payment_methods[index]["options"][""]["name"]');
+
+                console.log("::SELECTED PAYMENT METHOD::", cart_payment_method);
+
+                page_view('checkout');
+
+            }, 100);
+
+            //
+
+        };
+
+        const cart_make_payment = function () {
+
+            self = this;
+
+            cart_placing_order = true;
+
+            if (cart_payment_method) {
+
+                var date = new Date();
+
+                var order_id = date.toJSON().replace(/[^\w\.]/gi, '');
+
+                var payload = cart_calc_payload;
+
+                payload.order_id = order_id;
+
+                var uid = firebase.auth().currentUser.uid;
+
+                var userMetaDataPath = 'accounts/users/' + user.uid;
+
+                console.log("::USER PATH::", userMetaDataPath);
+
+                if (uid) {
+
+                    if (uid) {
+
+                        payload.firstname = user.firstname;
+                        payload.lastname = user.lastname;
+                        payload.email = user.email;
+                        payload.mobile = user.phoneNumber;
+                        payload.uid = uid;
+                        payload.order_currency = cart_currency;
+                        payload.order_amount = cart_calc_grand_total;
+
+                        payload.paypal_subtotal = (cart_calc_grand_total - cart_calc_delivery_fee).toFixed(2);
+                        payload.paypal_shipping = (cart_calc_delivery_fee).toFixed(2);
+
+
+                        console.log("::MAKE PAYMENT::", payload, cart_payment_method.options.id, cart_calc_grand_total);
+
+                        setTimeout(function () {
+
+                            cart_placing_order = false;
+
+                            switch (cart_payment_method.options.id) {
+
+                                case "mobile": {
+
+                                    var mobile_url = `${base_url}pay/initiate/mobile`;
+
+                                    Swal.fire({
+                                        title: 'Amount: ' + cart_currency + ' ' + cart_calc_grand_total.toFixed(2),
+                                        html: 'Enter your mobile wallet number.',
+                                        input: 'text',
+                                        inputAttributes: {
+                                            autocapitalize: 'off'
+                                        },
+                                        imageUrl: '<?php echo base_url(); ?>/uiux/assets/img/payments/mobile-money.svg',
+                                        showCancelButton: true,
+                                        confirmButtonText: 'Continue',
+                                        showLoaderOnConfirm: true,
+                                        preConfirm: function(inputValue){
+
+                                            payload.mobile = inputValue;
+
+                                            //
+                                            window.MambosJQueryApp.snippets.ajax.post(mobile_url, payload, function (result) {
+
+                                                //console.log(":: MOBILE INITIATE ::", result);
+
+                                                if (typeof result !== "object") {
+
+                                                    try {
+
+                                                        result = JSON.parse(result);
+
+                                                    } catch (error) {
+
+                                                    }
+
+                                                }
+
+                                                if(result.response.messageId === "SVC0007"){
+
+                                                    $f7.appModules.plugin.CapLocalNotifications.toast(result.response.text, "Error", "warning", 30000);
+
+                                                }else{
+
+
+                                                    if("transactionOperationStatus" in result.response){
+
+                                                        cart_place_pre_order(user.uid, result.response, "Mobile");
+
+                                                    }
+
+
+                                                }
+
+                                                //console.log("MOBILE PAYMENT RESULT :: ", result);
+
+                                            });
+
+
+                                        }
+
+                                    });
+
+                                    break;
+                                }
+
+                                case "paypal": {
+
+                                    var url = `${base_url}pay/initiate/paypal`;
+
+                                    //
+                                    window.MambosJQueryApp.snippets.ajax.post(url, payload, function (result) {
+
+                                        console.log(":: PAYPAL INITIATE ::", result);
+
+                                        if (typeof result !== "object") {
+
+                                            try {
+
+                                                result = JSON.parse(result);
+
+                                            } catch (error) {
+
+                                            }
+
+                                        }
+
+                                        var request_id = result.request_id;
+
+                                        if (request_id) {
+
+                                            var url = `${base_url}pay/request/paypal/${request_id}`;
+
+                                            window.open(url, '_blank', 'location=yes,height=600,width=800,scrollbars=yes,status=yes');
+
+                                            console.log("::WATCH FOR", result);
+
+                                            cart_place_pre_order(user.uid, result, "Paypal");
+
+                                        }
+
+                                    });
+
+                                    break;
+
+                                }
+
+                                case "card": {
+
+                                    var url = `${base_url}pay/initiate/card`;
+
+                                    //
+                                    window.MambosJQueryApp.snippets.ajax.post(url, payload, function (result) {
+
+                                        console.log(":: CARD PAYMENT INITIATE ::", result);
+
+                                        if (typeof result !== "object") {
+
+                                            try {
+
+                                                result = JSON.parse(result);
+
+                                            } catch (error) {
+
+                                            }
+
+                                        }
+
+                                        var request_id = result.request_id;
+
+                                        if (request_id) {
+
+                                            result.payment_method = "CARD";
+
+                                            //cart_place_order = function (order_id, order_number, uid)
+                                            cart_place_order(order_id, request_id, result);
+
+                                        }
+
+                                    });
+
+                                    break;
+
+                                }
+
+                                case "cash": {
+
+                                    var url = `${base_url}pay/initiate/cash`;
+
+                                    //
+                                    window.MambosJQueryApp.snippets.ajax.post(url, payload, function (result) {
+
+                                        console.log(":: CASH PAYMENT INITIATE ::", result);
+
+                                        if (typeof result !== "object") {
+
+                                            try {
+
+                                                result = JSON.parse(result);
+
+                                            } catch (error) {
+
+                                            }
+
+                                        }
+
+                                        var request_id = result.request_id;
+
+                                        if (request_id) {
+
+                                            result.payment_method = "CASH";
+
+                                            //cart_place_order = function (order_id, order_number, uid)
+                                            cart_place_order(order_id, request_id, result);
+
+                                        }
+
+                                    });
+
+                                }
+
+                                default: {
+
+                                    break;
+
+                                }
+                            }
+
+                        }, 1000);
+
+                    }
+
+                }
+                ;
+
+
+            } else {
+
+                $f7.appModules.plugin.CapLocalNotifications.toast("Please select a payment method to continue.", "Warning", "warning", 10000);
+
+            }
+
+            //
+
+        };
+
+        const cart_wallet_request = function (amount, order_number) {
+
+            var self = this;
+
+            var $listener_url = base_url+"pay/webhooks/mobile/result";
+            var $return_url = base_url+"pay/webhooks/mobile/return";
+
+            // Setup Paynow arguments
+            var $MerchantId = "2089";
+            var $MerchantKey = "5e915037-3876-4757-b0dc-ee22ffe912fb";
+            var $ConfirmUrl = $listener_url;
+            var $ReturnUrl = $return_url;
+            var $Reference = "Order Number: "+order_number;
+            var $Amount = amount;
+            var $AdditionalInfo = "";
+            var $Status = "Message";
+            var $custEmail = user.email;
+            var $custPhone = user.mobile.replace("+263","0");
+
+            //set POST variables
+            var $values = {
+                'resulturl':$ConfirmUrl,
+                'returnurl':$ReturnUrl,
+                'reference':$Reference,
+                'amount':$Amount,
+                'id':$MerchantId,
+                'additionalinfo':$AdditionalInfo,
+                'authemail':$custEmail, // customer email
+                'status':$Status,
+                'method':'ecocash',
+                'phone':$custPhone
+            };
+
+            $string = "";
+
+            for (var $key in $values) {
+                if ($key.toUpperCase() != "HASH") {
+                    $string += $values[$key];
+                }
+            }
+
+            $string += $MerchantKey;
+
+            $hash = sha512($string);
+
+            $values.hash = $hash.toUpperCase();
+
+            var url ="pay/ecocash";
+
+            window.MambosJQueryApp.snippets.ajax.post(url, $values, function (result) {
+
+                console.log("::MOBILE PAYMENT::",$values,result);
+
+            });
+
+        };
+
+        const cart_wallet_poll = function(){
+
+            console.log('$ReturnUrl');
+
+            var self = this;
+
+            setTimeout(function(){
+
+                var params = {
+                    method: 'POST',
+                };
+
+                fetch('/wp-json/wc-paynow-express/v1/order/$order_id', params)
+                    .then(function(res) {
+                        return res.json();
+                    })
+                    .then(function(res){
+                        try {
+                            var data = JSON.parse(res);
+
+                            if ( data.hasOwnProperty('complete') ) {
+                                if (data.complete) {
+                                    window.location.replace('$ReturnUrl');
+                                } else {
+                                    window.location.replace(data.url)
+                                }
+                            }
+                        } catch(e) {}
+                    });
+
+                cart_wallet_poll();
+
+            }, 5000);
+
+        };
+
+        const cart_place_pre_order = function (uid, result, method) {
+
+            var self = this;
+
+            Swal.fire({
+                title: 'Transaction Pending',
+                html: `<span style="color: #3085d6"> ${method} payment request sent.</span> <br><small>Waiting for payment confirmation. Please do not refresh this page...</small>`, // add html attribute if you want or remove
+                allowOutsideClick: false,
+                onBeforeOpen: () => {
+                    Swal.showLoading();
+                },
+            });
+
+            var order_id = result.order_id;
+            var order_number = result.order_number;
+
+            cart_place_order(order_id, order_number, uid);
+            setTimeout(function(){
+
+                if(!cart_place_order_successfull_payment_completed){
+
+                    Swal.fire({
+                        title: 'Session Timeout',
+                        html: `<span style="color: #3085d6"> Your payment could not be completed</span> <br><small>Please try again</small>`, // add html attribute if you want or remove
+                        allowOutsideClick: true,
+                        onBeforeOpen: () => {
+                            Swal.showLoading();
+
+                            setTimeout(function(){
+
+                                Swal.close();
+
+                                //Todo: check payment on server - confirm
+
+                            },2000);
+
+                        },
+                    });
+
+                }else{
+
+
+
+                }
+
+            }, 18000);
+            //cart_place_order_retry(order_id, order_number, uid, result);
+
+            /*
+
+
+            cart_place_order_retry = function (order_id, order_number, uid, result) {
+
+                var self = this;
+
+                setTimeout(function(){
+
+                    if(!mobile_payment_done){
+
+                        Swal.fire({
+                            title: 'Checking Payment',
+                            html: `<span style="color: #3085d6"> ${method} payment request sent.</span> <br><small>Waiting for payment confirmation. Please do not refresh this page...</small>`, // add html attribute if you want or remove
+                            allowOutsideClick: true,
+                            onBeforeOpen: () => {
+                                Swal.showLoading();
+                            },
+                        });
+
+                    }
+
+                }, 5000);
+
+                setTimeout(function(){
+
+                    if(!mobile_payment_done){
+
+                        Swal.fire({
+                            title: 'Retrying...',
+                            html: `<span style="color: #3085d6"> ${method} payment taking long...</span> <br><small>Waiting for payment confirmation. Please do not refresh this page...</small>`, // add html attribute if you want or remove
+                            allowOutsideClick: true,
+                            onBeforeOpen: () => {
+                                Swal.showLoading();
+                            },
+                        });
+
+
+
+                    }
+
+                }, 10000);
+
+
+            },
+
+
+            */
+
+        };
+
+        const cart_verify_order_payment = function (payment_object) {
+
+            var self = this;
+
+            var date = new Date();
+
+            var time = date.getTime();
+
+            if (payment_object !== null) {
+
+                var order_number = payment_object.order_id;
+
+                var order_placed = false;
+
+                if ("order_placed" in payment_object) {
+
+                    order_placed = true;
+
+                    console.log("::Order already placed and paid for::", payment_object);
+
+                } else {
+
+                    cart_place_order_successfull_payment_completed = true;
+
+                    if (payment_object.payment_status.toUpperCase() === "COMPLETED") {
+
+                        Swal.fire({
+                            title: 'Payment Received',
+                            type: 'success',
+                            html: `<span style="color: green;"> Order Number: ${order_number}</span> <br><small>Placing your order, please wait...</small>`, // add html attribute if you want or remove
+                            allowOutsideClick: false,
+                            onBeforeOpen: () => {
+                                Swal.showLoading();
+                            },
+                        });
+
+                        firebase.database().ref('accounts/users/' + user.uid + '/orders/' + order_number + '/payment/order_placed').set({time: time}).then(function (order) {
+                            console.log("Finished 1. accepting", order_number, order);
+                        }).catch(function (error) {
+                            console.log(error.message, "Order accepting error", "error", 3000);
+                        });
+
+                        firebase.database().ref('/activities/orders/' + order_number + '/payment/order_placed').set({time: time}).then(function (order) {
+                            console.log("Finished 2. accepting", order_number, order);
+                        }).catch(function (error) {
+                            console.log(error.message, "Order accepting error", "error", 3000);
+                        });
+
+                        firebase.database().ref('/activities/payments/orders/' + order_number + '/').set({time: time, data: payment_object}).then(function (order) {									console.log("Finished 3. accepting", order_number, order);
+                        }).catch(function (error) {
+                            console.log(error.message, "Order accepting error", "error", 3000);
+                        });
+
+                        firebase.database().ref('accounts/users/' + user.uid + '/recentPayments/'+ order_number +'/order_placed').set({time: time}).then(function (order) {
+                            console.log("Finished 4.accepting", order_number, order);
+                            cart_place_order_successfull(payment_object);
+                        }).catch(function (error) {
+                            console.log(error.message, "Order accepting error", "error", 3000);
+                        });
+
+                    } else {
+
+                        console.log("COULD NOT FIND PAYMENT STATUS", payment_object);
+
+                    }
+
+                }
+
+            }
+
+        };
+
+        const cart_place_order = function (order_id, order_number, uid) {
+
+            var self = this;
+
+            var date = new Date();
+
+            var order = cart_calc_payload;
+
+            order.cart_object = store.get("cart_object");
+
+            order.order_number = order_number;
+
+            order.order_id = order_id;
+
+            order.time = date.getTime();
+
+            order.order_date = date.toString();
+
+            order.coords = address_current_coords;
+            order.distance = address_current_distance;
+            order.duration = address_current_duration;
+            order.delivery_fee = cart_calc_delivery_fee;
+            order.delivery_date = address_current_day + ", " + address_current_time;
+            order.delivery_location = address_current_location;
+            order.delivery_day = address_current_day;
+            order.delivery_time = address_current_time;
+
+            order.currency = cart_currency;
+
+            order.geo_location = {
+                origin: {
+                    title: "NOT_SET_TITLE",
+                    description: "NOT_SET_DESCRIPTION",
+                    image: "IMAGE_UNAVAILABLE",
+                    marker: "MARKER_URL",
+                    lat: 0,
+                    lng: 0,
+                },
+                destination: {
+                    title: "NOT_SET_TITLE",
+                    description: "NOT_SET_DESCRIPTION",
+                    image: "IMAGE_UNAVAILABLE",
+                    marker: "MARKER_URL",
+                    lat: 0,
+                    lng: 0,
+                },
+                current_location: {
+                    lat: 0,
+                    lng: 0,
+                },
+            };
+
+            order.status_index = 0;
+
+            order.state = "NEW";
+
+            order.status_index = 0;
+
+            order.status = {
+                S00: { // Order Placed
+                    id: "step-placed",
+                    title: "Order Placed",
+                    state: "NEW",
+                    desc: "Your order has been placed",
+                    updated: false,
+                    updated_time: order.time,
+                    updated_by_uid: 0,
+                    update_comments: { set: false },
+                    step: '00',
+                    visible: true,
+                },
+                S10: { // Order Accepted
+                    id: "step-accepted",
+                    title: "Order Accepted",
+                    state: "ACCEPTED",
+                    desc: "Your order has been accepted",
+                    updated: false,
+                    updated_time: 0,
+                    updated_by_uid: 0,
+                    update_comments: { set: false },
+                    step: 10,
+                    visible: true,
+                },
+                S20: { // Order Being Prepared
+                    id: "step-preparing",
+                    title: "Order Preparation",
+                    state: "PREPARING",
+                    desc: "Your order is being prepared",
+                    updated: false,
+                    updated_time: 0,
+                    updated_by_uid: 0,
+                    update_comments: { set: false },
+                    step: 20,
+                    visible: true,
+                },
+                S25: { // Order Accepted
+                    id: "step-dispatched",
+                    title: "Order Ready",
+                    state: "DISPATCHED",
+                    desc: "Your order is now ready for {0}",
+                    updated: false,
+                    updated_time: 0,
+                    updated_by_uid: 0,
+                    update_comments: { set: false },
+                    step: 25,
+                    visible: true,
+                },
+                S30: { // Order En Route
+                    id: "step-moving",
+                    title: "On The Way",
+                    state: "MOVING",
+                    desc: "Your order is on the way",
+                    updated: false,
+                    updated_time: 0,
+                    updated_by_uid: 0,
+                    update_comments: { set: false },
+                    step: 30,
+                    visible: true,
+                },
+                S40: { // Order Delivery
+                    id: "step-delivered",
+                    title: "Order Delivered",
+                    state: "DELIVERED",
+                    desc: "Your order has been delivered",
+                    updated: false,
+                    updated_time: 0,
+                    updated_by_uid: 0,
+                    update_comments: { set: false },
+                    step: 40,
+                    visible: true,
+                },
+                S50: { // Order Completed
+                    id: "step-completed",
+                    title: "Order Completed",
+                    state: "COMPLETED",
+                    desc: "Your order has been completed. Thank you for ordering with us. Please call again.",
+                    updated: false,
+                    updated_time: 0,
+                    updated_by_uid: 0,
+                    update_comments: { set: false },
+                    step: 50,
+                    visible: false,
+                },
+                S60: { // Order Delivery
+                    id: "step-on-hold",
+                    title: "Order On Hold",
+                    state: "ON_HOLD",
+                    desc: "Your order has been put onhold.",
+                    updated: false,
+                    updated_time: 0,
+                    updated_by_uid: 0,
+                    update_comments: { set: false },
+                    step: 60,
+                    visible: false,
+                },
+                S70: { // Order Delivery
+                    id: "step-cancelled",
+                    title: "Order Cancelled",
+                    state: "CANCELLED",
+                    desc: "Your order has been cancelled.",
+                    updated: false,
+                    updated_time: 0,
+                    updated_by_uid: 0,
+                    update_comments: { set: false },
+                    step: 70,
+                    visible: false,
+                },
+                S80: { // Order Delivery
+                    id: "step-draft",
+                    title: "Draft Order",
+                    state: "DRAFT",
+                    desc: "Your order has been saved as a draft pending confirmation.",
+                    updated: false,
+                    updated_time: 0,
+                    updated_by_uid: 0,
+                    update_comments: { set: false },
+                    step: 80,
+                    visible: false,
+                },
+            };
+
+            order.costs = {
+                subtotal: cart_calc_subtotal,
+                delivery: cart_calc_delivery_fee,
+                extra: cart_calc_extras,
+                discount: cart_calc_discount,
+                discount_narration: cart_calc_discount_narration,
+                total: cart_calc_grand_total,
+            };
+
+            order.payment = {
+                method: cart_payment_method.options.name,
+                currency: cart_currency,
+                amount: cart_calc_grand_total,
+                result: false
+            };
+
+            for (const [key, value] of Object.entries(order)) {
+
+                if(value === "" || value === null || typeof value === "undefined"){
+
+                    order[key] = "N/A";
+
+                }
+
+            }
+
+            console.log("::PLACE ORDER::", order);
+
+            //
+
+            var user = firebase.auth().currentUser;
+
+            if (user !== null) {
+
+                firebase.database().ref('accounts/users/' + user.uid + '/orders/' + order.order_id).set(order).then(function (result) {
+
+                    console.log("Finished placing order:", result);
+
+                }).catch(function (error) {
+
+                    console.log(error.message, "Cart node error");
+
+                });
+
+                var order_meta = {
+                    order_number: order_number,
+                    order_id: order_id,
+                    uid: uid,
+                    status: 0,
+                    payment: order.payment,
+                };
+
+                firebase.database().ref('activities/orders/' + order.order_id).set(order_meta).then(function (result) {
+                    console.log("Finished placing order:", result);
+                    //cart_place_order_successfull(order_meta);
+                }).catch(function (error) {
+                    console.log(error.message, "Cart node error");
+                });
+
+            }
+
+        };
+
+        const cart_place_order_successfull = function (payment_object) {
+
+            var self = this;
+
+            //TODO set the order receipt here for the confirmation screen
+
+            setTimeout(function () {
+
+                Swal.close();
+
+                recentOrder = payment_object;
+
+                cart_place_order_successfull_payment_completed = true;
+
+                cart = {},
+
+                    page_view("payment_confirmation");
+
+                console.log("::payment_confirmation::", payment_object);
+
+            }, 500);
+
+            //
+
+        };
+
+        const cart_order_track = function () {
+
+            var self = this;
+
+            var _order_number = 0;
+
+            Swal.fire({
+                title: 'Track Order',
+                html: 'Enter your order number.',
+                input: 'text',
+                inputAttributes: {
+                    autocapitalize: 'off'
+                },
+                //imageUrl: base_url+'uiux/assets/img/payments/mobile-money.svg',
+                showCancelButton: true,
+                confirmButtonText: 'Continue',
+                showLoaderOnConfirm: true,
+                preConfirm: (inputValue) => {
+                    return fetch(`${base_url}pay/order/track/${inputValue}`)
+                        .then(response => {
+
+                            _order_number = inputValue;
+
+                            if (!response.ok) {
+                                throw new Error(response.statusText);
+                            }
+
+                            return response.json();
+
+
+                        })
+                        .catch(error => {
+
+                                Swal.fire({
+                                    icon: 'warning',
+                                    title: "Tracking Failed",
+                                    html: "Sorry, there was an error tracking your order. Please try again later.",
+                                    showConfirmButton: true,
+                                    confirmButtonText: 'OK',
+                                    timer: 60000
+                                });
+
+                            }
+                        );
+
+                },
+
+                allowOutsideClick: () => !Swal.isLoading()
+
+            }).then((result) => {
+
+                console.log(":: ORDER FOUND ::", result);
+
+                var order_data = result.value;
+
+                if(result.isConfirmed) {
+
+                    var thumbnail = base_url + order_data.img; //swal2-image
+
+                    //console.log("thumbnail", thumbnail);
+
+                    Swal.fire({
+                        icon: 'success',
+                        imageUrl: thumbnail,
+                        title: order_data.title,
+                        html: order_data.status + "<br><small style='opacity: 0.4;'>" + order_data.html + "</small>",
+                        showConfirmButton: true,
+                        confirmButtonText: 'OK',
+                        timer: 60000
+                    });
+
+                }
+
+            });
+
+
+        };
+
+        cart_remove_coupon = function () {
+
+            var self = this;
+
+            setTimeout(function () {
+
+                cart_coupon = 0;
+
+            }, 1000);
+
+            //
+
+        };
+
+        cart_destroy = function () {
+
+            var self = this;
+
+            cart_total = 0;
+            cart_amount = 0;
+            cart_total_items = 0;
+            cart_qty = 0;
+            cart = {};
+
+            cart_setup_firebase({
+                set: false
+            });
+
+        };
+
+        const selectOption = function () {
+
+            currentProductOptionSheetModal.open();
+
+        };
+
+        const selectSide = function () {
+
+            currentProductSideSheetModal.open();
+
+        };
+
+        const currentProductInfo = function () {
+
+
+
+        };
+
+        const openProductAsSheetModal = (index, product_index, product, element) => {
+
+            const self = this;
+
+            const elm = $$(element);
+
+            console.log("::: OPEN PRODUCT SHEET MODAL ::: ", elm.attr("id"), elm, product );
+
+            currentProduct = product;
+
+            selected_product = currentProduct;
+
+            selected_product_index = product_index;
+
+            selected_product_category_slug = index;
+
+            sselected_product_qty = selected_product.product_cart_qty;
+
+            selected_product_price_unit = (selected_product.product_price_regular * cart_exchange_rate);
+
+            selected_product_price_total = (selected_product.product_cart_qty * selected_product.product_price_regular);
+
+            product_addons = product_get_addons(index, product_index, selected_product);
+
+            setTimeout(function () {
+
+                product_calculate_addons();
+
+            },1000);
+
+            $f7.data.selected_product = product;
+
+            $update();
+
+            currentProductSheetModal.open();
+
+        };
+
+        const getProductsAsArray = (products) => {
+
+            return Object.keys(products).map((key) => [key, products[key]]);
+
+        };
+
+        const getData = function ( callBackFunction, callBackError ) {
+
+            products = $f7.params.data.productObject;
+
+            productObject = $f7.params.data.productObject;
+
+            productArray = $f7.params.data.productArray;
+
+            if(typeof productObject !== "undefined"){
+
+                menuObject = {
+                    categoryProducts: productArray,
+                };
+
+                $update();
+
+                setTimeout(function () {
+
+                    $f7.lazy.create('.lazy');
+
+                },1000);
+
+                console.error("PRODUCTS RESULT :: POPUP ORDER MENU x0 YES OBJECT ::", typeof productObject, productArray, productObject );
+
+            }else{
+
+                console.error("PRODUCTS RESULT :: POPUP ORDER MENU x0 NO OBJECT ::", productArray, productObject );
+
+            }
+
+        };
+
+        $on('pageInit', () => {
+
+            page_title = "Our Menu";
+
+            logoPath = window.app.appRenderer.module.styling.getNavBarLogo();
+
+            currentProductSheetModal = $f7.sheet.create({
+                el: '.current-product-sheet-swipe-to-close',
+                swipeToClose: true,
+                push: true,
+                backdrop: true,
+            });
+
+            currentProductOptionSheetModal = $f7.sheet.create({
+                el: '.current-product-sheet-option',
+                backdrop: true,
+            });
+
+            currentProductSideSheetModal = $f7.sheet.create({
+                el: '.current-product-sheet-side',
+                backdrop: true,
+            });
+
+            getData(function (data) {
+
+                console.warn("PRODUCTS DATA :: POPUP ORDER MENU x11111111111 ::", data);
+
+            }, function ( error ) {
+
+                console.warn("PRODUCTS DATA ERROR :: POPUP ORDER MENU x11111111111 ::", error );
+
+            });
+
+            $f7.on("PRODUCTS_LOADED", function (data) {
+
+                console.warn("EVENT :: PRODUCTS_LOADED :: POPUP ORDER MENU x22222222222 ::", data );
+
+                products = data.productObject;
+
+                productObject = data.productObject;
+
+                productArray = data.productArray;
+
+                menuObject = {
+                    categoryProducts: productArray,
+                };
+
+                setTimeout(function () {
+
+                    $f7.lazy.create('.lazy');
+
+                },1000);
+
+                $update();
+
+            });
+
+            $f7.on("DEBUG_PRODUCTS", function () {
+
+                getData(function (data) {
+
+                    console.log("PRODUCTS DATA 0x2", data);
+
+                }, function ( error ) {
+
+                    console.log("PRODUCTS DATA ERROR 0x2", error );
+
+                })
+
+            });
+
+            // trigger re-render
+            $update();
+
+        });
+
+        $on('pageMounted', (e, page) => {
+            console.log('page_title:', page_title, 'page mounted');
+        });
+        $on('pageBeforeIn', (e, page) => {
+            console.log('page_title:', page_title, 'page before in');
+
+            getData(function (data) {
+
+                console.warn("PRODUCTS DATA :: POPUP ORDER MENU x22 ::", data);
+
+                setTimeout(function () {
+
+                    $f7.lazy.create('.lazy');
+
+                },1000);
+
+            }, function ( error ) {
+
+                console.warn("PRODUCTS DATA ERROR :: POPUP ORDER MENU x22 ::", error );
+
+            });
+
+        });
+        $on('pageAfterIn', (e, page) => {
+            console.log('page_title:', page_title, 'page after in');
+            $f7.lazy.create('.lazy');
+        });
+        $on('pageBeforeOut', (e, page) => {
+            console.log('page_title:', page_title, 'page before out');
+        });
+        $on('pageAfterOut', (e, page) => {
+            console.log('page_title:', page_title, 'page after out');
+        });
+        $on('pageBeforeUnmount', (e, page) => {
+            console.log('page_title:', page_title, 'page before unmount');
+        });
+        $on('pageBeforeRemove', (e, page) => {
+            console.log('page_title:', page_title, 'page before remove');
+        });
+
+        return $render;
+
+    }
+</script>

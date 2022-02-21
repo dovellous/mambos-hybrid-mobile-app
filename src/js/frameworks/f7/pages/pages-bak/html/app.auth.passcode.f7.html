@@ -1,0 +1,158 @@
+<template>
+    <div class="page no-swipeback">
+        <div class="page-content login-screen-content">
+            <div class="login-screen-title">Ented Passcode</div>
+            <form>
+                <div class="block passcode-input">
+                    <input type="text" value="____" id="demo-numpad-inline" />
+                </div>
+                <div class="block block-strong no-padding no-margin passcode-numpad">
+                    <div id="numpad-inline-container"></div>
+                </div>
+            </form>
+        </div>
+    </div>
+</template>
+<script>
+    export default (props, {$f7ready, $f7, $f7route, $on, $update}) => {
+
+        let page_title = "Enter Passcode";
+
+        let eventName = "PASSCODE";
+
+        let passCodeType  = "PASSWORD";
+        
+        let passCodeLength = 6;
+
+        $f7ready(() => {
+
+            //
+
+        });
+
+        $on('pageInit', () => {
+
+            eventName = $f7route.params.eventName;
+
+            passCodeType = $f7route.params.passCodeType;
+
+            passCodeLength = parseInt($f7route.params.passCodeLength);
+
+            console.log("$f7route.params::",eventName, passCodeType, passCodeLength);
+
+            let asterics = "";
+
+            let dashes = "";
+
+            for(let i=0; i<passCodeLength; i++){
+
+                asterics += "*";
+
+                dashes += "_";
+
+            }
+
+            $f7.keypad.create({
+                inputEl: '#demo-numpad-inline',
+                containerEl: '#numpad-inline-container',
+                toolbar: false,
+                valueMaxLength: passCodeLength,
+                dotButton: false,
+                formatValue: function (value) {
+
+                    let valueFormat = value;
+
+                    if(passCodeType.toUpperCase() === "PASSWORD"){
+
+                        value = value.toString();
+
+                        valueFormat = (asterics).substring(0, value.length) + (dashes).substring(0, passCodeLength - value.length);
+
+                    }
+
+                    return valueFormat;
+
+                },
+                on: {
+                    change(keypad, value) {
+                        console.log(keypad, value);
+                        value = value.toString();
+                        if (value.length === passCodeLength) {
+                            
+                            $f7.emit(eventName, value);
+
+                            $f7.appModules.plugin.NavigatorModel.back()
+
+                        }
+                    }
+                }
+            });
+
+            // trigger re-render
+            $update();
+
+        });
+
+        $on('pageMounted', (e, page) => {
+            console.log('page_title:', page_title, 'page mounted');
+        });
+        $on('pageBeforeIn', (e, page) => {
+            console.log('page_title:', page_title, 'page before in');
+        });
+        $on('pageAfterIn', (e, page) => {
+            console.log('page_title:', page_title, 'page after in');
+        });
+        $on('pageBeforeOut', (e, page) => {
+            console.log('page_title:', page_title, 'page before out');
+        });
+        $on('pageAfterOut', (e, page) => {
+            console.log('page_title:', page_title, 'page after out');
+        });
+        $on('pageBeforeUnmount', (e, page) => {
+            console.log('page_title:', page_title, 'page before unmount');
+        });
+        $on('pageBeforeRemove', (e, page) => {
+            console.log('page_title:', page_title, 'page before remove');
+        });
+
+        return $render;
+
+    }
+</script>
+<style>
+    .block.passcode-input {
+        position: relative;
+        z-index: 5;
+    }
+    .block.passcode-numpad {
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        margin-bottom: 0;
+        max-width: none;
+        z-index: 10;
+    }
+    #demo-numpad-inline {
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        -ms-appearance: none;
+        appearance: none;
+        box-sizing: border-box;
+        border: none;
+        background: none;
+        border-radius: 0 0 0 0;
+        box-shadow: none;
+        display: block;
+        padding: 0 0 0 5px;
+        margin: 0;
+        width: 100%;
+        height: 43px;
+        color: #000;
+        font-family: inherit;
+        letter-spacing: 5px;
+        text-align: center;
+        font-size: 25px;
+        font-weight: 300;
+    }
+</style>

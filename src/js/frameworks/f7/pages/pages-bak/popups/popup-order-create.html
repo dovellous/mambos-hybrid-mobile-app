@@ -1,0 +1,2073 @@
+<template>
+    <div class="page">
+        <!-- additional "navbar-large" class -->
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <!-- ... -->
+                </div>
+                <!-- usual title will be visible when larger title collapsed -->
+                <div class="title">${page_title}</div>
+                <div class="right">
+                    <!-- Link to close popup -->
+                    <a class="link order-popup-previous-button">
+                        <i class="icon f7-icons">arrow_uturn_left</i>
+                    </a>
+                    <a class="link order-popup-close-button">
+                        <i class="icon f7-icons">multiply</i>
+                    </a>
+                </div>
+                <div class="title-large">
+                    <div class="title-large-text">
+                        <div class="display-flex padding-left-0 padding-right-0 justify-content-space-between align-items-center"  style=" width: -webkit-fill-available; ">
+                            <div style="/*font-size: 24px*/">Cart ${cartObject.products_count > 0 ? $h`Total:`: $h`<!--- --->`}</div>
+                            ${cartObject.products_count > 0 ? $h`
+                            <div style="font-size: 24px"><b class="payment-total-amount asap-font">${cartObject.currency} ${cartObject.cart_total}</b></div>
+                            `: $h`<!--- --->`}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="page-content page-bg-startup" id="popup-order-create-page-scrollable">
+
+            ${currentStepMaxAttained < 1 ? $h`
+
+            <div class="block inset list no-border text-align-center">
+                <img src="static/images/welcome/t1.png" class="big-icon-img margin-top-x2 margin-bottom-x2"/>
+                <h2 class="welcome-greeting text-align-center" >Hi ${displayName}, <br />Please choose Order Type.</h2>
+            </div>
+
+            <div class="block inset list no-border">
+                <ul class="transparent-bg">
+                    <li class="register-btn-container">
+                        <button @click=${initOrderDelivery} class="colx button button-large button-raised button-fill online-order-action-buttons online-ordering-btn-select-order-type-delivery">
+                            ORDER VIA MAMBO'S DELIVERY
+                        </button>
+                    </li>
+                    <li class="login-btn-container margin-top-x3">
+                        <button @click=${initOrderTakeaway} class="colx button button-large button-raised button-fill color-orange online-order-action-buttons online-ordering-btn-select-order-type-collection">
+                            ORDER FOR TAKEAWAY/SEAT-IN
+                        </button>
+                    </li>
+                </ul>
+            </div>
+            ` : $h`<!--- end --->`}
+
+            <div class="block inset list no-border padding-0" style="margin-bottom: 200px;">
+
+                <!--
+
+                    STEP 1: ORDER TYPE
+
+                    a) Select Delivery Address
+                    b) Select Takeaway / Seat-In Outlet
+
+                --->
+
+                ${currentStepMaxAttained > 1 ? $h`
+
+                <div class="card order-address-card margin-left-0 margin-right-0 margin-top margin-bottom">
+                    <div style="background-image:url(${currentAddressGoogleMap})" class="card-header map-container align-items-flex-end ">
+
+                        <span class="order-address-map-title text-color-theme">${onlineOrderObject.step_1_address_name} (${onlineOrderObject.step_1_address_type})</span>
+
+                    </div>
+                    <div class="card-header card-content-padding">
+                        <span class="card-header-title"><i class="card-title-icon-f7 icon f7-icons">${locationIcons[onlineOrderObject.step_1_address_type]}</i> ${onlineOrderObject.step_1_order_type}</span>
+                    </div>
+                    <div class="card-content card-content-padding">
+                        <p class="margin-bottom-0">${onlineOrderObject.step_1_address_location}</p>
+                        <p class="text-color-gray margin-top-0">Instruction: ${onlineOrderObject.step_1_address_instructions}</p>
+                        <p>
+                            <span><i class="card-footer-icon-md icon material-icons">delivery_dining</i>${onlineOrderObject.step_1_address_distance}</span>
+                            <span class="margin-left-x2"><i class="card-footer-icon-md icon material-icons">alarm</i> ${onlineOrderObject.step_1_address_duration}</span>
+                        </p>
+                    </div>
+                    <div class="card-footer padding-left-0">                        
+                        <a href="#" class="card-footer link" @click=${exeBtnStep1A} >CHANGE ADDRESS</a>
+                    </div>
+                </div>
+
+                ` : $h`<!--- end --->`}
+
+                <!--
+
+                    STEP 2: DELIVERY DATE
+
+                    a) Select Date
+                    b) Select Time
+
+                --->
+
+                ${currentStepMaxAttained > 2 ? $h`
+
+                <div class="card margin-left-0 margin-right-0 margin-top margin-bottom">
+                    <div class="card-header">
+                        <span class="card-header-title"><i class="card-title-icon-f7 icon f7-icons">calendar</i> Delivery Date</span>
+                    </div>
+                    <div class="card-content card-content-padding">
+                        <div class="list">
+                            <ul>
+                                <li>
+                                    <label class="item-radio item-radio-icon-end item-content">
+                                        <input type="radio" id="input-radio-step-2-order-delivery-date" name="input-radio-step-2-order-delivery-date" value="TODAY" checked @click=${initStep2A} />
+                                        <i class="icon icon-radio"></i>
+                                        <div class="item-inner">
+                                            <div class="item-title">${onlineOrderObject.step_2_order_delivery_date}</div>
+                                        </div>
+                                    </label>
+                                </li>
+                                <li>
+                                    <label class="item-radio item-radio-icon-end item-content">
+                                        <input type="radio" id="input-radio-step-2-order-delivery-date-scheduled"  name="input-radio-step-2-order-delivery-date-scheduled" value="TOMORROW" @click=${initStep2B} />
+                                        <i class="icon icon-radio"></i>
+                                        <div class="item-inner">
+                                            <div class="item-title">${onlineOrderObject.step_2_order_delivery_date_scheduled}</div>
+                                        </div>
+                                    </label>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="card-footer padding-left-0">
+                        <a href="#" class="card-footer link" @click=${exeBtnStep2A} >CHANGE DATE</a>
+                    </div>
+                </div>
+
+                ` : $h`<!--- end --->`}
+
+                <!--
+
+                    STEP 3: CART
+
+                    a) Add items to Cart
+
+                --->
+
+                ${currentStepMaxAttained > 3 ? $h`
+
+                <div class="card margin-left-0 margin-right-0 margin-top margin-bottom">
+                    <div class="card-header">
+                        <span class="card-header-title"><i class="card-title-icon-f7 icon f7-icons">bag</i> Order Cart Items</span>
+                    </div>
+                    <div class="card-content card-content-padding">
+
+
+                        ${cartObject.products_count > 0 ? $h`
+
+                        <div class="list media-list">
+                            <ul id="cart-items-list" class="cart-items-list">
+                                ${cartObject.cart_items.map((item, index) => $h`
+                                <li id="${item[1].product_id}"
+                                    data-id="${item[1].product_id}"
+                                    data-name="${item[1].product_name}"
+                                    data-index="${item[0]}"
+                                    data-price="${item[1].product_price_regular}"
+                                    class="product message-list">
+                                    <div class="item-content">
+                                        <div class="item-inner">
+                                            <div class="item-title-row title">
+                                                <div class="item-title"><h3>${item[1].product_name}</h3></div>
+                                                <div class="item-after" >$ ${item[1].product_price_regular}</div>
+                                            </div>
+                                            <div class="item-title-row subtitle">
+                                                <div class="item-subtitle">
+                                                    <span class="color-gray">${item[1].product_except}</span>
+                                                    <br />
+                                                    Quantity: x <span id="list-item-${item[0]}">${item[1].product_qty}</span>
+                                                    <input class="" type="hidden" id="list-item-input-${item[0]}" value="${item[1].product_qty}" />
+                                                </div>
+                                                <div class="stepper stepper-init stepper-small stepper-raised" data-value="${item[1].product_qty}" data-value-el="#list-item-input-${item[0]}" style="margin-top: 10px;">
+                                                    <div class="stepper-button-minus update-cart-item" data-key="${item[0]}" data-id="${item[1].product_id}" data-cart-item="-1|${item[0]}|${item[1].product_category_slug}|${item[1].product_index}"></div>
+                                                    <div class="stepper-button-plus update-cart-item"  data-key="${item[0]}" data-id="${item[1].product_id}" data-cart-item="1|${item[0]}|${item[1].product_category_slug}|${item[1].product_index}"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                `)}
+                            </ul>
+                        </div>
+
+                        ` : $h`
+
+                        <!--- {cartObject.products_count} has empty products --->
+
+                        <div class="block text-align-center">
+                            <img src="static/images/ecommerce/cart-error.svg" style="width: 75%; margin: auto;" align="center" class="margin-top-x3" />
+                            <p class="text-align-left">There are no items in your cart. To start an order, please click the button below. You can also <a @click=${refreshCart} href="#">Click here to refresh </a>the cart items.</p>
+                        </div>
+
+                        `}
+
+
+                    </div>
+                    <div class="card-footer padding-left-0">
+                        <a href="#" class="card-footer link" @click=${exeBtnStep3} >UPDATE CART ITEMS</a>
+                    </div>
+                </div>
+
+                ` : $h`<!--- end --->`}
+
+                <!--
+
+                    STEP 4: ORDER NOTES
+
+                    a) Add personalised, custom order notes
+
+                --->
+
+                ${currentStepMaxAttained > 4 ? $h`
+
+                <div class="card margin-left-0 margin-right-0 margin-top margin-bottom">
+                    <div class="card-header">
+                        <span class="card-header-title"><i class="card-title-icon-f7 icon f7-icons">equal_square</i> Notes</span>
+                    </div>
+                    <div class="card-content card-content-padding">
+                        <p class="margin-bottom-0">
+                            ${onlineOrderObject.step_4_order_notes}
+                        </p>
+                    </div>
+                    <div class="card-footer padding-left-0">
+                        <a href="#" class="card-footer link" @click=${exeBtnStep4} >UPDATE NOTES</a>
+                    </div>
+                </div>
+
+                ` : $h`<!--- end --->`}
+
+                <!--
+
+                    STEP 5: PAYMENT
+
+                    a) Select Payment method
+
+                --->
+
+                ${currentStepMaxAttained > 5 ? $h`
+
+                <div class="card margin-left-0 margin-right-0 margin-top margin-bottom">
+                    <div class="card-header">
+                        <span class="card-header-title"><i class="card-title-icon-f7 icon f7-icons">money_dollar_circle</i> Payment Method</span>
+                    </div>
+                    <div class="card-content card-content-padding">
+                        <div class="display-flex justify-content-space-between align-items-center full-width margin-bottom">
+                            <div class="row-text-key">Payment by:</div>
+                            <div class="row-text-value"><code>${onlineOrderObject.step_5_order_payment_method}</code></div>
+                        </div>
+                        <div class="display-flex justify-content-space-between align-items-center full-width">
+                            <img class="full-width" src="${onlineOrderObject.step_5_order_payment_method_image}" />
+                        </div>
+                    </div>
+                    <div class="card-footer padding-left-0">
+                        <a href="#" class="card-footer link" @click=${exeBtnStep5} >UPDATE PAYMENT METHOD</a>
+                    </div>
+                </div>
+
+                ` : $h`<!--- end --->`}
+
+                <!--
+
+                    STEP 6: APPLY COUPONS
+
+                    a) If you have a coupon enter it
+
+                --->
+
+                ${currentStepMaxAttained > 6 ? $h`
+
+                <div class="card margin-left-0 margin-right-0 margin-top margin-bottom">
+                    <div class="card-header">
+                        <span class="card-header-title"><i class="card-title-icon-f7 icon f7-icons">tickets</i> Coupons</span>
+                    </div>
+                    <div class="card-content card-content-padding">
+                        <p class="margin-bottom-0">
+                            <strong>Coupon Code: <code class="text-color-theme"><strong>${onlineOrderObject.step_6_order_coupon_code}</strong></code></strong>
+                            <br />
+                            ${onlineOrderObject.step_6_order_coupon_description}
+                        </p>
+                        <div class="display-flex justify-content-space-between align-items-center full-width">
+                            <div class="row-text-key">Discount:</div>
+                            <div class="row-text-value"><code>${onlineOrderObject.step_6_order_coupon_discount_amount}</code></div>
+                        </div>
+                    </div>
+                    <div class="card-footer padding-left-0">
+                        <a href="#" class="card-footer link" @click=${exeBtnStep6} >UPDATE COUPON</a>
+                    </div>
+                </div>
+
+                ` : $h`<!--- end --->`}
+
+                <!--
+
+                    STEP 7: CHECKOUT
+
+                    a) Calculate sub total
+                    b) Apply discount
+                    c) Apply delivery fee
+                    d) Calculate grand total
+
+                --->
+
+                ${currentStepMaxAttained > 7 ? $h`
+
+                <div class="card margin-left-0 margin-right-0 margin-top margin-bottom">
+                    <div class="card-header">
+                        <span class="card-header-title"><i class="card-title-icon-f7 icon f7-icons">cart</i> Checkout</span>
+                    </div>
+                    <div class="card-content card-content-padding">
+                        <div class="display-flex justify-content-space-between align-items-center full-width">
+                            <div class="row-text-key">Sub Total:</div>
+                            <div class="row-text-value"><code>${onlineOrderObject.step_7_order_checkout_subtotal}</code></div>
+                        </div>
+                        <div class="display-flex justify-content-space-between align-items-center full-width">
+                            <div class="row-text-key">Delivery Fee:</div>
+                            <div class="row-text-value"><code>${onlineOrderObject.step_7_order_checkout_delivery_fee}</code></div>
+                        </div>
+                        <div class="display-flex justify-content-space-between align-items-center full-width text-color-green">
+                            <div class="row-text-key">Discount:</div>
+                            <div class="row-text-value"><code>${onlineOrderObject.step_7_order_checkout_discount}</code></div>
+                        </div>
+                        <div class="display-flex justify-content-space-between align-items-center full-width">
+                            <hr class="full-width" />
+                        </div>
+                        <div class="display-flex justify-content-space-between align-items-center full-width">
+                            <div class="row-text-key"><strong>Grand Total:</strong></div>
+                            <div class="row-text-value"><code><strong>${onlineOrderObject.step_7_order_checkout_currency} ${onlineOrderObject.step_7_order_checkout_grand_total}</strong></code></div>
+                        </div>
+                    </div>
+                    <div class="card-footer padding-left-0">
+                        <a href="#" class="card-footer link" @click=${exeBtnStep8} >MAKE PAYMENT</a>
+                    </div>
+                </div>
+
+                ` : $h`<!--- end --->`}
+
+                <!--
+
+                    STEP 8: TRANSACTION DETAILS
+
+                    a) Calculate sub total
+                    b) Apply discount
+                    c) Apply delivery fee
+                    d) Calculate grand total
+
+                --->
+
+                ${currentStepMaxAttained > 8 ? $h`
+
+                <div class="card margin-left-0 margin-right-0 margin-top margin-bottom">
+                    <div class="card-header">
+                        <span class="card-header-title"><i class="card-title-icon-f7 icon f7-icons">creditcard</i> Transaction Details</span>
+                    </div>
+                    <div class="card-content card-content-padding">
+                        <div class="display-flex justify-content-space-between align-items-center full-width">
+                            <div class="row-text-key">Payment Method:</div>
+                            <div class="row-text-value"><span>Mobile Money: ${onlineOrderObject.step_8_order_transaction_payment_method}</span></div>
+                        </div>
+                        <div class="display-flex justify-content-space-between align-items-center full-width">
+                            <div class="row-text-key">Reference:</div>
+                            <div class="row-text-value"><span>${onlineOrderObject.step_8_order_transaction_payment_ref}</span></div>
+                        </div>
+                        <div class="display-flex justify-content-space-between align-items-center full-width">
+                            <div class="row-text-key">Amount:</div>
+                            <div class="row-text-value"><span>${onlineOrderObject.step_8_order_transaction_payment_currency} ${onlineOrderObject.step_8_order_transaction_payment_amount}</span></div>
+                        </div>
+                        <div class="display-flex justify-content-space-between align-items-center full-width">
+                            <div class="row-text-key">Date:</div>
+                            <div class="row-text-value"><span>${onlineOrderObject.step_8_order_transaction_payment_date}</span></div>
+                        </div>
+                        <div class="display-flex justify-content-space-between align-items-center full-width">
+                            <div class="row-text-key">Status:</div>
+                            <div class="row-text-value"><span>${onlineOrderObject.step_8_order_transaction_payment_status_text}</span><i class="card-title-icon-f7 icon f7-icons text-color-${onlineOrderObject.step_8_order_transaction_payment_status_color}">${onlineOrderObject.step_8_order_transaction_payment_status_icon}</i></div>
+                        </div>
+                    </div>
+                    <div class="card-footer padding-left-0">
+                        <a href="#" class="card-footer link" @click=${exeBtnStep8} >CHECK PAYMENT</a>
+                    </div>
+                </div>
+
+                ` : $h`<!--- end --->`}
+
+            </div>
+
+            <div class="block inset list no-border" style=" position: fixed; bottom: 0; width: -webkit-fill-available; ">
+
+                ${currentStep === 1 ? $h`
+
+                <button @click=${exeBtnStep1A} class="colx button button-large button-raised button-fill online-order-action-buttons online-ordering-btn-select-address" >SELECT ADDRESS</button>
+
+                <button @click=${exeBtnStep1B} class="colx button button-large button-raised button-fill color-orange online-order-action-buttons online-ordering-btn-select-outlet margin-top-x2" >SELECT OUTLET</button>
+
+                <!--- // Show upon firing : ONLINE_ORDER_FIRE_SHOW_ADDRESS_OR_OUTLETS --->
+
+                ` : $h`<!--- end --->`}
+
+                ${currentStep === 2 ? $h`
+
+                <button @click=${exeBtnStep2A} class="colx button button-large button-raised button-fill online-order-action-buttons online-ordering-btn-select-date" >SET DATE</button>
+
+                <button @click=${exeBtnStep2B} class="colx button button-large button-raised button-fill color-orange online-order-action-buttons online-ordering-btn-select-time margin-top-x2" >SET TIME</button>
+
+                <!--- // Show upon firing : ONLINE_ORDER_FIRE_SHOW_DATE --->
+
+                ` : $h`<!--- end --->`}
+
+                ${currentStep === 3 ? $h`
+
+                <button @click=${exeBtnStep3} class="colx button button-large button-raised button-fill online-order-action-buttons online-ordering-btn-show-menu" >SHOW MENU</button>
+
+                <!--- // Show upon firing : ONLINE_ORDER_FIRE_SHOW_MENU --->
+
+                ` : $h`<!--- end --->`}
+
+                ${currentStep === 4 ? $h`
+
+                <button @click=${exeBtnStep4A} class="colx button button-large button-raised button-fill online-order-action-buttons online-ordering-btn-enter-notes" >ENTER NOTES</button>
+
+                <button @click=${exeBtnStep4B} class="colx button button-large button-raised button-fill color-orange online-order-action-buttons online-ordering-btn-enter-notes-skip margin-top-x2" >SKIP</button>
+
+                <!--- // Show upon firing : ONLINE_ORDER_FIRE_SHOW_NOTES_INPUT --->
+
+                ` : $h`<!--- end --->`}
+
+                ${currentStep === 5 ? $h`
+
+                <button @click=${exeBtnStep5} class="colx button button-large button-raised button-fill online-order-action-buttons online-ordering-btn-select-payment-method" >SHOW PAYMENT OPTIONS</button>
+
+                <!--- // Show upon firing : ONLINE_ORDER_FIRE_SHOW_PAYMENT_OPTIONS --->
+
+                ` : $h`<!--- end --->`}
+
+                ${currentStep === 6 ? $h`
+
+                <button @click=${exeBtnStep6A} class="colx button button-large button-raised button-fill online-order-action-buttons online-ordering-btn-enter-coupon" >APPLY COUPON</button>
+
+                <button @click=${exeBtnStep6B} class="colx button button-large button-raised button-fill color-orange online-order-action-buttons online-ordering-btn-enter-coupon-skip margin-top-x2" >SKIP</button>
+
+                <!--- // Show upon firing : ONLINE_ORDER_FIRE_ENTER_COUPON --->
+
+                ` : $h`<!--- end --->`}
+
+                ${currentStep === 7 ? $h`
+
+                <button @click=${exeBtnStep7} class="colx button button-large button-raised button-fill online-order-action-buttons online-ordering-btn-select-currency" >SET CURRENCY</button>
+
+                <!--- // Show upon firing : ONLINE_ORDER_FIRE_SHOW_CURRENCIES --->
+
+                ` : $h`<!--- end --->`}
+
+                ${currentStep === 8 ? $h`
+
+                <button @click=${exeBtnStep8} class="colx button button-large button-raised button-fill online-order-action-buttons online-ordering-btn-init-transaction" >MAKE PAYMENT</button>
+
+                <!--- // Show upon firing : ONLINE_ORDER_FIRE_INIT_TRANSACTION --->
+
+                ` : $h`<!--- end --->`}
+
+                ${currentStep === 9 ? $h`
+
+                <button @click=${exeBtnStep9} class="colx button button-large button-raised button-fill online-order-action-buttons online-ordering-btn-check-payment" >CHECK PAYMENT</button>
+
+                <!--- // Show upon firing : ONLINE_ORDER_FIRE_CHECK_PAYMENT --->
+
+                ` : $h`<!--- end --->`}
+
+                ${currentStep === 10 ? $h`
+
+                <button @click=${exeBtnStep10A} class="colx button button-large button-raised button-fill online-order-action-buttons online-ordering-btn-order-again" >ORDER AGAIN</button>
+
+                <button @click=${exeBtnStep10B} class="colx button button-large button-raised button-fill color-orange online-order-action-buttons online-ordering-btn-go-home margin-top-x2" >GO HOME</button>
+
+                <!--- // Show upon firing : ONLINE_ORDER_FIRE_ORDER_COMPLETED --->
+
+                ` : $h`<!--- end --->`}
+
+            </div>
+
+        </div>
+
+    </div>
+</template>
+<script>
+    export default (props, {$f7ready, $f7, $on, $update}) => {
+
+        let page_title = ":: ORDER CREATE SCREEN ::";
+
+        let displayName = "...";
+
+        let previousStep = -1;
+
+        let currentStepMaxAttained = 0;
+
+        let currentStep = 0;
+
+        let currentStepMaster = 0;
+
+        let nextStep = 1;
+
+        let currentOrderType = 'DELIVERY';
+
+        let currentAddressGoogleMap = "";
+
+        let locationIcons = {
+            office: "building_2",
+            home: "house",
+            school: "building_columns",
+            other: "map_pin_ellipse"
+        };
+
+        let cartObject = {
+            cart_items:  [],
+            products_count: 0,
+            currency: "USD",
+            cart_total: 0,
+            payment_methods: {},
+        };
+
+        let onlineOrderObject = {
+            step_1_address_name :  '',
+            step_1_address_type :  '',
+            step_1_order_type :  '',
+            step_1_address_location :  '',
+            step_1_address_duration :  '',
+            step_1_address_distance :  '',
+            step_1_address_instructions :  '',
+            step_1_address_coordinates :  '',
+            step_2_order_delivery_date :  '',
+            step_3_order_cart_items :  [],
+            step_4_order_notes :  '',
+            step_5_order_payment_method :  '',
+            step_5_order_payment_method_image :  '',
+            step_6_order_coupon_code :  '',
+            step_6_order_coupon_description :  '',
+            step_6_order_coupon_discount_amount :  '',
+            step_7_order_checkout_subtotal :  '',
+            step_7_order_checkout_delivery_fee :  '',
+            step_7_order_checkout_discount :  '',
+            step_7_order_checkout_currency :  '',
+            step_7_order_checkout_grand_total :  '',
+            step_8_order_transaction_payment_method :  '',
+            step_8_order_transaction_payment_ref :  '',
+            step_8_order_transaction_payment_currency :  '',
+            step_8_order_transaction_payment_amount :  '',
+            step_8_order_transaction_payment_date :  '',
+            step_8_order_transaction_payment_status_text :  '',
+            step_8_order_transaction_payment_status_icon :  '',
+            step_8_order_transaction_payment_status_color :  '',
+        };
+
+        const debugOnlineOrderObject = (data) => {
+
+            console.info(":::::: CUSTOM:", data);
+
+            console.info(":::::: ONLINE ORDER OBJECT:", onlineOrderObject);
+
+            console.debug(":::::: SET STEPS : PREVIOUS:", previousStep, "CURRENT:", currentStep,  "CURRENT_MASTER:", currentStepMaster,  "NEXT:", nextStep, "ATTAINED:", currentStepMaxAttained);
+
+        };
+
+        const setMap = (coordinates) => {
+
+            if( Array.isArray(coordinates)){
+
+                coordinates = coordinates.join(",");
+
+            }
+
+            if( typeof coordinates === "object"){
+
+                coordinates = `${coordinates.lat},${coordinates.lng}`;
+
+            }
+
+            currentAddressGoogleMap = `https://maps.googleapis.com/maps/api/staticmap?center=${coordinates}&zoom=15&size=600x300&maptype=roadmap&markers=${coordinates}&key=AIzaSyCVP6N800aBz9lXz0mpJUE270jHX0OuUrk`;
+
+            console.log("::: SET MAP : ", coordinates, currentAddressGoogleMap);
+
+            return currentAddressGoogleMap;
+
+        };
+
+        const initOnlineOrderObject = () => {
+
+            const _onlineOrderObject = {};
+
+            _onlineOrderObject.step_1_address_name = '';
+            _onlineOrderObject.step_1_address_type = '';
+            _onlineOrderObject.step_1_order_type = '';
+            _onlineOrderObject.step_1_address_location = '';
+            _onlineOrderObject.step_1_address_location = '';
+            _onlineOrderObject.step_1_address_duration = '';
+            _onlineOrderObject.step_1_address_distance = '';
+            _onlineOrderObject.step_1_address_instructions = '';
+            _onlineOrderObject.step_1_address_coordinates = '';
+            _onlineOrderObject.step_2_order_delivery_date = '';
+            _onlineOrderObject.step_3_order_cart_items = [];
+            _onlineOrderObject.step_4_order_notes = '';
+            _onlineOrderObject.step_5_order_payment_method = '';
+            _onlineOrderObject.step_5_order_payment_method_image = '';
+            _onlineOrderObject.step_6_order_coupon_code = '';
+            _onlineOrderObject.step_6_order_coupon_description = '';
+            _onlineOrderObject.step_6_order_coupon_discount_amount = '';
+            _onlineOrderObject.step_7_order_checkout_subtotal = '';
+            _onlineOrderObject.step_7_order_checkout_delivery_fee = '';
+            _onlineOrderObject.step_7_order_checkout_discount = '';
+            _onlineOrderObject.step_7_order_checkout_currency = '';
+            _onlineOrderObject.step_7_order_checkout_grand_total = '';
+            _onlineOrderObject.step_8_order_transaction_payment_method = '';
+            _onlineOrderObject.step_8_order_transaction_payment_ref = '';
+            _onlineOrderObject.step_8_order_transaction_payment_currency = '';
+            _onlineOrderObject.step_8_order_transaction_payment_amount = '';
+            _onlineOrderObject.step_8_order_transaction_payment_date = '';
+            _onlineOrderObject.step_8_order_transaction_payment_status_text = '';
+            _onlineOrderObject.step_8_order_transaction_payment_status_icon = '';
+            _onlineOrderObject.step_8_order_transaction_payment_status_color = '';
+
+            onlineOrderObject = _onlineOrderObject;
+
+        };
+
+        const getOnlineOrderObject = () => {
+
+            return onlineOrderObject;
+
+        };
+
+
+        //Step 1
+        const goHome = () => {
+
+            //
+
+        };
+
+        //Step 1
+        const initSteps = () => {
+
+            //
+
+            console.log(":::::: INIT STEPS : currentStep", currentStep);
+
+        };
+
+        //Step 1
+        const initOrderDelivery = () => {
+
+            //
+            currentOrderType = "DELIVERY";
+            $f7.data.metaDataOnlineOrder_step_1_order_type = "DELIVERY";
+
+                beginStep1();
+
+            console.log(":::::: INIT ORDER - DELIVERY : currentStep", currentStep );
+
+        };
+
+        //Step 1
+        const initOrderTakeaway = () => {
+
+            //
+            currentOrderType = "TAKEAWAY";
+            $f7.data.metaDataOnlineOrder_step_1_order_type = "TAKEAWAY";
+
+             beginStep1();
+
+            console.log(":::::: INIT ORDER - TAKEAWAY : currentStep", currentStep );
+
+        };
+
+        //Step 2A
+        const initStep2A = () => {
+
+            //
+            $f7.data.metaDataOnlineOrder_step_2_order_day = "TODAY";
+
+            enterStep(2.1);
+
+            console.log(":::::: INIT STEP 2A : ORDER DAY : ", $f7.data.metaDataOnlineOrder_step_2_order_day, "currentStep", currentStep );
+
+        };
+
+        //Step 2B
+        const initStep2B = () => {
+
+            //
+            $f7.data.metaDataOnlineOrder_step_2_order_day = "SCHEDULED";
+
+            enterStep(2.2);
+
+            console.log(":::::: INIT STEP 2B : ORDER DAY : ", $f7.data.metaDataOnlineOrder_step_2_order_day, "currentStep", currentStep );
+
+        };
+
+        // BEGIN COMPLETE STEPS
+        //
+        //
+        //
+        //
+        //
+
+
+        //Step 1
+        const beginStep1 = () => {
+
+            console.log(":::::: EXE STEP :", currentStep, "beginStep1");
+
+            enterStep(1);
+
+        };
+
+
+        //Step 1
+        const exeBtnStep1 = () => {
+
+            $f7.emit('ONLINE_ORDER_FIRE_SHOW_ADDRESSES', {isDelivery: true, onlineOrderType: "DELIVERY"});
+
+        };
+
+
+        //Step 1A
+        const exeBtnStep1A = () => {
+
+            $f7.emit('ONLINE_ORDER_FIRE_SHOW_ADDRESSES', {isDelivery: true, onlineOrderType: "DELIVERY"});
+
+        };
+
+
+        //Step 1B
+        const exeBtnStep1B = () => {
+
+            $f7.emit('ONLINE_ORDER_FIRE_SHOW_OUTLETS', {isDelivery: false, onlineOrderType: "TAKEAWAY"});
+
+        };
+
+
+        //Step 2
+        const exeBtnStep2 = () => {
+
+            $f7.emit('ONLINE_ORDER_FIRE_SHOW_DATE', {enabled: true});
+
+        };
+
+
+        //Step 2A
+        const exeBtnStep2A = () => {
+
+            $f7.emit('ONLINE_ORDER_FIRE_SHOW_DATE', {enabled: true});
+
+        };
+
+
+        //Step 2B
+        const exeBtnStep2B = () => {
+
+            $f7.emit('ONLINE_ORDER_FIRE_SHOW_DATE_SCHEDULED', {enabled: true});
+
+        };
+
+        let hasSelectedCurrency = false;
+
+
+        //Step 3
+        const exeBtnStep3 = () => {
+
+            if(!hasSelectedCurrency){
+
+                exeBtnStep7();
+
+                hasSelectedCurrency = true;
+
+            }
+
+            $f7.emit('ONLINE_ORDER_FIRE_SHOW_MENU', {enabled: true});
+
+        };
+
+
+        //Step 4
+        const exeBtnStep4 = () => {
+
+            $f7.emit('ONLINE_ORDER_FIRE_SHOW_NOTES_INPUT', {enabled: true});
+
+        };
+
+
+        //Step 4A
+        const exeBtnStep4A = () => {
+
+            $f7.emit('ONLINE_ORDER_FIRE_SHOW_NOTES_INPUT', {enabled: true});
+
+        };
+
+
+        //Step 4B
+        const exeBtnStep4B = () => {
+
+            $f7.emit('ONLINE_ORDER_FIRE_SHOW_NOTES_INPUT_CANCEL', {enabled: true});
+
+        };
+
+
+        //Step 5
+        const exeBtnStep5 = () => {
+
+            $f7.emit('ONLINE_ORDER_FIRE_SHOW_PAYMENT_OPTIONS', {enabled: true});
+
+        };
+
+
+        //Step 6
+        const exeBtnStep6 = () => {
+
+            $f7.emit('ONLINE_ORDER_FIRE_ENTER_COUPON', {enabled: true});
+
+        };
+
+
+        //Step 6A
+        const exeBtnStep6A = () => {
+
+            $f7.emit('ONLINE_ORDER_FIRE_ENTER_COUPON', {enabled: true});
+
+        };
+
+
+        //Step 6B
+        const exeBtnStep6B = () => {
+
+            $f7.emit('ONLINE_ORDER_FIRE_ENTER_COUPON_CANCEL', {enabled: true});
+
+        };
+
+
+        //Step 7
+        const exeBtnStep7 = () => {
+
+            $f7.emit('ONLINE_ORDER_FIRE_SHOW_CURRENCIES', {enabled: true});
+
+        };
+
+
+        //Step 8
+        const exeBtnStep8 = () => {
+
+            $f7.emit('ONLINE_ORDER_FIRE_INIT_TRANSACTION', {enabled: true});
+
+        };
+
+        //Step 9
+        const exeBtnStep9 = () => {
+
+            $f7.emit('ONLINE_ORDER_FIRE_CHECK_PAYMENT', {enabled: true});
+
+        };
+
+        //Step 10
+        const exeBtnStep10 = () => {
+
+            $f7.emit('ONLINE_ORDER_FIRE_ORDER_COMPLETED', {enabled: true});
+
+        };
+
+        //Step 10A
+        const exeBtnStep10A = () => {
+
+            $f7.emit('ONLINE_ORDER_FIRE_ORDER_COMPLETED_RESET', {enabled: true});
+
+        };
+
+        //Step 10B
+        const exeBtnStep10B = () => {
+
+            $f7.emit('ONLINE_ORDER_FIRE_ORDER_COMPLETED_GO_HOME', {enabled: true});
+
+        };
+
+
+
+        //Step 1
+        const actionOnStep1 = ( data ) => {
+
+            //Set vars
+            $f7.data.metaDataOnlineOrder_step_1_address_name = data.step_1_address_name;
+            $f7.data.metaDataOnlineOrder_step_1_address_type = data.step_1_address_type;
+            $f7.data.metaDataOnlineOrder_step_1_order_type = data.step_1_order_type;
+            $f7.data.metaDataOnlineOrder_step_1_address_location = data.step_1_address_location;
+            $f7.data.metaDataOnlineOrder_step_1_address_duration = data.step_1_address_duration;
+            $f7.data.metaDataOnlineOrder_step_1_address_distance = data.step_1_address_distance;
+            $f7.data.metaDataOnlineOrder_step_1_address_instructions = data.step_1_address_instructions;
+            $f7.data.metaDataOnlineOrder_step_1_address_coordinates = data.step_1_address_coordinates;
+
+            completeStep1();
+
+        };
+
+
+        //Step 2
+        const actionOnStep2 = ( data ) => {
+
+            //Set vars
+            $f7.data.metaDataOnlineOrder_step_2_order_delivery_date = data.step_2_order_delivery_date;
+
+            completeStep2();
+
+        };
+
+
+        //Step 3
+        const actionOnStep3 = ( data ) => {
+
+            //Set vars
+            $f7.data.metaDataOnlineOrder_step_3_order_cart_items = data.step_3_order_cart_items;
+
+            completeStep3();
+
+        };
+
+
+        //Step 4
+        const actionOnStep4 = ( data ) => {
+
+            //Set vars
+            $f7.data.metaDataOnlineOrder_step_4_order_notes = data.step_4_order_notes;
+
+            completeStep4();
+
+        };
+
+
+        //Step 5
+        const actionOnStep5 = ( data ) => {
+
+            //Set vars
+            $f7.data.metaDataOnlineOrder_step_5_order_payment_method = data.step_5_order_payment_method;
+            $f7.data.metaDataOnlineOrder_step_5_order_payment_method_image = data.step_5_order_payment_method_image;
+
+            completeStep5();
+
+        };
+
+
+        //Step 6
+        const actionOnStep6 = ( data ) => {
+
+            //Set vars
+            $f7.data.metaDataOnlineOrder_step_6_order_coupon_code = data.step_6_order_coupon_code;
+            $f7.data.metaDataOnlineOrder_step_6_order_coupon_description = data.step_6_order_coupon_description;
+            $f7.data.metaDataOnlineOrder_step_6_order_coupon_discount_amount = data.step_6_order_coupon_discount_amount;
+
+            completeStep6();
+
+        };
+
+
+        //Step 6
+        const actionOnStep7A = ( data ) => {
+
+            //Set vars
+            $f7.data.metaDataOnlineOrder_step_7_order_checkout_currency = data.step_7_order_checkout_currency;
+
+            completeStep7A();
+
+        };
+
+
+        //Step 7
+        const actionOnStep70 = ( data ) => {
+
+            //Set vars
+            $f7.data.metaDataOnlineOrder_step_7_order_checkout_currency = data.step_7_order_checkout_currency;
+
+        };
+
+
+
+        //Step 7
+        const actionOnStep7 = ( data ) => {
+
+            //Set vars
+            $f7.data.metaDataOnlineOrder_step_7_order_checkout_subtotal = data.step_7_order_checkout_subtotal;
+            $f7.data.metaDataOnlineOrder_step_7_order_checkout_delivery_fee = data.step_7_order_checkout_delivery_fee;
+            $f7.data.metaDataOnlineOrder_step_7_order_checkout_discount = data.step_7_order_checkout_discount;
+            $f7.data.metaDataOnlineOrder_step_7_order_checkout_currency = data.step_7_order_checkout_currency;
+            $f7.data.metaDataOnlineOrder_step_7_order_checkout_grand_total = data.step_7_order_checkout_grand_total;
+
+            completeStep7();
+
+        };
+
+
+        //Step 8
+        const actionOnStep8 = ( data ) => {
+
+            //Set vars
+            $f7.data.metaDataOnlineOrder_step_8_order_transaction_payment_method = data.step_8_order_transaction_payment_method;
+            $f7.data.metaDataOnlineOrder_step_8_order_transaction_payment_ref = data.step_8_order_transaction_payment_ref;
+            $f7.data.metaDataOnlineOrder_step_8_order_transaction_payment_currency = data.step_8_order_transaction_payment_currency;
+            $f7.data.metaDataOnlineOrder_step_8_order_transaction_payment_amount = data.step_8_order_transaction_payment_amount;
+            $f7.data.metaDataOnlineOrder_step_8_order_transaction_payment_date = data.step_8_order_transaction_payment_date;
+            $f7.data.metaDataOnlineOrder_step_8_order_transaction_payment_status_text = data.step_8_order_transaction_payment_status_text;
+            $f7.data.metaDataOnlineOrder_step_8_order_transaction_payment_status_icon = data.step_8_order_transaction_payment_status_icon;
+            $f7.data.metaDataOnlineOrder_step_8_order_transaction_payment_status_color = data.step_8_order_transaction_payment_status_color;
+
+            completeStep8();
+
+        };
+
+
+        //Step 9
+        const actionOnStep9 = ( data ) => {
+
+            //Set vars
+
+            completeStep9();
+
+        };
+
+
+        //Step 10
+        const actionOnStep10 = ( data ) => {
+
+            //Set vars
+
+            completeStep10();
+
+        };
+
+
+        //Step 10A
+        const actionOnStep10A = ( data ) => {
+
+            //Set vars
+
+            completeStep10();
+
+            goHome();
+
+        };
+
+
+        //Step 1
+        const completeStep1 = () => {
+
+            console.log(":::::: EXE STEP :", currentStep, "completeStep1");
+
+            //Set vars
+            onlineOrderObject.step_1_address_name = step_1_address_name();
+            onlineOrderObject.step_1_address_type = step_1_address_type();
+            onlineOrderObject.step_1_order_type = step_1_order_type();
+            onlineOrderObject.step_1_address_location = step_1_address_location();
+            onlineOrderObject.step_1_address_duration = step_1_address_duration();
+            onlineOrderObject.step_1_address_distance = step_1_address_distance();
+            onlineOrderObject.step_1_address_instructions = step_1_address_instructions();
+            onlineOrderObject.step_1_address_coordinates = step_1_address_coordinates();
+
+            setMap($f7.data.metaDataOnlineOrder_step_1_address_coordinates);
+
+            enterStep(2);
+
+        };
+
+
+        //Step 2
+        const completeStep2 = () => {
+
+            console.log(":::::: EXE STEP :", currentStep, "completeStep2");
+
+            //Set vars
+            onlineOrderObject.step_2_order_delivery_date = step_2_order_delivery_date();
+
+            enterStep(3);
+
+        };
+
+
+        //Step 3
+        const completeStep3 = () => {
+
+            console.log(":::::: EXE STEP :", currentStep, "completeStep3");
+
+            //Set vars
+            onlineOrderObject.step_3_order_cart_items = step_3_order_cart_items();
+
+            enterStep(4);
+
+        };
+
+
+        //Step 4
+        const completeStep4 = () => {
+
+            console.log(":::::: EXE STEP :", currentStep, "completeStep4");
+
+            //Set vars
+            onlineOrderObject.step_4_order_notes = step_4_order_notes();
+
+            enterStep(5);
+
+        };
+
+
+        //Step 5
+        const completeStep5 = () => {
+
+            console.log(":::::: EXE STEP :", currentStep, "completeStep5");
+
+            //Set vars
+            onlineOrderObject.step_5_order_payment_method = step_5_order_payment_method();
+            onlineOrderObject.step_5_order_payment_method_image = step_5_order_payment_method_image();
+
+            enterStep(6);
+
+        };
+
+
+        //Step 6
+        const completeStep6 = () => {
+
+            console.log(":::::: EXE STEP :", currentStep, "completeStep6");
+
+            //Set vars
+            onlineOrderObject.step_6_order_coupon_code = step_6_order_coupon_code();
+            onlineOrderObject.step_6_order_coupon_description = step_6_order_coupon_description();
+            onlineOrderObject.step_6_order_coupon_discount_amount = step_6_order_coupon_discount_amount();
+
+            enterStep(8);
+
+        };
+
+
+        //Step 7
+        const completeStep7A = () => {
+
+            console.log(":::::: EXE STEP :", currentStep, "completeStep7");
+
+            //Set vars
+            onlineOrderObject.step_7_order_checkout_currency = step_7_order_checkout_currency();
+
+            enterStep(7);
+
+        };
+
+
+        //Step 7
+        const completeStep7 = () => {
+
+            console.log(":::::: EXE STEP :", currentStep, "completeStep7");
+
+            //Set vars
+            onlineOrderObject.step_7_order_checkout_subtotal = step_7_order_checkout_subtotal();
+            onlineOrderObject.step_7_order_checkout_delivery_fee = step_7_order_checkout_delivery_fee();
+            onlineOrderObject.step_7_order_checkout_discount = step_7_order_checkout_discount();
+            onlineOrderObject.step_7_order_checkout_currency = step_7_order_checkout_currency();
+            onlineOrderObject.step_7_order_checkout_grand_total = step_7_order_checkout_grand_total();
+
+            enterStep(8);
+
+        };
+
+
+        //Step 8
+        const completeStep8 = () => {
+
+            console.log(":::::: EXE STEP :", currentStep, "completeStep8");
+
+            //Set vars
+            onlineOrderObject.step_8_order_transaction_payment_method = step_8_order_transaction_payment_method();
+            onlineOrderObject.step_8_order_transaction_payment_ref = step_8_order_transaction_payment_ref();
+            onlineOrderObject.step_8_order_transaction_payment_currency = step_8_order_transaction_payment_currency();
+            onlineOrderObject.step_8_order_transaction_payment_amount = step_8_order_transaction_payment_amount();
+            onlineOrderObject.step_8_order_transaction_payment_date = step_8_order_transaction_payment_date();
+            onlineOrderObject.step_8_order_transaction_payment_status_text = step_8_order_transaction_payment_status_text();
+            onlineOrderObject.step_8_order_transaction_payment_status_icon = step_8_order_transaction_payment_status_icon();
+            onlineOrderObject.step_8_order_transaction_payment_status_color = step_8_order_transaction_payment_status_color();
+
+            enterStep(9);
+
+        };
+
+        //Step 9
+        const completeStep9 = () => {
+
+            console.log(":::::: EXE STEP :", currentStep, "completeStep9");
+
+            //Set vars
+
+            enterStep(10);
+
+        };
+
+        //Step 10
+        const completeStep10 = () => {
+
+            console.log(":::::: EXE STEP :", currentStep, "completeStep10");
+
+            //Set vars
+
+            beginStep1();
+
+        };
+
+        //Step 10A
+        const completeStep10A = () => {
+
+            console.log(":::::: EXE STEP :", currentStep, "completeStep10A");
+
+            //Set vars
+
+            enterStep(0);
+
+            goHome();
+
+        };
+
+
+        //
+        //
+        //
+        //
+        // END COMPLETE STEPS
+
+        // BEGIN COMPLETE STEPS
+        //
+        //
+        //
+        //
+
+        const enterStep = ( step ) => {
+
+            previousStep = parseInt(step)-1;
+
+            currentStep = step;
+            
+            currentStepMaster = parseInt(step);
+
+            nextStep = parseInt(step)+1;
+
+            if(currentStepMaster > currentStepMaxAttained ){
+
+                currentStepMaxAttained = currentStepMaster;
+
+            }
+
+            $update();
+
+            console.log(":::::: SET STEPS : PREVIOUS:", previousStep, "CURRENT:", currentStep,  "CURRENT_MASTER:", currentStepMaster,  "NEXT:", nextStep, "ATTAINED:", currentStepMaxAttained);
+
+            if(previousStep < 1){
+
+                //$f7.appModules.plugin.NavigatorModel.back();
+
+                //$f7.appRenderer.appViewsObject.popups.addressSetupPopup.close();
+
+            }
+
+            let allowedAutoSteps = [1];
+
+            if(currentStep <= currentStepMaxAttained) {
+
+                if(allowedAutoSteps.includes(currentStep)) {
+
+                    switch (step) {
+
+                        case 1 : {
+
+                            // showButtons(['online-ordering-btn-select-address', 'online-ordering-btn-select-outlet']);
+
+                            if (currentOrderType === "DELIVERY") {
+
+                                //
+                                $f7.emit('ONLINE_ORDER_FIRE_SHOW_ADDRESSES', {
+                                    isDelivery: true,
+                                    onlineOrderType: "DELIVERY"
+                                });
+
+                            } else {
+
+                                //
+                                $f7.emit('ONLINE_ORDER_FIRE_SHOW_OUTLETS', {
+                                    isDelivery: false,
+                                    onlineOrderType: "TAKEAWAY"
+                                });
+
+                            }
+
+                            break;
+
+                        }
+
+                        case 1.1 : {
+
+                            // showButtons(['online-ordering-btn-select-address', 'online-ordering-btn-select-outlet']);
+                            currentOrderType = "DELIVERY";
+                            $f7.data.metaDataOnlineOrder_step_1_order_type = currentOrderType;
+                            $f7.emit('ONLINE_ORDER_FIRE_SHOW_ADDRESSES', {
+                                isDelivery: true,
+                                onlineOrderType: "DELIVERY"
+                            });
+                            break;
+
+                        }
+
+                        case 1.2 : {
+
+                            // showButtons(['online-ordering-btn-select-address', 'online-ordering-btn-select-outlet']);
+                            currentOrderType = "TAKEAWAY";
+                            $f7.data.metaDataOnlineOrder_step_1_order_type = currentOrderType;
+                            $f7.emit('ONLINE_ORDER_FIRE_SHOW_OUTLETS', {
+                                isDelivery: false,
+                                onlineOrderType: "TAKEAWAY"
+                            });
+                            break;
+
+                        }
+
+                        case 2 : {
+
+                            // showButtons(['online-ordering-btn-select-date', 'online-ordering-btn-select-time']);
+                            $f7.emit('ONLINE_ORDER_FIRE_SHOW_DATE', {enabled: true});
+                            break;
+
+                        }
+
+                        case 2.1 : {
+
+                            // showButtons(['online-ordering-btn-select-date', 'online-ordering-btn-select-time']);
+                            $f7.emit('ONLINE_ORDER_FIRE_SHOW_DATE', {enabled: true});
+                            break;
+
+                        }
+
+                        case 2.2 : {
+
+                            // showButtons(['online-ordering-btn-select-date', 'online-ordering-btn-select-time']);
+                            $f7.emit('ONLINE_ORDER_FIRE_SHOW_DATE_SCHEDULED', {enabled: true});
+                            break;
+
+                        }
+
+                        case 3 : {
+
+                            // showButtons(['online-ordering-btn-show-menu']);
+                            $f7.emit('ONLINE_ORDER_FIRE_SHOW_MENU', {enabled: true});
+                            break;
+
+                        }
+
+                        case 4 : {
+
+                            // showButtons(['online-ordering-btn-enter-notes', 'online-ordering-btn-enter-notes-skip']);
+                            $f7.emit('ONLINE_ORDER_FIRE_SHOW_NOTES_INPUT', {enabled: true});
+                            break;
+
+                        }
+
+                        case 4.1 : {
+
+                            // showButtons(['online-ordering-btn-enter-notes', 'online-ordering-btn-enter-notes-skip']);
+                            $f7.emit('ONLINE_ORDER_FIRE_SHOW_NOTES_INPUT', {enabled: true});
+                            break;
+
+                        }
+
+                        case 4.2 : {
+
+                            // showButtons(['online-ordering-btn-enter-notes', 'online-ordering-btn-enter-notes-skip']);
+                            $f7.emit('ONLINE_ORDER_FIRE_SHOW_NOTES_INPUT_CANCEL', {enabled: true});
+                            break;
+
+                        }
+
+                        case 5 : {
+
+                            // showButtons(['online-ordering-btn-select-payment-method']);
+                            $f7.emit('ONLINE_ORDER_FIRE_SHOW_PAYMENT_OPTIONS', {enabled: true});
+                            break;
+
+                        }
+
+                        case 6 : {
+
+                            // showButtons(['online-ordering-btn-enter-coupon', 'online-ordering-btn-enter-coupon-skip']);
+                            $f7.emit('ONLINE_ORDER_FIRE_ENTER_COUPON', {enabled: true});
+                            break;
+
+                        }
+
+                        case 6.1 : {
+
+                            // showButtons(['online-ordering-btn-enter-coupon', 'online-ordering-btn-enter-coupon-skip']);
+                            $f7.emit('ONLINE_ORDER_FIRE_ENTER_COUPON', {enabled: true});
+                            break;
+
+                        }
+
+                        case 6.2 : {
+
+                            // showButtons(['online-ordering-btn-enter-coupon', 'online-ordering-btn-enter-coupon-skip']);
+                            $f7.emit('ONLINE_ORDER_FIRE_ENTER_COUPON_CANCEL', {enabled: true});
+                            break;
+
+                        }
+
+                        case 7 : {
+
+                            // showButtons(['online-ordering-btn-select-currency']);
+                            $f7.emit('ONLINE_ORDER_FIRE_SHOW_CURRENCIES', {enabled: true});
+                            break;
+
+                        }
+
+                        case 8 : {
+
+                            // showButtons(['online-ordering-btn-init-transaction']);
+                            $f7.emit('ONLINE_ORDER_FIRE_INIT_TRANSACTION', {enabled: true});
+                            break;
+
+                        }
+
+                        case 9 : {
+
+                            // showButtons(['online-ordering-btn-check-payment']);
+                            $f7.emit('ONLINE_ORDER_FIRE_CHECK_PAYMENT', {enabled: true});
+                            break;
+
+                        }
+
+                        case 10 : {
+
+                            // showButtons(['online-ordering-btn-order-again', 'online-ordering-btn-go-home']);
+                            $f7.emit('ONLINE_ORDER_FIRE_ORDER_COMPLETED', {enabled: true});
+                            break;
+
+                        }
+
+                        case 10.1 : {
+
+                            // showButtons(['online-ordering-btn-order-again', 'online-ordering-btn-go-home']);
+                            $f7.emit('ONLINE_ORDER_FIRE_ORDER_COMPLETED_RESET', {enabled: true});
+                            break;
+
+                        }
+
+                        case 10.2 : {
+
+                            // showButtons(['online-ordering-btn-order-again', 'online-ordering-btn-go-home']);
+                            $f7.emit('ONLINE_ORDER_FIRE_ORDER_COMPLETED_GO_HOME', {enabled: true});
+                            break;
+
+                        }
+
+                        default : {
+
+                            // showButtons(['online-ordering-btn-select-address', 'online-ordering-btn-select-outlet']);
+
+                            break;
+
+                        }
+
+                    }
+
+                }
+
+                const objDiv = document.getElementById("popup-order-create-page-scrollable");
+                objDiv.scrollTop = objDiv.scrollHeight;
+
+            }
+
+        };
+
+        //
+        //
+        //
+        //
+        // END ENTER STEPS
+
+        // BEGIN STEPS VARS GETTERS
+        //
+        //
+        //
+        //
+
+        /*      */
+        const step_1_address_name =  () => {
+
+            return $f7.data.metaDataOnlineOrder_step_1_address_name;
+
+        };
+
+        /*      */
+        const step_1_address_type =  () => {
+
+            return $f7.data.metaDataOnlineOrder_step_1_address_type;
+
+        };
+
+        /*      */
+        const step_1_order_type =  () => {
+
+            return $f7.data.metaDataOnlineOrder_step_1_order_type;
+
+        };
+
+        /*      */
+        const step_1_address_location =  () => {
+
+            return $f7.data.metaDataOnlineOrder_step_1_address_location;
+
+        };
+
+        /*      */
+        const step_1_address_duration =  () => {
+
+            return $f7.data.metaDataOnlineOrder_step_1_address_duration;
+
+        };
+
+        /*      */
+        const step_1_address_distance =  () => {
+
+            return $f7.data.metaDataOnlineOrder_step_1_address_distance;
+
+        };
+
+        /*      */
+        const step_1_address_instructions =  () => {
+
+            return $f7.data.metaDataOnlineOrder_step_1_address_instructions;
+
+        };
+
+        /*      */
+        const step_1_address_coordinates =  () => {
+
+            return $f7.data.metaDataOnlineOrder_step_1_address_coordinates;
+
+        };
+
+        /*      */
+        const step_2_order_delivery_date =  () => {
+
+            return $f7.data.metaDataOnlineOrder_step_2_order_delivery_date;
+
+        };
+
+        /*      */
+        const step_3_order_cart_items =  () => {
+
+            return $f7.data.metaDataFirebaseUserCart;
+
+
+        };
+
+        /*      */
+        const step_4_order_notes =  () => {
+
+            return $f7.data.metaDataOnlineOrder_step_4_order_notes;
+
+        };
+
+        /*      */
+        const step_5_order_payment_method =  () => {
+
+            return $f7.data.metaDataOnlineOrder_step_5_order_payment_method;
+
+        };
+
+        /*      */
+        const step_5_order_payment_method_image =  () => {
+
+            return $f7.data.metaDataOnlineOrder_step_5_order_payment_method_image;
+
+        };
+
+        /*      */
+        const step_6_order_coupon_code =  () => {
+
+            return $f7.data.metaDataOnlineOrder_step_6_order_coupon_code;
+
+        };
+
+        /*      */
+        const step_6_order_coupon_description =  () => {
+
+            return $f7.data.metaDataOnlineOrder_step_6_order_coupon_description;
+
+        };
+
+        /*      */
+        const step_6_order_coupon_discount_amount =  () => {
+
+            return $f7.data.metaDataOnlineOrder_step_6_order_coupon_discount_amount;
+
+        };
+
+        /*      */
+        const step_7_order_checkout_subtotal =  () => {
+
+            return $f7.data.metaDataOnlineOrder_step_7_order_checkout_subtotal;
+
+        };
+
+        /*      */
+        const step_7_order_checkout_delivery_fee =  () => {
+
+            return $f7.data.metaDataOnlineOrder_step_7_order_checkout_delivery_fee;
+
+        };
+
+        /*      */
+        const step_7_order_checkout_discount =  () => {
+
+            return $f7.data.metaDataOnlineOrder_step_7_order_checkout_discount;
+
+        };
+
+        /*      */
+        const step_7_order_checkout_currency =  () => {
+
+            return $f7.data.metaDataOnlineOrder_step_7_order_checkout_currency;
+
+        };
+
+        /*      */
+        const step_7_order_checkout_grand_total =  () => {
+
+            return $f7.data.metaDataOnlineOrder_step_7_order_checkout_grand_total;
+
+        };
+
+        /*      */
+        const step_8_order_transaction_payment_method =  () => {
+
+            return $f7.data.metaDataOnlineOrder_step_8_order_transaction_payment_method;
+
+        };
+
+        /*      */
+        const step_8_order_transaction_payment_ref =  () => {
+
+            return $f7.data.metaDataOnlineOrder_step_8_order_transaction_payment_ref;
+
+        };
+
+        /*      */
+        const step_8_order_transaction_payment_currency =  () => {
+
+            return $f7.data.metaDataOnlineOrder_step_8_order_transaction_payment_currency;
+
+        };
+
+        /*      */
+        const step_8_order_transaction_payment_amount =  () => {
+
+            return $f7.data.metaDataOnlineOrder_step_8_order_transaction_payment_amount;
+
+        };
+
+        /*      */
+        const step_8_order_transaction_payment_date =  () => {
+
+            return $f7.data.metaDataOnlineOrder_step_8_order_transaction_payment_date;
+
+        };
+
+        /*      */
+        const step_8_order_transaction_payment_status_text =  () => {
+
+            return $f7.data.metaDataOnlineOrder_step_8_order_transaction_payment_status_text;
+
+        };
+
+        /*      */
+        const step_8_order_transaction_payment_status_icon =  () => {
+
+            return $f7.data.metaDataOnlineOrder_step_8_order_transaction_payment_status_icon;
+
+        };
+
+        /*      */
+        const step_8_order_transaction_payment_status_color =  () => {
+
+            return $f7.data.metaDataOnlineOrder_step_8_order_transaction_payment_status_color;
+
+        };
+
+
+        /*      */
+        const refreshCart = (_cart) => {
+
+            let _cart_items = [];
+
+            //console.log("::::::::::::::::;; REFRESH CART 1" , _cart);
+
+            if(_cart !== null && typeof _cart !== "undefined" && typeof _cart === "object" ){
+
+                _cart_items = _cart;
+
+                //console.log("::::::::::::::::;; REFRESH CART 1A" , _cart_items);
+
+            }else {
+
+                try{
+
+                    let local_cart_items = store.get("cart_object");
+
+                    if(typeof local_cart_items === "object"){
+
+                        _cart_items = local_cart_items;
+
+                    }else{
+
+                        _cart_items = JSON.parse(local_cart_items);
+
+                    }
+
+                    //console.log("::::::::::::::::;; REFRESH CART 1B" , local_cart_items, _cart_items);
+
+                }catch (e) {
+
+                }
+
+            }
+
+            console.log("::::::::::::::::;; REFRESH CART 2222222222222222222222222222222222222222222222" , _cart_items);
+
+            if(typeof _cart_items !== "undefined" && _cart_items !== null) {
+
+                $f7.data.cart = _cart_items.cart;
+                $f7.data.cart_amount = formatMoney(_cart_items.cart_amount);
+                $f7.data.cart_qty = _cart_items.cart_qty;
+                $f7.data.cart_total = formatMoney(_cart_items.cart_total);
+                $f7.data.cart_total_items = _cart_items.cart_total_items;
+
+                if("cart" in _cart_items ) {
+
+                    cartObject.cart_items = Object.keys(_cart_items.cart).map((key) => [key, _cart_items.cart[key]]);
+                    cartObject.products_count = $f7.data.cart_total_items;
+                    cartObject.currency = $f7.data.cart_currency;
+                    cartObject.cart_total = $f7.data.cart_total;
+                    cartObject.meta = _cart_items;
+
+                }
+
+
+
+            }else{
+
+                cartObject = {
+                    cart_items:  [],
+                    products_count: 0,
+                    currency: "USD",
+                    cart_total: 0,
+                    payment_methods: {},
+                };
+
+            }
+
+            $f7.emit("UPDATE_STEP", 4);
+
+            // trigger re-render
+            $update();
+
+            //console.log("::::::::::::::::;; REFRESH CART 4" , _cart_items);
+
+            console.log("::::::::::::::::;; REFRESH CART", cartObject);
+
+        };
+
+        const addEventListeners = () => {
+
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            /*
+            /*      NAV BAR BUTTONS
+            /*
+            /*//////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+            $$('.order-popup-previous-button').on('click', function () {
+
+                enterStep(previousStep);
+
+            });
+
+            $$('.order-popup-close-button').on('click', function () {
+
+                $f7.dialog.confirm(
+                    "You are about to close the online ordering window. Your order items will be discarded unless saved. Do you want to save this order?",
+                    "Save Changes?",
+                    function(){
+
+                        $f7.dialog.prompt(
+                            'Enter Draft Order Name',
+                            function (inputValue) {
+
+                                const onlineOrderObject = getOnlineOrderObject();
+
+                                window.SweetAlert({
+                                    title: "Draft Order Saved!",
+                                    text: `This draft order has been saved successfully as "${inputValue}."`,
+                                    icon: "success",
+                                    buttons: false,
+                                });
+
+                                $f7.appModules.plugin.CapLocalNotifications.fire(
+                                    `Draft Order "${inputValue}" Saved!`,
+                                    null,
+                                    `This draft order has been saved successfully as ${inputValue}.`,
+                                    20,
+                                    {}
+                                );
+
+                                $f7.appModules.plugin.NavigatorModel.back();
+
+                                $f7.appRenderer.module.popup.close("#popup-order-create");
+
+                            });
+
+                    },
+                    function () {
+
+                        $f7.appModules.plugin.NavigatorModel.back();
+
+                        $f7.appRenderer.module.popup.close("#popup-order-create");
+
+                    });
+
+            });
+
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            /*
+            /*      LISTEN FOR EVENTS ACROSS STAGES
+            /*
+            /*//////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+            //Step 1
+            $f7.on( 'STEP_1_ACTION_SELECTED_ADDRESS', ( data ) => {
+
+                actionOnStep1( data );
+
+            });
+
+
+            //Step 2
+            $f7.on( 'STEP_2_ACTION_SELECTED_TIME', ( data ) => {
+
+                actionOnStep2( data );
+
+            });
+
+
+            //Step 2
+            $f7.on( 'STEP_2_ACTION_SELECTED_TIME_SCHEDULED', ( data ) => {
+
+                actionOnStep2( data );
+
+            });
+
+
+            //Step 3
+            $f7.on( 'STEP_3_ACTION_SELECTED_MENU', ( data ) => {
+
+                actionOnStep3( data );
+
+            });
+
+
+            //Step 4
+            $f7.on( 'STEP_4_ACTION_ENTERED_NOTES', ( data ) => {
+
+                actionOnStep4( data );
+
+            });
+
+
+            //Step 5
+            $f7.on( 'STEP_5_ACTION_SELECTED_PAYMENT_METHOD', ( data ) => {
+
+                actionOnStep5( data );
+
+            });
+
+
+            //Step 6
+            $f7.on( 'STEP_6_ACTION_ENTERED_COUPON_CODE', ( data ) => {
+
+                actionOnStep6( data );
+
+            });
+
+            //Step 6
+            $f7.on( 'STEP_7_ACTION_SELECTED_CURRENCY', ( data ) => {
+
+                actionOnStep70( data );
+
+            });
+
+
+            //Step 7
+            $f7.on( 'STEP_7_ACTION_MAKE_PAYMENT', ( data ) => {
+
+                actionOnStep7( data );
+
+            });
+
+
+            //Step 8
+            $f7.on( 'STEP_8_ACTION_CHECK_PAYMENT', ( data ) => {
+
+                actionOnStep8( data );
+
+            });
+
+            //Step 9
+            $f7.on( 'STEP_9_ACTION_ORDER_AGAIN', ( data ) => {
+
+                actionOnStep9( data );
+
+            });
+
+            //Step 10
+            $f7.on( 'STEP_10_ACTION_GO_HOME', ( data ) => {
+
+                actionOnStep10( data );
+
+            });
+
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            /*
+            /*      GENERAL
+            /*
+            /*//////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+            $f7.on("CART_UPDATE", function ( cart ) {
+
+                console.log("::: UPDATE CART :::", cart);
+
+                refreshCart(cart);
+
+            });
+
+            $f7.on("REFRESH_CART", function () {
+
+                refreshCart();
+
+            });
+
+            $f7.on("CLEAR_CART", function () {
+
+                refreshCart();
+
+            });
+
+            $f7.on("UPDATE_STEP", function (step) {
+
+                enterStep(step);
+
+            });
+
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            /*
+            /*      END GENERAL
+            /*
+            /*//////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        };
+
+        $f7ready(() => {
+
+            console.log("F7 && READY EVENT ::: ORDERING SCREEN", page_title);
+
+            $update();
+
+        });
+
+        $on('pageInit', (e, page) => {
+
+            page_title = "Online Ordering Screen";
+
+            initOnlineOrderObject();
+
+            addEventListeners();
+
+            initSteps();
+
+            $f7.emit("HIDE_TOOLBAR");
+
+            $f7.on("DEBUG_ONLINE_ORDER_OBJECT", function (data) {
+
+                debugOnlineOrderObject(data);
+
+            });
+
+            $f7.on("FIREBASE_USER_AUTH_LOGIN_EVENT", function (user) {
+
+                console.log(":: LANDING SCREEN :: EVENT :: FIREBASE_USER_AUTH_LOGIN_EVENT >>>> :1:", user);
+
+                displayName = user.displayName;
+
+                $update();
+
+            });
+
+            $f7.on("ON_FIREBASE_AUTH_USER_DATA_UPDATED_F7", function (user) {
+
+                console.log(":: LANDING SCREEN :: EVENT :: ON_FIREBASE_AUTH_USER_DATA_UPDATED_F7 >>>> :2:", user);
+
+                displayName = user.displayName;
+
+                $update();
+
+            });
+
+                setTimeout(function () {
+
+                    if(displayName.length < 0 || displayName === "" || displayName === null) {
+
+                        const _currentUser = firebase.auth().currentUser;
+
+                        if(_currentUser !== null){
+
+                            displayName = _currentUser.displayName;
+
+                        }
+
+                    }
+
+                }, 5000);
+
+            $update();
+
+        });
+
+        $on('pageMounted', (e, page) => {
+            console.log('page_title:', page_title, 'page mounted');
+        });
+        $on('pageBeforeIn', (e, page) => {
+            console.log('page_title:', page_title, 'page before in');
+        });
+        $on('pageAfterIn', (e, page) => {
+            console.log('page_title:', page_title, 'page after in');
+            $update();
+        });
+        $on('pageBeforeOut', (e, page) => {
+            console.log('page_title:', page_title, 'page before out');
+        });
+        $on('pageAfterOut', (e, page) => {
+            console.log('page_title:', page_title, 'page after out');
+        });
+        $on('pageBeforeUnmount', (e, page) => {
+            console.log('page_title:', page_title, 'page before unmount');
+        });
+        $on('pageBeforeRemove', (e, page) => {
+            console.log('page_title:', page_title, 'page before remove');
+        });
+
+        return $render;
+
+    }
+
+</script>

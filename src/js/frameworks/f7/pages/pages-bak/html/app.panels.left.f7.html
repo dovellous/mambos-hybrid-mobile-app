@@ -1,0 +1,2100 @@
+<template>
+    <div id="left-panel-drawer-page" class="page scrollable">
+        <div class="page-content md-bg-1">
+            <div class="user-profile">
+                <div class="list media-list margin-top margin-bottom">
+                    <ul class="transparent-bg no-border">
+                        <li class="item-content">
+                            <div class="item-media">
+                                <img id="panelUserPhotoURL" src="${photoURL}" onerror="$$(this).attr('src', 'static/images/sys/user.png');" class="drawer-user-avatar" style="width: 64px; height: 64px; border-radius: 100%" />
+                            </div>
+                        </li>
+                        <li class="item-content transparent-bg">
+                            <div class="item-inner" href="/app-settings-profile/" style="padding: 0px;">
+                                <div class="item-title-row">
+                                    <div id="panelUserDisplayName" class="item-title panel-user-display-name">${displayName}</div>
+                                    <div class="item-after drawer-dropdown-icon">
+                                        <a class="link popover-open" href="#" data-popover=".popover-links-drawer-user-menu">
+                                            <i class="f7-icons">chevron_down</i>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div id="panelUserEmail" class="item-subtitle">${email}</div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="page-content">
+
+            <div class="list" style="margin-top: 0px;">
+
+                <div class="list-group">
+                    <ul>
+                        <li class="drawer-link">
+                            <a class="item-link item-content small-icons steem-keychain-checked" href="#">
+                                <div class="item-media"><i class="f7-icons icon app-theme-color">person_crop_rectangle</i></div>
+                                <div class="item-inner no-arrow">
+                                    <div class="item-title">
+                                        <span>
+                                            Mambo's ID: ${mambosID}
+                                        </span>
+                                    </div>
+                                </div>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                ${drawerObject.leftPanelData.map((item, index) => $h`
+
+                ${ !item[1].hasOwnProperty('set') ? $h`
+
+                <div id="item-ul-list-container-${item[0]}-${index}"  data-slug="${item[0]}"  data-index="${index}" class="list-group">
+                    <ul>
+                        ${item[1].map((item_li, item_li_index) => $h`
+                        <li id="left-panel-list-item-li-${item[0]}-${item_li_index}" class="drawer-link">
+                            <a id="left-panel-list-item-li-a-${item[0]}-${item_li_index}" class="item-link item-content small-icons drawer-link-a" href="#" data-path="${item_li.path}" >
+                                <div class="item-media"><i class="${item_li.iconClass} icon app-theme-color">${item_li.icon}</i></div>
+                                <div class="item-inner">
+                                    <div class="item-title">
+                                        <span>${item_li.label}</span>
+                                    </div>
+                                </div>
+                            </a>
+                        </li>
+                        `)}
+                    </ul>
+                </div>
+
+                ` : $h` <!--- ${index} ${item[0]} has empty list items --->` }
+
+                `)}
+
+            </div>
+
+            <div class="block p-b-150">
+                <div class="item-inner">
+                    <div class="item-title credits">
+                        <div class="item-header">${drawerObject.app.name}</div>
+                        <div class="item-footer opacity-3">© 2021. All Rights Reserved</div>
+                        <div class="item-footer opacity-5">Version ${drawerObject.app.version}</div>
+                        <div class="item-footer opacity-5">Developer: ${drawerObject.app.developer}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!--- SHEET nMODAL - DELIVERY ADDRESS --->
+
+        <div class="sheet-modal online-order-sheet-modal-show-addresses" style="height:auto; --f7-sheet-bg-color: #fff;">
+            <div class="sheet-modal-inner">
+                <div class="page-content">
+                    <div class="block-title block-title-large">My Addresses</div>
+                    <div class="block">
+                        <h3>
+                            Pick an address for delivery.
+                        </h3>
+                        <div class="list media-list chevron-center">
+                            <ul>
+                                ${addressesObject.map((item, index) => $h`
+                                <li>
+                                    <a @click=${onlineOrderingAdhocSelectAddress} href="#" data-address-index="${index}|${item[0]}" data-order-type="DELIVERY" class="item-link item-content trigger-order-address-delivery-selected">
+                                        <div class="item-media">
+                                            <i class="f7-icons">${locationIcons[item[1].address_type]}</i>
+                                        </div>
+                                        <div class="item-inner address-inner padding-right-0">
+                                            <div class="item-title-row">
+                                                <div class="item-title"><strong>${item[1].address_name}</strong> - ${item[1].distance}</div>
+                                                <div class="item-after">${item[1].duration}</div>
+                                            </div>
+                                            <div class="item-subtitle">${item[1].address}</div>
+                                        </div>
+                                    </a>
+                                </li>
+                                `)}
+                            </ul>
+                            <ul>
+                                <li>
+                                    <a class="item-link item-content ripple-inset" href="#" @click=${createNewAddress}>
+                                        <div class="item-media">
+                                            <i class="f7-icons">plus_circle</i>
+                                        </div>
+                                        <div class="item-inner">
+                                            <div class="item-title">Create a new delivery address</div>
+                                        </div>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!--- SHEET MODAL - OUTLET ADDRESS --->
+
+        <div class="sheet-modal shhet-modal-push online-order-sheet-modal-show-outlets" style="height:auto; --f7-sheet-bg-color: #fff;">
+            <div class="toolbar">
+                <div class="toolbar-inner">
+                    <div class="left"></div>
+                    <div class="right">
+                        <a class="link sheet-close">Close</a>
+                    </div>
+                </div>
+            </div>
+            <div class="sheet-modal-inner">
+                <div class="page-content">
+                    <div class="block-title block-title-large">Mambo's Outlets</div>
+                    <div class="block">
+                        <h3>
+                            Pick an outlet for order collection / seat-in.
+                        </h3>
+                        <div class="list media-list chevron-center">
+                            <ul>
+                                ${outletsObject.map((item, index) => $h`
+                                <li>
+                                    <a @click=${onlineOrderingAdhocSelectOutlet} href="#" data-address-index="${index}|${item[0]}" data-order-type="TAKEAWAY" class="item-link item-content trigger-order-address-takeaway-selected">
+                                        <div class="item-inner">
+                                            <div class="item-title-row">
+                                                <div class="item-title"><strong>${item[1].title}</strong></div>
+                                            </div>
+                                            <div class="item-subtitle">${item[1].address}</div>
+                                            <div class="item-text">
+                                                Tel: ${item[1].telephone} <br />Email: ${item[1].email} <br />Business Hrs: ${item[1].time}
+
+                                            </div>
+                                        </div>
+                                    </a>
+                                </li>
+                                `)}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!--- SHEET MODAL - NOTES --->
+
+        <div class="sheet-modal online-order-sheet-modal-show-notes" style="height:auto; --f7-sheet-bg-color: #fff; position: sticky;">
+            <div class="sheet-modal-inner">
+                <div class="page-content">
+                    <div class="block-title block-title-large">Order Notes</div>
+                    <div class="block">
+                        <h3>
+                            Please enter some notes to send with the order below.
+                        </h3>
+                        <div class="list media-list chevron-center">
+                            <textarea class="order-notes-textarea" id="online-order-sheet-modal-show-notes-textarea"></textarea>
+
+
+                            <button @click=${saveOrderNotes} class="colx button button-large button-raised button-fill online-order-action-buttons online-order-sheet-modal-show-notes-save-btn" >SAVE NOTES</button>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!--- SHEET MODAL - PAYMENT METHODS --->
+
+        <div class="sheet-modal online-order-sheet-modal-show-payment-methods" style="height:auto; --f7-sheet-bg-color: #fff;">
+            <div class="sheet-modal-inner">
+                <div class="page-content">
+                    <div class="block-title block-title-large">Payment Methods</div>
+                    <div class="block">
+                        <h3>
+                            Please select the desired payment method below.
+                        </h3>
+                        <div class="padding-horizontal padding-bottom">
+
+                            <div class="list">
+                                <ul>
+                                    <li @click=${onlineOrderingSelectPaymentMethod} data-payment-method="CARD">
+                                        <label class="item-radio item-radio-icon-end item-content" >
+                                            <input type="radio" name="payment-method-input-radio" value="CARD_ZIMSWITCH" />
+                                            <i class="icon icon-radio"></i>
+                                            <div class="item-inner">
+                                                <div class="item-title">Pay with SWIPE CARD (ZIMSWITCH)</div>
+                                            </div>
+                                        </label>
+                                    </li>
+                                    <li @click=${onlineOrderingSelectPaymentMethod} data-payment-method="CASH">
+                                        <label class="item-radio item-radio-icon-end item-content" >
+                                            <input type="radio" name="payment-method-input-radio" value="CASH_ZWL" />
+                                            <i class="icon icon-radio"></i>
+                                            <div class="item-inner">
+                                                <div class="item-title">Pay with CASH ON DELIVERY (ZWL)</div>
+                                            </div>
+                                        </label>
+                                    </li>
+                                    <li @click=${onlineOrderingSelectPaymentMethod} data-payment-method="CASH">
+                                        <label class="item-radio item-radio-icon-end item-content" >
+                                            <input type="radio" name="payment-method-input-radio" value="CASH_USD" />
+                                            <i class="icon icon-radio"></i>
+                                            <div class="item-inner">
+                                                <div class="item-title">Pay with CASH ON DELIVERY (USD)</div>
+                                            </div>
+                                        </label>
+                                    </li>
+                                    <li @click=${onlineOrderingSelectPaymentMethod} data-payment-method="MOBILE">
+                                        <label class="item-radio item-radio-icon-end item-content" >
+                                            <input type="radio" name="payment-method-input-radio" value="MOBILE" />
+                                            <i class="icon icon-radio"></i>
+                                            <div class="item-inner">
+                                                <div class="item-title">Pay with MOBILE MONEY</div>
+                                            </div>
+                                        </label>
+                                    </li>
+                                    <li @click=${onlineOrderingSelectPaymentMethod} data-payment-method="PAYPAL">
+                                        <label class="item-radio item-radio-icon-end item-content" >
+                                            <input type="radio" name="payment-method-input-radio" value="PAYPAL" />
+                                            <i class="icon icon-radio"></i>
+                                            <div class="item-inner">
+                                                <div class="item-title">Pay with PAYPAL</div>
+                                            </div>
+                                        </label>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="block">
+                        <div class="list media-list chevron-center">
+
+                            <button @click=${onlineOrderingSelectPaymentMethodDo} class="colx button button-large button-raised button-fill online-order-action-buttons online-order-sheet-modal-show-payment-methods-save-btn" >SAVE PAYMENT METHOD</button>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!--- SHEET MODAL - PAYMENT COUPON --->
+
+        <div class="sheet-modal online-order-sheet-modal-show-coupon" style="height:auto; --f7-sheet-bg-color: #fff; position: sticky;">
+            <div class="sheet-modal-inner">
+                <div class="page-content">
+                    <div class="block-title block-title-large">Discount Coupon</div>
+                    <div class="block">
+                        <h3>
+                            If you have a coupon code, please enter it below to apply a discount to this order.
+                        </h3>
+                        <div class="list media-list chevron-center">
+                            <textarea class="order-notes-textarea" id="online-order-sheet-modal-show-coupon-textarea"></textarea>
+
+
+                            <button @click=${applyCoupon} class="colx button button-large button-raised button-fill online-order-action-buttons online-order-sheet-modal-show-coupon-apply-btn" >APPLY COUPON</button>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!--- SHEET MODAL - CURRENCY --->
+
+        <div class="sheet-modal online-order-sheet-modal-show-currencies" style="height:auto; --f7-sheet-bg-color: #fff;">
+            <div class="sheet-modal-inner">
+                <div class="page-content">
+                    <div class="block-title block-title-large">Currency</div>
+                    <div class="block">
+                        <h3>
+                            Please select the currency you want to pay with
+                        </h3>
+                        <div class="padding-horizontal padding-bottom">
+
+                            <div class="list">
+                                <ul>
+                                    <li @click=${onlineOrderingSelectCurrency} data-currency="USD">
+                                        <label class="item-radio item-radio-icon-end item-content" >
+                                            <input type="radio" name="currency-input-radio" value="USD" />
+                                            <i class="icon icon-radio"></i>
+                                            <div class="item-inner">
+                                                <div class="item-title">USD - United States Dollars</div>
+                                            </div>
+                                        </label>
+                                    </li>
+                                    <li @click=${onlineOrderingSelectCurrency} data-currency="ZWL">
+                                        <label class="item-radio item-radio-icon-end item-content" >
+                                            <input type="radio" name="currency-input-radio" value="ZWL" />
+                                            <i class="icon icon-radio"></i>
+                                            <div class="item-inner">
+                                                <div class="item-title">ZWL - Local Currency</div>
+                                            </div>
+                                        </label>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="block">
+                        <div class="list media-list chevron-center">
+
+                            <button @click=${onlineOrderingSelectCurrencyDo} class="colx button button-large button-raised button-fill online-order-action-buttons online-order-sheet-modal-show-currency-save-btn" >SAVE CURRENCY</button>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+
+</template>
+<script>
+    export default (props, {$f7ready, $f7, $on, $update, $theme}) => {
+
+        let page_title = ":: PANEL LEFT SCREEN ::";
+
+        let displayName, email, photoURL, mambosID;
+
+        let drawerObject = {
+            app: {
+                name: "Online Ordering App",
+                version: "1.0.0",
+                developer: "Mambo's Chicken",
+            },
+            drawerlistUser: [],
+            leftPanelData: [],
+        };
+
+        let addressesObject = [];
+
+        let outletsObject = [];
+
+        let locationIcons = {
+            office: "building_2",
+            home: "house",
+            school: "building_columns",
+            other: "map_pin_ellipse"
+        };
+
+        const createNewAddress = function () {
+
+            sheetModalAddresses.close();
+
+            app.appRenderer.appViewsObject.popups.addressSetupPopup.open();
+
+        };
+
+        const doMenuAction = function(path){
+
+            $f7.panel.close("#view-left-panel");
+
+            console.log("DO ACTION ::: 1", path);
+
+            const path_array = path.split(";");
+
+            for(let i=0; i<path_array.length; i++){
+
+                try {
+
+                    const pair_array = path_array[i].split("|");
+
+                    switch (pair_array[0]) {
+
+                        case "tab" : {
+
+                            //
+                            $f7.tab.show("#" + pair_array[1]);
+
+                            break;
+
+                        }
+
+                        case "navigate" : {
+
+                            //
+                            $f7.appModules.plugin.NavigatorModel.gotoUrl(`/${pair_array[1]}/`);
+
+                            break;
+
+                        }
+
+                        case "popup" : {
+
+                            //
+                            $f7.appRenderer.module.popup.open(pair_array[1]);
+
+                            break;
+
+                        }
+
+                        case "fx" : {
+
+                            //
+                            switch(pair_array[1]){
+
+                                case "logout" : {
+
+                                    firebase.auth().signOut();
+
+                                    $$("#app-toolbar").hide();
+
+                                    $f7.tab.show("#view-home");
+
+                                    $f7.appModules.plugin.NavigatorModel.gotoUrl(`/app-auth-login/`);
+
+                                    break;
+
+                                }
+
+                                case "exit" : {
+
+                                    CapApp.exitApp();
+
+                                    break;
+
+                                }
+
+                                default : {
+
+                                    break;
+
+                                }
+
+                            }
+
+                            break;
+
+                        }
+
+                        default: {
+
+                            //
+                            break;
+
+                        }
+
+                    }
+
+                }catch (e) {
+
+                    //console.error("Menu execution failed", path);
+
+                }
+
+            }
+
+        };
+
+        const getData = function () {
+
+            const applicationData = $f7.appFirebase.module.authentication.databaseAppDataLocalGetObject();
+
+            let firebaseDataLocalObject = null;
+
+            if("firebaseDataLocalObject" in applicationData){
+
+                firebaseDataLocalObject = applicationData["firebaseDataLocalObject"];
+
+            }else{
+
+                firebaseDataLocalObject = applicationData;
+
+            }
+
+            let leftPanelData = {};
+
+            if(firebaseDataLocalObject){
+
+                leftPanelData = firebaseDataLocalObject.settings.ui.locale.en.appPanelsLeft.drawer;
+
+            }
+
+            const drawerlistUser = leftPanelData.drawerlistUser;
+
+            delete leftPanelData.drawerlistUser;
+
+            let _drawerObject = {
+                app: {
+                    name: window.app.data.name,
+                    version: window.app.data.version,
+                    developer: window.app.data.developer,
+                },
+                drawerlistUser: Object.keys(drawerlistUser).map((key) => [key, drawerlistUser[key]]),
+                leftPanelData: Object.keys(leftPanelData).map((key) => [key, leftPanelData[key]]),
+            };
+
+            //console.error(":: LEFT DRAWER OBJECT >>>> :1:", _drawerObject);
+
+            //console.error(":: LEFT DRAWER OBJECT >>>> :1:", JSON.stringify(_drawerObject));
+
+            return _drawerObject;
+
+        };
+
+        const saveLocalUserData = function(){
+
+            const userData = $f7.appFirebase.module.authentication.getUserData();
+
+            if(!isDefined(userData.displayName)){
+
+                setTimeout(function () {
+
+                    saveLocalUserData();
+
+                },500);
+
+            }else {
+
+                $$(".panel-user-display-name").html(userData.displayName);
+
+                $$("#panelUserPhotoURL").attr("src", userData.photoURL);
+
+                $$("#panelUserEmail").html(userData.email);
+
+                $f7.appData.module.data.setData("firebaseUserData", userData);
+
+            }
+
+        };
+
+        //////////////////////////////////////////////////////////////////////////////////
+
+        //  STEP #1 - Open Order Type
+
+        let sheetModalAddresses, sheetModalOutlets;
+
+        const parseAddressIndex = (indices, orderType) => {
+
+            let data = {};
+
+            let _addressesObject = {};
+
+            if(orderType === "DELIVERY") {
+
+                _addressesObject = $f7.data.metaDataFirebaseUserAddresses[indices[1]];
+
+                data = setAddressIndexDelivery(_addressesObject);
+
+            }else{
+
+                _addressesObject = $f7.data.metaDataFirebaseUserOutlets[indices[1]];
+
+                data = setAddressIndexTakeaway(_addressesObject);
+
+            }
+
+            console.log(data);
+
+            return data;
+
+        };
+
+        const setAddressIndexDelivery = (_addressesObject) => {
+
+            let data = {};
+
+            data.step_1_address_name = _addressesObject.address_name;
+            data.step_1_address_type = _addressesObject.address_type;
+            data.step_1_order_type = "DELIVERY";
+            data.step_1_address_location = _addressesObject.address;
+            data.step_1_address_duration = _addressesObject.duration;
+            data.step_1_address_distance = _addressesObject.distance;
+            data.step_1_address_instructions = _addressesObject.instructions;
+            data.step_1_address_coordinates = _addressesObject.geometry;
+
+            return data;
+
+        };
+
+        const setAddressIndexTakeaway = (_addressesObject) => {
+
+            let data = {};
+
+            data.step_1_order_type = "TAKEAWAY";
+            data.step_1_address_name = _addressesObject.title;
+            data.step_1_address_type = "Restaurant";
+            data.step_1_order_type = orderType;
+            data.step_1_address_location = _addressesObject.address;
+
+            //TODO: get current location and calculate distance and time
+            data.step_1_address_instructions = _addressesObject.open;
+            data.step_1_address_duration = 0; // _addressesObject.address_duration;
+            data.step_1_address_distance = 0; // _addressesObject.address_distance;
+            data.step_1_address_coordinates = _addressesObject.latlng;
+
+            return data;
+
+        };
+
+        const onlineOrderingAdhocSelectAddress = (e) => {
+
+            let elm = $$(e.target).closest("a.trigger-order-address-delivery-selected");
+
+            let orderType = elm.attr("data-order-type");
+
+            let dataArray = elm.attr("data-address-index").toString().split("|");
+
+            let addressObject = parseAddressIndex( dataArray, orderType);
+
+            app.emit('STEP_1_ACTION_SELECTED_ADDRESS', addressObject);
+
+            sheetModalAddresses.close();
+
+        };
+
+        const onlineOrderingAdhocSelectOutlet = (e) => {
+
+            let elm = $$(e.target).closest("a.trigger-order-address-takeaway-selected");
+
+            let orderType = elm.attr("data-order-type");
+
+            let dataArray = elm.attr("data-address-index").toString().split("|");
+
+            let addressObject = parseAddressIndex( dataArray, orderType);
+
+            app.emit('STEP_1_ACTION_SELECTED_ADDRESS', addressObject);
+
+            sheetModalOutlets.close();
+
+        };
+
+        const showModalDeliveryAddresses = () => {
+
+            if(typeof $f7.data.user_account_details !== "undefined" && $f7.data.user_account_details !== null) {
+
+                if (Array.isArray($f7.data.metaDataFirebaseUserAddressesArray)) {
+
+                    addressesObject = $f7.data.metaDataFirebaseUserAddressesArray;
+
+                    console.log(":: CREATE ADDRESSES SHEET MODAL ::", addressesObject);
+
+                    $update();
+
+                    // Select
+                    sheetModalAddresses = $f7.sheet.create({
+                        el: '.online-order-sheet-modal-show-addresses',
+                        swipeToClose: true,
+                        backdrop: true,
+                        // Events
+                        on: {
+                            open: function (sheet) {
+                                console.log('Sheet open');
+                            },
+                            opened: function (sheet) {
+
+                                $update();
+
+                            },
+                        }
+                    });
+
+                    sheetModalAddresses.open();
+
+                }
+
+            }
+
+        };
+
+        const showModalTakeawayOutlets = () => {
+
+            if(typeof $f7.appData.module.data.getData().firebaseDataLocalObject !== "undefined" && $f7.appData.module.data.getData().firebaseDataLocalObject !== null) {
+
+                if (Array.isArray($f7.data.metaDataFirebaseUserOutletsArray)) {
+
+                    outletsObject = $f7.data.metaDataFirebaseUserOutletsArray;
+
+                    console.log(":: CREATE OUTLETS SHEET MODAL ::", outletsObject);
+
+                    $update();
+
+                    // Select
+                    sheetModalOutlets = $f7.sheet.create({
+                        el: '.online-order-sheet-modal-show-outlets',
+                        swipeToClose: false,
+                        backdrop: true,
+                        // Events
+                        on: {
+                            open: function (sheet) {
+                                console.log('Sheet open');
+                            },
+                            opened: function (sheet) {
+                                console.log('Sheet opened');
+                            },
+                        }
+                    });
+
+                    sheetModalOutlets.open();
+
+                }
+
+            }
+
+        };
+
+        //////////////////////////////////////////////////////////////////////////////////
+
+        //  STEP #2
+
+        let calendarDeliveryDateTime, calendarDeliveryScheduled;
+
+        const parseDateTimePicker = ( value ) => {
+
+            return {
+                step_2_order_delivery_date: "Tomorrow: Fri 23 May 2021, 1745 Hrs",
+                meta: value
+            }
+
+        };
+
+        const showDateTimePicker = () => {
+
+            const orderingDates = {
+                TodayHours: [17,18,19,20,21,22,23], //TODO:
+                Tomorrow: [7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23],
+                Scheduled: [0]
+            };
+
+            let calendarDeliveryDateTimeSeletedDay = "Today";
+
+            calendarDeliveryDateTime = app.picker.create({
+                inputEl: '#calendarDeliveryDateTime',
+                rotateEffect: true,
+                formatValue: function (values) {
+                    return values[1];
+                },
+                cols: [
+                    {
+                        textAlign: 'left',
+                        values: ['Today', 'Tomorrow', 'Scheduled'],
+                        onChange: function (picker, day) {
+                            calendarDeliveryDateTimeSeletedDay = day;
+                            if (picker.cols[2].replaceValues) {
+                                picker.cols[2].replaceValues(orderingDates[day]);
+                            }
+                            if(day === "Scheduled"){
+                                calendarDeliveryDateTime.close();
+                                calendarDeliveryScheduled.open();
+                            }
+
+                            app.emit('STEP_2_ACTION_SELECTED_TIME', parseDateTimePicker(picker.getValue()));
+
+                        }
+                    },
+                    // Space divider
+                    {
+                        divider: true,
+                        content: '&nbsp;&nbsp;&nbsp;'
+                    },
+                    //Hours
+                    {
+                        values: orderingDates.TodayHours,
+                        onChange: function (picker) {
+
+                            app.emit('STEP_2_ACTION_SELECTED_TIME', parseDateTimePicker(picker.getValue()));
+
+                        }
+                    },
+                    // Space divider
+                    {
+                        divider: true,
+                        content: ':'
+                    },
+                    // Minutes
+                    {
+                        values: (function (picker) {
+
+                            let arr = [];
+
+                            let today = new Date();
+
+                            let current_minute = today.getMinutes();
+
+                            if(calendarDeliveryDateTimeSeletedDay === "Today" ){
+
+                                for (let i = current_minute; i <= 59; i++) { arr.push(i < 10 ? '0' + i : i); }
+
+                            }else{
+
+                                for (let i = 0; i <= 59; i++) { arr.push(i < 10 ? '0' + i : i); }
+
+                            }
+
+                            return arr;
+
+                        })(),
+                        onChange: function (picker) {
+
+                            app.emit('STEP_2_ACTION_SELECTED_TIME', parseDateTimePicker(picker.getValue()));
+
+                        }
+                    },
+                    // Space divider
+                    {
+                        divider: true,
+                        content: '&nbsp;'
+                    },
+                    //AM or PM
+                    {
+                        values: ['Hours'],
+                    },
+                ],
+                on: {
+
+                    opened: function (picker) {
+                        console.log('Calendar opened', picker.getValue());
+                    },
+                    closed: function (picker) {
+                        console.log('Calendar closed', picker.getValue());
+                        app.emit('STEP_2_ACTION_SELECTED_TIME', parseDateTimePicker(picker.getValue()));
+                    },
+                }
+            });
+
+            calendarDeliveryDateTime.open();
+
+        };
+
+        const showCalendarDateTimePicker = () => {
+
+            //  Date + Time
+            calendarDeliveryScheduled = $f7.calendar.create({
+                inputEl: '#demo-calendar-date-time',
+                timePicker: true,
+                dateFormat: { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric' },
+                //Disable all dates between 1st October 2015 and 31 December 2015
+                disabled: {
+                    from: new Date(2021, 8, 11),
+                    to: new Date(1979, 1, 1)
+                },
+                on: {
+                    opened: function (picker) {
+                        console.log('Calendar opened', calendarDeliveryScheduled.getValue());
+                    },
+                    closed: function (picker) {
+                        console.log('Calendar closed', calendarDeliveryScheduled.getValue());
+                        app.emit('STEP_2_ACTION_SELECTED_TIME', parseDateTimePicker(picker.getValue()));
+                    },
+                }
+            });
+
+            calendarDeliveryScheduled.open();
+
+        };
+
+        //////////////////////////////////////////////////////////////////////////////////
+
+        //  STEP #3
+
+        const showOrderMenuPopup = () => {
+
+            $f7.appRenderer.appViewsObject.popups.menuPopup.open();
+
+        };
+
+
+        //////////////////////////////////////////////////////////////////////////////////
+
+        //  STEP #4
+
+        let sheetModalNotes;
+
+        const saveOrderNotes = () => {
+
+            const notes = $$("#online-order-sheet-modal-show-notes-textarea").val();
+
+            app.emit('STEP_4_ACTION_ENTERED_NOTES', {step_4_order_notes: notes});
+
+            sheetModalNotes.close();
+
+        };
+
+        const showNotesInputModal = () => {
+
+
+            // Select
+            sheetModalNotes = $f7.sheet.create({
+                el: '.online-order-sheet-modal-show-notes',
+                swipeToClose: true,
+                backdrop: true,
+                // Events
+                on: {
+                    open: function (sheet) {
+                        console.log('Sheet open');
+                    },
+                    opened: function (sheet) {
+                        console.log('Sheet opened');
+                    },
+                    close: function (sheet) {
+                        saveOrderNotes();
+                    },
+                    closed: function (sheet) {
+                        saveOrderNotes();
+                    }
+                }
+            });
+
+            sheetModalNotes.open();
+
+
+        };
+
+
+        //////////////////////////////////////////////////////////////////////////////////
+
+        //  STEP #5
+
+        let sheetModalPaymentMethods;
+
+        const onlineOrderingSelectPaymentMethodDo = (e) => {
+
+            let elm = $$('input[name="payment-method-input-radio"]:checked').closest("li");
+
+            let paymentMethod = elm.attr("data-payment-method");
+
+            savePaymentMethods(paymentMethod);
+
+        };
+
+        const onlineOrderingSelectPaymentMethod = (e) => {
+
+            let elm = $$(e.target).closest("li");
+
+            let paymentMethod = elm.attr("data-payment-method");
+
+            savePaymentMethods(paymentMethod);
+
+        };
+
+        const savePaymentMethods = (paymentMethod) => {
+
+            let paymentMethodImage = "";
+
+            switch (paymentMethod.toUpperCase()) {
+
+                case "CARD" : {
+                    paymentMethodImage = "static/images/ecommerce/card.svg";
+                    break;
+                }
+
+                case "ZIMSWITCH" : {
+                    paymentMethodImage = "static/images/ecommerce/card.svg";
+                    break;
+                }
+
+                case "CASH_USD" : {
+                    paymentMethodImage = "static/images/ecommerce/cash.svg";
+                    break;
+                }
+
+                case "CASH_ZWL" : {
+                    paymentMethodImage = "static/images/ecommerce/cash.svg";
+                    break;
+                }
+
+                case "MOBILE" : {
+                    paymentMethodImage = "static/images/ecommerce/mobile.svg";
+                    break;
+                }
+
+                case "PAYPAL" : {
+                    paymentMethodImage = "static/images/ecommerce/paypal.svg";
+                    break;
+                }
+
+                default: {
+
+
+                    break;
+                }
+
+            }
+
+            app.emit('STEP_5_ACTION_SELECTED_PAYMENT_METHOD', {step_5_order_payment_method: paymentMethod, step_5_order_payment_method_image: paymentMethodImage});
+
+            sheetModalPaymentMethods.close();
+
+        };
+
+        const showPaymentMethodsInputModal = () => {
+
+
+            // Select
+            sheetModalPaymentMethods = $f7.sheet.create({
+                el: '.online-order-sheet-modal-show-payment-methods',
+                swipeToClose: true,
+                backdrop: true,
+                // Events
+                on: {
+                    open: function (sheet) {
+                        console.log('Sheet open');
+                    },
+                    opened: function (sheet) {
+                        console.log('Sheet opened');
+                    },
+                    close: function (sheet) {
+                        //onlineOrderingSelectPaymentMethodDo();
+                    },
+                    closed: function (sheet) {
+                        //onlineOrderingSelectPaymentMethodDo();
+                    }
+                }
+            });
+
+            sheetModalPaymentMethods.open();
+
+        };
+
+
+        //////////////////////////////////////////////////////////////////////////////////
+
+        //  STEP #6
+
+        let sheetModalCoupon;
+
+        const applyCoupon = () => {
+
+            const couponCode = $$("#online-order-sheet-modal-show-coupon-textarea").val();
+
+            const couponDescription = "";
+
+            const couponDiscount = "";
+
+            app.emit('STEP_6_ACTION_ENTERED_COUPON_CODE', {step_6_order_coupon_code: couponCode, step_6_order_coupon_description: couponDescription, step_6_order_coupon_discount_amount: couponDiscount});
+
+            sheetModalCoupon.close();
+
+        };
+
+        const showCouponInputModal = () => {
+
+
+            // Select
+            sheetModalCoupon = $f7.sheet.create({
+                el: '.online-order-sheet-modal-show-coupon',
+                swipeToClose: true,
+                backdrop: true,
+                // Events
+                on: {
+                    open: function (sheet) {
+                        console.log('Sheet open');
+                    },
+                    opened: function (sheet) {
+                        console.log('Sheet opened');
+                    },
+                    close: function (sheet) {
+                        applyCoupon();
+                    },
+                    closed: function (sheet) {
+                        applyCoupon();
+                    }
+                }
+            });
+
+            sheetModalCoupon.open();
+
+
+        };
+
+
+        //////////////////////////////////////////////////////////////////////////////////
+
+        //  STEP #7
+
+        let sheetModalCurrencies;
+
+        const onlineOrderingSelectCurrencyDo = (e) => {
+
+            let elm = $$('input[name="currency-input-radio"]:checked').closest("li");
+
+            let currency = elm.attr("data-currency");
+
+            saveCurrencies(currency);
+
+        };
+
+        const onlineOrderingSelectCurrency = (e) => {
+
+            let elm = $$(e.target).closest("li");
+
+            let currency = elm.attr("data-currency");
+
+            saveCurrencies(currency);
+
+        };
+
+        const saveCurrencies = (currency) => {
+
+            console.log("CURRENCY", currency);
+
+            app.emit('STEP_7_ACTION_SELECTED_CURRENCY', {step_7_order_checkout_currency: currency});
+
+            sheetModalCurrencies.close();
+
+        };
+
+        const showCurrenciesInputModal = () => {
+
+
+            // Select
+            sheetModalCurrencies = $f7.sheet.create({
+                el: '.online-order-sheet-modal-show-currencies',
+                swipeToClose: true,
+                backdrop: true,
+                // Events
+                on: {
+                    open: function (sheet) {
+                        console.log('Sheet open');
+                    },
+                    opened: function (sheet) {
+                        console.log('Sheet opened');
+                    },
+                    close: function (sheet) {
+                        //onlineOrderingSelectCurrencyDo();
+                    },
+                    closed: function (sheet) {
+                        //onlineOrderingSelectCurrencyDo();
+                    }
+                }
+            });
+
+            sheetModalCurrencies.open();
+
+        };
+
+        //////////////////////////////////////////////////////////////////////////////////
+
+        //  STEP #8
+
+        let a8, b8;
+
+        const showModal8 = () => {
+
+
+
+        };
+
+
+        const showToasterSuccess = ( message ) => {
+
+            $f7.toast.create({
+                icon: $theme.ios || $theme.aurora ? '<i class="f7-icons">checkmark_alt_circle</i>' : '<i class="material-icons">check_circle</i>',
+                text: message,
+                position: 'center',
+                closeTimeout: 7000,
+            }).open();
+
+        };
+
+
+        const addListenersForOnlineOrders = () => {
+
+            console.log(":::: ADD LISTENERS FOR ONLINE ORDERS ::::");
+
+            // Buttons ['online-ordering-btn-select-address', 'online-ordering-btn-select-outlet']
+            $f7.on('ONLINE_ORDER_FIRE_SHOW_ADDRESSES', () => {
+
+                showModalDeliveryAddresses();
+
+            });
+
+            // Buttons ['online-ordering-btn-select-address', 'online-ordering-btn-select-outlet']
+            $f7.on('ONLINE_ORDER_FIRE_SHOW_OUTLETS', () => {
+
+                showModalTakeawayOutlets();
+
+            });
+
+            // Buttons ['online-ordering-btn-select-date', 'online-ordering-btn-select-time']
+            $f7.on('ONLINE_ORDER_FIRE_SHOW_DATE', () => {
+
+                showDateTimePicker();
+
+            });
+
+            // Buttons ['online-ordering-btn-select-date', 'online-ordering-btn-select-time']
+            $f7.on('ONLINE_ORDER_FIRE_SHOW_DATE_SCHEDULED', () => {
+
+                showCalendarDateTimePicker();
+
+            });
+
+            // Buttons ['online-ordering-btn-show-menu']
+            $f7.on('ONLINE_ORDER_FIRE_SHOW_MENU', () => {
+
+                showOrderMenuPopup();
+
+            });
+
+            // Buttons ['online-ordering-btn-enter-notes', 'online-ordering-btn-enter-notes-skip']
+            $f7.on('ONLINE_ORDER_FIRE_SHOW_NOTES_INPUT', () => {
+
+                showNotesInputModal();
+
+            });
+
+            // Buttons ['online-ordering-btn-enter-notes', 'online-ordering-btn-enter-notes-skip']
+            $f7.on('ONLINE_ORDER_FIRE_SHOW_NOTES_INPUT_CANCEL', () => {
+
+                $f7.emit("UPDATE_STEP", 5);
+
+            });
+
+            // Buttons ['online-ordering-btn-select-payment-method']
+            $f7.on('ONLINE_ORDER_FIRE_SHOW_PAYMENT_OPTIONS', () => {
+
+                showPaymentMethodsInputModal();
+
+            });
+
+            // Buttons ['online-ordering-btn-enter-coupon', 'online-ordering-btn-enter-coupon-skip']
+            $f7.on('ONLINE_ORDER_FIRE_ENTER_COUPON', () => {
+
+                showCouponInputModal();
+
+            });
+
+            // Buttons ['online-ordering-btn-enter-coupon', 'online-ordering-btn-enter-coupon-skip']
+            $f7.on('ONLINE_ORDER_FIRE_ENTER_COUPON_CANCEL', () => {
+
+                $f7.emit("UPDATE_STEP", 7);
+
+            });
+
+            // Buttons ['online-ordering-btn-select-currency']
+            $f7.on('ONLINE_ORDER_FIRE_SHOW_CURRENCIES', () => {
+
+                showCurrenciesInputModal();
+
+            });
+
+            // Buttons ['online-ordering-btn-init-transaction']
+            $f7.on('ONLINE_ORDER_FIRE_INIT_TRANSACTION', () => {
+
+                //
+
+            });
+
+            // Buttons ['online-ordering-btn-check-payment']
+            $f7.on('ONLINE_ORDER_FIRE_CHECK_PAYMENT', () => {
+
+                //
+
+            });
+
+            // Buttons ['online-ordering-btn-order-again', 'online-ordering-btn-go-home']
+            $f7.on('ONLINE_ORDER_FIRE_ORDER_COMPLETED', () => {
+
+                //
+
+            });
+
+        };
+
+        $f7ready(() => {
+
+            console.log("F7 && READY EVENT", page_title);
+
+            $update();
+
+        });
+
+        $on('pageInit', (e, page) => {
+
+            console.log('page_title:', page_title, 'page init');
+
+            page_title = "Left Drawer Menu";
+
+            drawerObject = getData();
+
+            addListenersForOnlineOrders();
+
+            $f7.on("HIDE_TOOLBAR", function(){
+
+                $$("#app-toolbar").hide();
+
+            });
+
+            $f7.on("SHOW_TOOLBAR", function(){
+
+                $$("#app-toolbar").show();
+
+            });
+
+            $f7.on("CREATE_ORDER", function(openAsPopup){
+
+                //$f7.appRenderer.module.popup.open("#popup-order-create");
+
+                $f7.appModules.plugin.NavigatorModel.gotoUrl(`/popup-order-create/`);
+
+            });
+
+            $f7.on("REORDER_SAME_ORDER", function(orderObject){
+
+
+                $f7.dialog.confirm(
+                    "You are about to re-order the same food items: <strong>"+orderObject.order_details.cart_title+"</strong> from order ref #<strong>"+orderObject.order_details.order_id+"</strong>. Do you want to proceed? Please be advised that the prices may have changed since then. 😜 ",
+                    "Order Again?",
+                    function(){
+
+                        console.log("REORDER:", orderObject);
+
+                    },
+                    function () {
+
+                        //
+
+                    });
+
+
+            });
+
+            $f7.on("ON_FIREBASE_AUTH_USER_DATA_UPDATED_F7_ADDRESSES", function(_addressesObject){
+
+                addressesObject = _addressesObject;
+
+            });
+
+            $f7.on("SETUP_BIOMETRIC", function(encrypt){
+
+                //
+                console.log("::: SETTING UP BIOMETRIC :::", encrypt);
+
+            });
+
+            $f7.on("WEB_USER_CREATED", function(user){
+
+                //console.error(":: WEB_USER_CREATED >>>> :2:", user);
+
+                if(typeof user === "object") {
+
+                    if ("result" in user) {
+
+                        if ("firstname" in user.result) {
+
+                            showToasterSuccess("Accoutn created!");
+
+                            $f7.appModules.plugin.CapLocalNotifications.fire(
+                                "Your Account was registered.",
+                                null,
+                                `Hi ${user.result.firstname}, Welcome to 👑 Mambo's Chicken.  😂👌❤️😍. The home of the famous thighs 🍗🍗 and breasts. The only place where you can Eat Like A King!  💪`,
+                                getTimestamp(),
+                                {}
+                                );
+
+                        }
+
+                    }
+
+                }
+
+                $update();
+
+            });
+
+            $f7.on("FIREBASE_USER_AUTH_LOGIN_EVENT", function (user) {
+
+                displayName = user.displayName;
+                email = user.email;
+                photoURL = user.photoURL;
+
+                if(photoURL == null || photoURL === ''){
+                    photoURL = 'static/images/sys/user.png';
+                }
+
+                console.log(":: LEFT DRAWER USER LOG IN EVENT >>>> :3:", displayName, email, photoURL, user);
+
+                $update();
+
+            });
+
+            window.addEventListener($f7.appFirebase.events.ON_FIREBASE_AUTH_USER_DATA_UPDATED, function (e) {
+
+                console.log("ON_FIREBASE_AUTH_USER_DATA_UPDATED", e.detail.userData, "ON_FIREBASE_AUTH_USER_DATA_UPDATED ????", (firebase.auth().currentUser !== null));
+
+                $f7.on("FIREBASE_TOKEN", function (token) {
+
+                    $f7.data.metaDataFirebaseToken = token;
+
+                });
+
+
+                // Check if the user is logged in
+                if(isDefined(e.detail.userData) && firebase.auth().currentUser !== null){
+
+                    let user = firebase.auth().currentUser;
+
+                    let userData = $f7.appFirebase.module.authentication.getUserData();
+
+                    let firebasePathToWatch = Object.values($f7.appFirebase.module.authentication.databaseAppDataLocalGetObject().paths);
+
+                    if(firebase.auth().currentUser !== null){
+
+                        firebasePathToWatch.push("accounts/"+firebase.auth().currentUser.uid+"/children");
+
+                    }
+
+                    $f7.appFirebase.module.authentication.firebasePaths = firebasePathToWatch;
+
+                    $f7.appFirebase.module.authentication.databaseInstance = firebase.database();
+
+                    let listenerInitiated = $f7.appFirebase.module.authentication.listenerInitiated;
+
+                    console.log("::listenerInitiated::", listenerInitiated);
+
+                    if(typeof listenerInitiated === "undefined" || listenerInitiated === null){
+
+                        for (let i = 0; i < firebasePathToWatch.length; i++) {
+
+                            let _firebasePathToWatch =  firebasePathToWatch[i];
+
+                            if(typeof userData === "object"){
+
+                                _firebasePathToWatch = _firebasePathToWatch.format(userData.uid);
+
+                            }
+
+                            $f7.appFirebase.module.authentication.databaseListen(_firebasePathToWatch);
+
+                        }
+
+                        $f7.appFirebase.module.authentication.listenerInitiated = true;
+
+                    }
+
+                    $f7.appFirebase.module.authentication.saveDevice();
+
+                    saveLocalUserData(userData);
+
+                    // ADDRESSES
+
+                    let addressesPath = 'accounts/users/' + user.uid + '/addresses';
+
+                    $f7.data.addresses = [];
+
+                    let firebaseRefAddresses = firebase.database().ref(addressesPath);
+
+                    firebaseRefAddresses.on('value', function (snapshot) {
+
+                        let user_addresses = snapshot.val();
+
+                        if (user_addresses === false || user_addresses === null || user_addresses.length === 0 && typeof user_addresses !== "object") {
+
+                            console.log(":: ADDRESSES SNAPSHOT [NULL]::", user_addresses);
+
+                        } else {
+
+                            let _address_list = [];
+
+                            $f7.appData.module.data.setData("address_object", user_addresses);
+
+                            if( user_addresses !== null ) {
+
+                                $f7.data.metaDataFirebaseUserAddressesArray = Object.keys(user_addresses).map((key) => [key, user_addresses[key]]);
+
+                                $f7.data.metaDataFirebaseUserAddresses = user_addresses;
+
+                            }
+
+                            let _outlets = $f7.appData.module.data.getData().firebaseDataLocalObject.about.outlets;
+
+                            $f7.data.metaDataFirebaseUserOutlets = _outlets;
+
+                            $f7.data.metaDataFirebaseUserOutletsArray = Object.keys(_outlets).map((key) => [key, _outlets[key]]);
+
+                            addressesObject = $f7.data.metaDataFirebaseUserAddressesArray;
+
+                            $f7.emit("ON_FIREBASE_AUTH_USER_DATA_UPDATED_F7_ADDRESSES", addressesObject);
+
+                            $f7.appData.module.data.setData("metaDataFirebaseUserOutlets", _outlets);
+
+                            $f7.appData.module.data.setData("metaDataFirebaseUserOutletsArray", $f7.data.metaDataFirebaseUserOutletsArray);
+
+                            $f7.appData.module.data.setData("metaDataFirebaseUserAddressesArray", $f7.data.metaDataFirebaseUserAddressesArray);
+
+                            $f7.appData.module.data.setData("metaDataFirebaseUserAddresses", user_addresses);
+
+                            $f7.emit('ON_FIREBASE_AUTH_USER_METADATA_ADDRESSES', user_addresses);
+
+                            for (const key in user_addresses) {
+
+                                _address_list.push(user_addresses[key]);
+
+                            }
+
+                            $f7.data.addresses = _address_list;
+
+                            $f7.appData.module.data.setData("_address_list", _address_list);
+
+                            console.log(":: ADDRESSES SNAPSHOT [OK]::", $f7.data.addresses);
+
+                            $f7.emit("SNAPSHOT_ADDRESSES", user_addresses, _address_list);
+
+                        }
+
+                    });
+
+                    // ORDERS
+
+                    let ordersPath = 'accounts/users/' + user.uid + '/orders';
+
+                    $f7.data.orders = [];
+
+                    let firebaseRefOrders = firebase.database().ref(ordersPath);
+
+                    firebaseRefOrders.on('value', function (snapshot) {
+
+                        let user_orders = snapshot.val();
+
+                        if (user_orders === false || user_orders === null || user_orders.length === 0 && typeof user_orders !== "object") {
+
+                            console.log(":: ORDERS SNAPSHOT [NULL]::", user_orders);
+
+                        } else {
+
+                            let _orders_list = [];
+
+                            $f7.appData.module.data.setData("order_object", user_orders);
+
+                            if( user_orders !== null ) {
+
+                                $f7.data.metaDataFirebaseUserOrdersArray = Object.keys(user_orders).map((key) => [key, user_orders[key]]);
+
+                                $f7.data.metaDataFirebaseUserOrders = user_orders;
+
+                            }
+
+                            $f7.appData.module.data.setData("metaDataFirebaseUserOrdersArray", $f7.data.metaDataFirebaseUserOrdersArray);
+
+                            $f7.appData.module.data.setData("metaDataFirebaseUserOrders", user_orders);
+
+                            $f7.emit('ON_FIREBASE_AUTH_USER_METADATA_ORDERS', user_orders);
+
+                            for (const key in user_orders) {
+
+                                _orders_list.push(user_orders[key]);
+
+                            }
+
+                            $f7.data.orders = _orders_list;
+
+                            $f7.appData.module.data.setData("_orders_list", _orders_list);
+
+                            console.log(":: ORDERS SNAPSHOT [OK]::", user_orders, $f7.data.orders);
+
+                            $f7.emit("SNAPSHOT_ORDERS", _orders_list);
+
+                        }
+
+                    });
+
+                    // CART
+
+                    let cartPath = 'accounts/users/' + user.uid + '/cart';
+
+                    $f7.data.cart = {};
+
+                    let firebaseRefCart = firebase.database().ref(cartPath);
+
+                    firebaseRefCart.on('value', function (snapshot) {
+
+                        let user_cart = snapshot.val();
+
+                        if (user_cart === false || user_cart === null || user_cart.length === 0 && typeof user_cart !== "object") {
+
+                            console.log(":: CART SNAPSHOT [NULL]::", user_cart);
+
+                        } else {
+
+                            let _cart_list = []
+
+                            $f7.appData.module.data.setData("cart_object", user_cart);
+
+                            if( user_cart !== null ) {
+
+                                $f7.data.metaDataFirebaseUserCart = user_cart;
+
+                            }
+
+                            $f7.appData.module.data.setData("metaDataFirebaseUserCart", user_cart);
+
+                            $f7.emit('ON_FIREBASE_AUTH_USER_METADATA_CART', user_cart);
+
+                            $$(".center-button-counter").text(user_cart.cart_total_items);
+
+                            $f7.emit("CART_UPDATE", user_cart);
+
+                            for (const key in user_cart) {
+
+                                _cart_list.push(user_cart[key]);
+
+                                $f7.data[key] = user_cart[key];
+
+                            }
+
+                            $f7.appData.module.data.setData("_cart_list", _cart_list);
+
+                            console.log(":: CART SNAPSHOT [OK]::", user_cart, $f7.data.cartx);
+
+                            $f7.emit("SNAPSHOT_CART", _cart_list);
+
+                        }
+
+                    });
+
+                    // NOTIFICATIONS
+
+                    let notificationsPath = 'accounts/users/' + user.uid + '/notifications';
+
+                    $f7.data.notifications = [];
+
+                    let firebaseRefNotifications = firebase.database().ref(notificationsPath);
+
+                    firebaseRefNotifications.on('value', function (snapshot) {
+
+                        let user_notifications = snapshot.val();
+
+                        if (user_notifications === false || user_notifications === null || user_notifications.length === 0 && typeof user_notifications !== "object") {
+
+                            console.log(":: NOTIFICATIONS SNAPSHOT [NULL]::", user_notifications);
+
+                        } else {
+
+                            let _notifications_list = [];
+
+                            $f7.appData.module.data.setData("notification_object", user_notifications);
+
+                            if( user_notifications !== null ) {
+
+                                $f7.data.metaDataFirebaseUserNotificationsArray = Object.keys(user_notifications).map((key) => [key, user_notifications[key]]);
+
+                                $f7.data.metaDataFirebaseUserNotifications = user_notifications;
+
+                            }
+
+                            $f7.appData.module.data.setData("metaDataFirebaseUserNotificationsArray", Object.keys(user_notifications).map((key) => [key, user_notifications[key]]));
+
+                            $f7.appData.module.data.setData("metaDataFirebaseUserNotifications", user_notifications);
+
+                            $f7.emit('ON_FIREBASE_AUTH_USER_METADATA_NOTIFICATIONS', user_notifications);
+
+                            for (const key in user_notifications) {
+
+                                _notifications_list.push(user_notifications[key]);
+
+                            }
+
+                            $f7.data.notifications = _notifications_list;
+
+                            $f7.appData.module.data.setData("_notifications_list", _notifications_list);
+
+                            console.log(":: NOTIFICATIONS SNAPSHOT [OK]::", user_notifications, $f7.data.notifications);
+
+                        }
+
+                    });
+
+                    // USER DETAILS
+
+                    let user_account_detailsPath = 'accounts/users/' + user.uid;
+
+                    $f7.data.user_account_details = [];
+
+                    let firebaseRefUser_account_details = firebase.database().ref(user_account_detailsPath);
+
+                    firebaseRefUser_account_details.on('value', function (snapshot) {
+
+                        let user_user_account_details = snapshot.val();
+
+                        if (user_user_account_details === false || user_user_account_details === null || user_user_account_details.length === 0 && typeof user_user_account_details !== "object") {
+
+                            console.log(":: USER_ACCOUNT_DETAILS SNAPSHOT [NULL]::", user_user_account_details);
+
+                        } else {
+
+                            user_user_account_details.meta = {
+                                uid: user.uid,
+                                displayName: user.displayName,
+                                photoURL: user.photoURL,
+                                email: user.email
+                            };
+
+                            const _user_account_details_list = [];
+
+                            for (const key in user_user_account_details) {
+
+                                _user_account_details_list.push(user_user_account_details[key]);
+
+                            }
+
+                            $f7.appData.module.data.setData("user_object", user_user_account_details);
+
+                            $f7.appData.module.data.setData("metaDataFirebaseUserUser", user_user_account_details);
+
+                            $f7.data.metaDataFirebaseUserUser = user_user_account_details;
+
+                            $f7.emit("ON_FIREBASE_AUTH_USER_METADATA", user_user_account_details);
+
+                            $f7.data.user_account_details = _user_account_details_list;
+
+                            $f7.appData.module.data.setData("_user_account_details_list", _user_account_details_list);
+
+                            console.log(":: USER_ACCOUNT_DETAILS SNAPSHOT [OK]::", $f7.data.user_account_details);
+
+                        }
+
+                    });
+
+                    $f7.emit("ON_FIREBASE_AUTH_USER_DATA_UPDATED_F7", user);
+
+                    $f7.data.metaDataFirebaseLoaded = true;
+
+                }
+
+                $update();
+
+            });
+
+            window.addEventListener($f7.appFirebase.events.ON_FIREBASE_AUTH_STATE_CHANGED, function (e) {
+
+                console.log("ON_FIREBASE_AUTH_STATE_CHANGED", e.detail.loggedIn, "ON_FIREBASE_AUTH_STATE_CHANGED");
+
+                $f7.dialog.close();
+
+                // Check if the user is logged in
+                if(isDefined(e.detail.loggedIn)){
+
+                    let userData = $f7.appFirebase.module.authentication.getUserData();
+
+                    saveLocalUserData(userData);
+
+                }
+
+                $update();
+
+            });
+
+            window.addEventListener($f7.appFirebase.events.ON_FIREBASE_REMOTE_DATA_CHANGED, function (e) {
+
+                let data = e.detail;
+
+                let user = $f7.appFirebase.module.authentication.getUserData();
+
+                if(data.path === "accounts/{0}/children".format(user.uid)) {
+
+                    console.log("::MOTHER PATH ::", "accounts/{0}/children".format(user.uid));
+
+                    if(data.value !== null)
+                    {
+
+                        console.log("::SET CHILDREN TO ::", data.value);
+
+                        $f7.appData.module.data.setLocalUserData("children", data.value);
+
+                    }
+
+                }
+
+                $update();
+
+            });
+
+            $update();
+
+        });
+
+        $on('pageMounted', (e, page) => {
+            console.log('page_title:', page_title, 'page mounted');
+        });
+
+        $on('pageBeforeIn', (e, page) => {
+            console.log('page_title:', page_title, 'page before in');
+
+            if(!$f7.data.metaDataFirebaseLoaded){
+
+                let _metaDataFirebaseUserAddresses = {};
+                let _metaDataFirebaseUserAddressesArray = [];
+                let _metaDataFirebaseUserOutlets = {};
+                let _metaDataFirebaseUserOutletsArray = [];
+                let _metaDataFirebaseUserCart = {};
+                let _metaDataFirebaseUserOrders = {};
+                let _metaDataFirebaseUserOrdersArray = {};
+                let _metaDataFirebaseUserUser = {};
+                let _metaDataFirebaseUserNotifications = {};
+                let _metaDataFirebaseUserNotificationsArray = [];
+
+
+                //ADDRESSES
+                try {
+
+                    _metaDataFirebaseUserAddresses = $f7.appData.module.data.getData("metaDataFirebaseUserAddresses");
+
+                    if (typeof _metaDataFirebaseUserAddresses !== "object"){
+
+                        _metaDataFirebaseUserAddresses = JSON.parse(_metaDataFirebaseUserAddresses);
+
+                    }
+
+                }catch (e) {
+
+                    _metaDataFirebaseUserAddresses = {};
+
+                }
+
+                //ADDRESSES ARRAY
+                try {
+
+                    _metaDataFirebaseUserAddressesArray = $f7.appData.module.data.getData("metaDataFirebaseUserAddressesArray");
+
+                    if (typeof _metaDataFirebaseUserAddressesArray !== "object"){
+
+                        _metaDataFirebaseUserAddressesArray = JSON.parse(_metaDataFirebaseUserAddressesArray);
+
+                    }
+
+                }catch (e) {
+
+                    _metaDataFirebaseUserAddressesArray = {};
+
+                }
+
+                //OUTLETS
+                try {
+
+                    _metaDataFirebaseUserOutlets = $f7.appData.module.data.getData("metaDataFirebaseUserOutlets");
+
+                    if (typeof _metaDataFirebaseUserOutlets !== "object"){
+
+                        _metaDataFirebaseUserOutlets = JSON.parse(_metaDataFirebaseUserOutlets);
+
+                    }
+
+                }catch (e) {
+
+                    _metaDataFirebaseUserOutlets = {};
+
+                }
+
+                //OUTLETS ARRAY
+                try {
+
+                    _metaDataFirebaseUserOutletsArray = $f7.appData.module.data.getData("metaDataFirebaseUserOutletsArray");
+
+                    if (typeof _metaDataFirebaseUserOutletsArray !== "object"){
+
+                        _metaDataFirebaseUserOutletsArray = JSON.parse(_metaDataFirebaseUserOutletsArray);
+
+                    }
+
+                }catch (e) {
+
+                    _metaDataFirebaseUserOutletsArray = {};
+
+                }
+
+                //CART
+                try {
+
+                    _metaDataFirebaseUserCart = $f7.appData.module.data.getData("metaDataFirebaseUserCart");
+
+                    if (typeof _metaDataFirebaseUserCart !== "object"){
+
+                        _metaDataFirebaseUserCart = JSON.parse(_metaDataFirebaseUserCart);
+
+                    }
+
+                }catch (e) {
+
+                    _metaDataFirebaseUserAddressesArray = {};
+
+                }
+
+                //ORDERS
+                try {
+
+                    _metaDataFirebaseUserOrders = $f7.appData.module.data.getData("metaDataFirebaseUserOrders");
+
+                    if (typeof _metaDataFirebaseUserOrders !== "object"){
+
+                        _metaDataFirebaseUserOrders = JSON.parse(_metaDataFirebaseUserOrders);
+
+                    }
+
+                }catch (e) {
+
+                    _metaDataFirebaseUserOrders = {};
+
+                }
+
+                //ORDERS ARRAY
+                try {
+
+                    _metaDataFirebaseUserOrdersArray = $f7.appData.module.data.getData("metaDataFirebaseUserOrdersArray");
+
+                    if (typeof _metaDataFirebaseUserOrdersArray !== "object"){
+
+                        _metaDataFirebaseUserOrdersArray = JSON.parse(_metaDataFirebaseUserOrdersArray);
+
+                    }
+
+                }catch (e) {
+
+                    _metaDataFirebaseUserOrdersArray = {};
+
+                }
+
+                //USER
+                try {
+
+                    _metaDataFirebaseUserUser = $f7.appData.module.data.getData("metaDataFirebaseUserUser");
+
+                    if (typeof _metaDataFirebaseUserUser !== "object"){
+
+                        _metaDataFirebaseUserUser = JSON.parse(_metaDataFirebaseUserUser);
+
+                    }
+
+                }catch (e) {
+
+                    _metaDataFirebaseUserUser = {};
+
+                }
+
+                //NOTIFICATIONS
+                try {
+
+                    _metaDataFirebaseUserNotifications = $f7.appData.module.data.getData("metaDataFirebaseUserNotifications");
+
+                    if (typeof _metaDataFirebaseUserNotifications !== "object"){
+
+                        _metaDataFirebaseUserNotifications = JSON.parse(_metaDataFirebaseUserNotifications);
+
+                    }
+
+                }catch (e) {
+
+                    _metaDataFirebaseUserNotifications = {};
+
+                }
+
+                //NOTIFICATIONS ARRAY
+                try {
+
+                    _metaDataFirebaseUserNotificationsArray = $f7.appData.module.data.getData("metaDataFirebaseUserNotificationsArray");
+
+                    if (typeof _metaDataFirebaseUserNotificationsArray !== "object"){
+
+                        _metaDataFirebaseUserNotificationsArray = JSON.parse(_metaDataFirebaseUserNotificationsArray);
+
+                    }
+
+                }catch (e) {
+
+                    _metaDataFirebaseUserNotificationsArray = {};
+
+                }
+
+                if( _metaDataFirebaseUserAddresses !== null){
+
+                    $f7.data.metaDataFirebaseUserAddresses = _metaDataFirebaseUserAddresses;
+
+                }
+
+                if( _metaDataFirebaseUserAddressesArray !== null){
+
+                    $f7.data.metaDataFirebaseUserAddressesArray = _metaDataFirebaseUserAddressesArray;
+
+                }
+
+                if( _metaDataFirebaseUserOutlets !== null){
+
+                    $f7.data.metaDataFirebaseUserOutlets = _metaDataFirebaseUserOutlets;
+
+                }
+
+                if( _metaDataFirebaseUserOutletsArray !== null){
+
+                    $f7.data.metaDataFirebaseUserOutletsArray = _metaDataFirebaseUserOutletsArray;
+
+                }
+
+                if( _metaDataFirebaseUserCart !== null){
+
+                    $f7.data.metaDataFirebaseUserCart = _metaDataFirebaseUserCart;
+
+                }
+
+                if( _metaDataFirebaseUserOrders !== null){
+
+                    $f7.data.metaDataFirebaseUserOrders = _metaDataFirebaseUserOrders;
+
+                }
+
+                if( _metaDataFirebaseUserOrdersArray !== null){
+
+                    $f7.data.metaDataFirebaseUserOrdersArray = _metaDataFirebaseUserOrdersArray;
+
+                }
+
+                if( _metaDataFirebaseUserUser !== null){
+
+                    $f7.data.metaDataFirebaseUserUser = _metaDataFirebaseUserUser;
+
+                }
+
+                if( _metaDataFirebaseUserNotifications !== null){
+
+                    $f7.data.metaDataFirebaseUserNotifications = _metaDataFirebaseUserNotifications;
+
+                }
+
+                if( _metaDataFirebaseUserNotificationsArray !== null){
+
+                    $f7.data.metaDataFirebaseUserNotificationsArray = _metaDataFirebaseUserNotificationsArray;
+
+                }
+
+                $f7.data.metaDataFirebaseLoaded = false;
+
+            }
+
+        });
+        $on('pageAfterIn', (e, page) => {
+
+            console.log('page_title:', page_title, 'page after in');
+
+            setTimeout(function(){
+
+                $$(".drawer-link-a").on('click', function () {
+
+                    doMenuAction($$(this).attr("data-path"));
+
+                });
+
+            },3000);
+
+        });
+        $on('pageBeforeOut', (e, page) => {
+            console.log('page_title:', page_title, 'page before out');
+        });
+        $on('pageAfterOut', (e, page) => {
+            console.log('page_title:', page_title, 'page after out');
+        });
+        $on('pageBeforeUnmount', (e, page) => {
+            console.log('page_title:', page_title, 'page before unmount');
+        });
+        $on('pageBeforeRemove', (e, page) => {
+            console.log('page_title:', page_title, 'page before remove');
+        });
+
+        return $render;
+
+    }
+
+</script>
+
+<style>
+
+    .item-inner.address-inner.padding-right-0:before{
+        display: none !important;
+    }
+
+</style>
