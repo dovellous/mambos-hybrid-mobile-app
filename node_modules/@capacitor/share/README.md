@@ -11,6 +11,9 @@ API](https://web.dev/web-share/)), though web support is currently spotty.
 npm install @capacitor/share
 npx cap sync
 ```
+## Android
+
+By default, Capacitor apps only allow to share files from caches folder. To make other Android folders shareable, they have to be added in `android/app/src/main/res/xml/file_paths.xml` file. Check the Specifying Available Files section in [FileProvider docs](https://developer.android.com/reference/androidx/core/content/FileProvider) for the available locations.
 
 ## Example
 
@@ -31,6 +34,7 @@ Each platform uses a different set of fields, but you should supply them all.
 
 <docgen-index>
 
+* [`canShare()`](#canshare)
 * [`share(...)`](#share)
 * [Interfaces](#interfaces)
 
@@ -38,6 +42,21 @@ Each platform uses a different set of fields, but you should supply them all.
 
 <docgen-api>
 <!--Update the source file JSDoc comments and rerun docgen to update the docs below-->
+
+### canShare()
+
+```typescript
+canShare() => Promise<CanShareResult>
+```
+
+Check if sharing is supported.
+
+**Returns:** <code>Promise&lt;<a href="#canshareresult">CanShareResult</a>&gt;</code>
+
+**Since:** 1.1.0
+
+--------------------
+
 
 ### share(...)
 
@@ -59,6 +78,13 @@ Show a Share modal for sharing content with other apps
 
 
 ### Interfaces
+
+
+#### CanShareResult
+
+| Prop        | Type                 | Description                          | Since |
+| ----------- | -------------------- | ------------------------------------ | ----- |
+| **`value`** | <code>boolean</code> | Whether sharing is supported or not. | 1.1.0 |
 
 
 #### ShareResult

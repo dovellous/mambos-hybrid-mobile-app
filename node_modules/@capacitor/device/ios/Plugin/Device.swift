@@ -34,6 +34,22 @@ import Foundation
     }
 
     /**
+     * Get real free disk space
+     */
+    public func getRealFreeDiskSize() -> Int64? {
+        do {
+            let values = try URL(fileURLWithPath: NSHomeDirectory() as String).resourceValues(forKeys: [URLResourceKey.volumeAvailableCapacityForImportantUsageKey])
+            if let available = values.volumeAvailableCapacityForImportantUsage {
+                return available
+            } else {
+                return nil
+            }
+        } catch {
+            return nil
+        }
+    }
+
+    /**
      * Get total disk size
      */
     public func getTotalDiskSize() -> Int64? {
@@ -48,5 +64,17 @@ import Foundation
 
     public func getLanguageCode() -> String {
         return String(Locale.preferredLanguages[0].prefix(2))
+    }
+
+    public func getLanguageTag() -> String {
+        return String(Locale.preferredLanguages[0])
+    }
+
+    public func getModelName() -> String {
+        var size = 0
+        sysctlbyname("hw.machine", nil, &size, nil, 0)
+        var machine = [CChar](repeating: 0, count: size)
+        sysctlbyname("hw.machine", &machine, &size, nil, 0)
+        return String(cString: machine)
     }
 }
